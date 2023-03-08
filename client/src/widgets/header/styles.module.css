@@ -1,0 +1,40 @@
+.header {
+  display: flex;
+  height: 50px;
+  width: 80%;
+  margin: 0 auto;
+  align-items: center;
+  position: relative;
+}
+.logo {
+  height: 35px;
+  object-fit: cover;
+  object-position: center;
+}
+.search {
+  margin-left: 20px;
+  background: lightgrey;
+  border: 0;
+  outline: 0;
+  padding: 3px 10px;
+  border-radius: 10px;
+}
+.menu_handle {
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+  margin-left: auto;
+  margin-right: 10px;
+}
+.menuAvatar {
+  height: 35px;
+  width: 35px;
+  border-radius: 50%;
+}
+.menuAvatar img {
+  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  object-position: center;
+  object-fit: cover;
+}

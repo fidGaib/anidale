@@ -1,0 +1,19 @@
+#loading {
+  background: rgba(169, 169, 169, 0.538);
+  animation-name: placeHolder;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease;
+  animation-duration: 1s;
+  border: 0;
+}
+#loading img {
+  visibility: hidden;
+}
+@keyframes placeHolder {
+  0% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 1;
+  }
+}

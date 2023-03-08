@@ -1,0 +1,31 @@
+/* wrapPreview */
+.wrapPreview {
+  width: 100%;
+  background: #fff;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  padding-left: 20px;
+}
+.wrapPreview div {
+  width: 150px;
+  height: 150px;
+  border-radius: 5px;
+  transition: all 0.3s;
+  padding: 0.5px;
+}
+.wrapPreview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 5px;
+  object-position: center;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.wrapPreview div:hover {
+  opacity: 0.8;
+}

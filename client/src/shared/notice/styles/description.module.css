@@ -1,0 +1,10 @@
+.description {
+  margin: 10px;
+  overflow: hidden;
+  max-height: 100px;
+
+  word-wrap: break-word;
+  display: table-cell;
+  white-space: normal;
+  hyphens: auto;
+}

@@ -1,0 +1,20 @@
+/* list sett */
+.listSettings {
+  width: 15%;
+  padding: 5px;
+  padding-right: 0;
+}
+.listSettings li {
+  padding: 7px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: all 0.3s;
+}
+.listSettings .active {
+  border-left: 2px solid brown;
+  background: rgba(211, 211, 211, 0.513);
+}
+.listSettings li:hover {
+  border-left: 2px solid brown;
+  background: rgba(211, 211, 211, 0.513);
+}
