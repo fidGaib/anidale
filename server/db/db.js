@@ -1,9 +1,6 @@
-const { Sequelize } = require('sequelize')
+import { Sequelize } from 'sequelize'
 
-module.exports = new Sequelize (
-    process.env.DB_LINK,
-    {
-        logging: false,
-        freezeTableName: true
-    }
-)
+export default new Sequelize(process.env.DB_LINK, {
+  logging: false,
+  freezeTableName: true,
+})

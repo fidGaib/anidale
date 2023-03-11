@@ -1,9 +1,9 @@
-const Router = require("express");
-const router = new Router();
-const userRouter = require("./route/user-router");
-const noticeRouter = require("./route/notice-router");
+import Router from 'express'
+const router = new Router()
+import userRouter from './route/user-router'
+import noticeRouter from './route/notice-router'
 
-router.use("/user", userRouter);
-router.use("/notice", noticeRouter);
+router.use('/user', userRouter)
+router.use('/notice', noticeRouter)
 
-module.exports = router;
+export default router
