@@ -1,7 +1,9 @@
 import Router from 'express'
-import userController from '../../api/user/user-controller'
-const router = new Router()
 import { body } from 'express-validator'
+
+import userController from '../../api/user/user-controller'
+
+const router = new Router()
 
 router.post(
   '/login',

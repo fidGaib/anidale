@@ -1,6 +1,8 @@
+import { validationResult } from 'express-validator'
+
 import ApiError from '../error/ApiError'
 import noticeService from './notice-service'
-import { validationResult } from 'express-validator'
+
 class noticeController {
   async create(req, res, next) {
     try {

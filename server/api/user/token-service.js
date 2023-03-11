@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken'
+
 import Token from '../../db/models/token-model'
 
 class tokenService {

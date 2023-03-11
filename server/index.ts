@@ -1,14 +1,14 @@
-import * as dotenv from 'dotenv'
-dotenv.config()
-
-import express from 'express'
-import sequelize from './db/db'
-import cors from 'cors'
-import router from './routes'
-import ErrorHandlingMiddleware from './api/middleware/ErrorHandlingMiddleware'
-const PORT = process.env.PORT
-import fileUpload from 'express-fileupload'
 import cookieParser from 'cookie-parser'
+import cors from 'cors'
+import express from 'express'
+import fileUpload from 'express-fileupload'
+
+import ErrorHandlingMiddleware from './api/middleware/ErrorHandlingMiddleware'
+import sequelize from './db/db'
+import router from './routes'
+
+const PORT = process.env.PORT
+
 const app = express()
 
 app.use(

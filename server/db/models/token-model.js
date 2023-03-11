@@ -1,4 +1,5 @@
 import DataTypes from 'sequelize'
+
 import sequelize from '../db'
 
 const Token = sequelize.define(

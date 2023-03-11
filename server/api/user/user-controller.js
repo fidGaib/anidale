@@ -1,6 +1,7 @@
+import { validationResult } from 'express-validator'
+
 import ApiError from '../error/ApiError'
 import userService from './user-service'
-import { validationResult } from 'express-validator'
 
 class userController {
   async login(req, res, next) {

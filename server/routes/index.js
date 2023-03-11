@@ -1,7 +1,9 @@
 import Router from 'express'
-const router = new Router()
-import userRouter from './route/user-router'
+
 import noticeRouter from './route/notice-router'
+import userRouter from './route/user-router'
+
+const router = new Router()
 
 router.use('/user', userRouter)
 router.use('/notice', noticeRouter)

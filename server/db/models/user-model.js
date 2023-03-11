@@ -1,5 +1,6 @@
-import sequelize from '../db'
 import DataTypes from 'sequelize'
+
+import sequelize from '../db'
 import { Notice } from './notice-model'
 
 const User = sequelize.define(

@@ -1,5 +1,5 @@
-import { access, writeFile } from 'node:fs/promises'
 import { randomBytes } from 'node:crypto'
+import { access, writeFile } from 'node:fs/promises'
 
 async function generateEnv() {
   if (

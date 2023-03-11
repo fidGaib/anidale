@@ -1,8 +1,8 @@
-import ApiError from '../error/ApiError'
-import { v4 } from 'uuid'
+import { unlink } from 'fs'
 import { join } from 'path'
 import sharp from 'sharp'
-import { unlink, writeFile } from 'fs'
+import { v4 } from 'uuid'
+
 class fileService {
   directory = join(__dirname, '../uploads')
   async validate(file, maxSize, mimetype) {
