@@ -1,6 +1,5 @@
-import { Sequelize } from 'sequelize'
+import { PrismaClient } from '@prisma/client'
 
-export default new Sequelize(process.env.DB_LINK, {
-  logging: false,
-  freezeTableName: true,
-})
+const prisma = new PrismaClient()
+
+export default prisma

@@ -1,28 +1,8 @@
-import DataTypes from 'sequelize'
+import prisma from '../db'
 
-import sequelize from '../db'
+prisma.notice
 
-const Notice = sequelize.define(
-  'notice',
-  {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    description: { type: DataTypes.STRING },
-    date: { type: DataTypes.STRING, allowNull: false },
-  },
-  { timestamps: false },
-)
-const NoticeImage = sequelize.define(
-  'notice_image',
-  {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    minimize: { type: DataTypes.STRING },
-    oversize: { type: DataTypes.STRING },
-    vertical: { type: DataTypes.BOOLEAN },
-  },
-  { timestamps: false },
-)
-
-Notice.hasMany(NoticeImage)
-NoticeImage.belongsTo(Notice)
+const Notice = prisma.notice
+const NoticeImage = prisma.noticeImage
 
 export { Notice, NoticeImage }

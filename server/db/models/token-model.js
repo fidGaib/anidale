@@ -1,15 +1,5 @@
-import DataTypes from 'sequelize'
+import prisma from '../db'
 
-import sequelize from '../db'
-
-const Token = sequelize.define(
-  'token',
-  {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    user: { type: DataTypes.INTEGER, allowNull: false },
-    refreshToken: { type: DataTypes.TEXT, allowNull: false },
-  },
-  { timestamps: false },
-)
+const Token = prisma.token
 
 export default Token

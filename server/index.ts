@@ -4,7 +4,6 @@ import express from 'express'
 import fileUpload from 'express-fileupload'
 
 import ErrorHandlingMiddleware from './api/middleware/ErrorHandlingMiddleware'
-import sequelize from './db/db'
 import router from './routes'
 
 const PORT = process.env.PORT
@@ -26,8 +25,6 @@ app.use('/api', router)
 app.use(ErrorHandlingMiddleware)
 const start = async () => {
   try {
-    await sequelize.authenticate()
-    await sequelize.sync()
     app.listen(PORT, () => console.log(`Server started on port ${PORT}`))
   } catch (e) {
     console.log(e)

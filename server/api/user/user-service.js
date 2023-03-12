@@ -12,18 +12,21 @@ class userService {
     try {
       if (!email) throw ApiError.badRequest('Введите email.')
       if (!pass) throw ApiError.badRequest('Введите пароль.')
-      const candidate = await User.findOne({ where: { email } })
+      const candidate = await User.findUnique({ where: { email } })
       if (candidate) throw ApiError.badRequest('Такой пользователь уже существует.')
       let defaultLogin = Math.round(Math.random() * 99999999)
       const avatar_random = Math.round(Math.random() * avatar.length)
       const hashPass = await hash(pass, 10)
       const activationLink = v4()
       const user = await User.create({
-        email,
-        pass: hashPass,
-        activationLink,
-        login: `bot#` + defaultLogin,
-        avatar: avatar[avatar_random],
+        data: {
+          email,
+          pass: hashPass,
+          activationLink,
+          isActivated: false,
+          login: `bot#` + defaultLogin,
+          avatar: avatar[avatar_random],
+        },
       })
       const userDto = new UserDto(user)
       const tokens = tokenService.generateTokens({ ...userDto })
@@ -33,14 +36,14 @@ class userService {
         user: userDto,
       }
     } catch (e) {
-      throw ApiError.badRequest(e.message)
+      throw ApiError.badRequest(e instanceof Error ? e.message : '')
     }
   }
   async login(email, pass) {
     try {
       if (!email) throw ApiError.badRequest('Введите email.')
       if (!pass) throw ApiError.badRequest('Введите пароль.')
-      const candidate = await User.findOne({ where: { email } })
+      const candidate = await User.findUnique({ where: { email } })
       if (!candidate) throw ApiError.badRequest('Такого пользователя не существует.')
       const isPassEquals = await compare(pass, candidate.pass)
       if (!isPassEquals) throw ApiError.badRequest('Не верный пароль.')
@@ -49,7 +52,7 @@ class userService {
       await tokenService.saveToken(userDto.id, tokens.refreshToken)
       return { ...tokens, user: userDto }
     } catch (e) {
-      throw ApiError.badRequest(e.message)
+      throw ApiError.badRequest(e instanceof Error ? e.message : '')
     }
   }
   async logout(refreshToken) {
@@ -67,7 +70,7 @@ class userService {
       const userData = tokenService.validateRefreshToken(refreshToken)
       const tokenFromDb = await tokenService.findToken(refreshToken)
       if (!userData || !tokenFromDb) throw ApiError.UnathorizedError()
-      const user = await User.findByPk(userData.id)
+      const user = await User.findUnique({ where: { id: userData.id } })
       const userDto = new UserDto(user)
       const tokens = tokenService.generateTokens({ ...userDto })
       await tokenService.saveToken(userDto.id, tokens.refreshToken)
@@ -77,24 +80,24 @@ class userService {
         user: userDto,
       }
     } catch (e) {
-      throw ApiError.badRequest(e.message)
+      throw ApiError.badRequest(e instanceof Error ? e.message : '')
     }
   }
   async fetchOne(id) {
     try {
-      const user = await User.findOne({ where: { id } })
+      const user = await User.findUnique({ where: { id } })
       const userDto = new UserDto(user)
       return { user: userDto }
     } catch (e) {
-      throw ApiError.badRequest(e.message)
+      throw ApiError.badRequest(e instanceof Error ? e.message : '')
     }
   }
   async fetchAll() {
     try {
-      const users = await User.findAll()
+      const users = await User.findMany()
       return { users }
     } catch (e) {
-      throw ApiError.badRequest(e.message)
+      throw ApiError.badRequest(e instanceof Error ? e.message : '')
     }
   }
 }
