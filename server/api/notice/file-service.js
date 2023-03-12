@@ -1,4 +1,4 @@
-import { unlink } from 'fs'
+import { mkdirSync, unlink } from 'fs'
 import { join } from 'path'
 import sharp from 'sharp'
 import { v4 } from 'uuid'
@@ -27,6 +27,7 @@ class fileService {
       let fileName = v4()
       let type = file.mimetype.split('/')
       let dirname = join(this.directory, `_${user_id}`, cat)
+      mkdirSync(dirname, { recursive: true })
       //let fullImg = `${fileName}.${type[1]}`;
       let minImg = `min_${fileName}.${type[1]}`
 
