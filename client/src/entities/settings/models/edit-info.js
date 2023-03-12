@@ -1,35 +1,35 @@
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable } from 'mobx'
 
 class EditProfile {
-  avatar = [];
-  email = "";
-  login = "";
+  avatar = []
+  email = ''
+  login = ''
   constructor() {
-    makeAutoObservable(this);
+    makeAutoObservable(this)
   }
   setAvatar(obj) {
-    this.avatar = [];
-    this.avatar.push(obj);
+    this.avatar = []
+    this.avatar.push(obj)
   }
   addAvatar(objFile) {
-    let file = Array.from(objFile);
-    file = file[0];
-    this.setAvatar(file);
+    let file = Array.from(objFile)
+    file = file[0]
+    this.setAvatar(file)
   }
   setEmail(val) {
-    this.email = val;
+    this.email = val
   }
   setLogin(val) {
-    this.login = val;
+    this.login = val
   }
   async validate() {
-    if (!this.email || !this.login) return 0;
-    else return 1;
+    if (!this.email || !this.login) return 0
+    else return 1
   }
   async sendInfo() {
-    const validate = await editProfile.validate();
+    const validate = await editProfile.validate()
     if (validate) {
-    } else return;
+    } else return
   }
 }
-export const editProfile = new EditProfile();
+export const editProfile = new EditProfile()

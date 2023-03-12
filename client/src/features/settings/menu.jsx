@@ -1,5 +1,6 @@
-import { settingController } from "../../pages/settings/model";
-import cl from "./style.module.css";
+import { settingController } from '../../pages/settings/model'
+import cl from './style.module.css'
+
 const Menu = () => {
   return (
     <div className={cl.listSettings}>
@@ -7,15 +8,15 @@ const Menu = () => {
         <li
           key={list.id}
           onClick={() => {
-            settingController.handleSett(list.id);
+            settingController.handleSett(list.id)
           }}
-          className={list.active ? cl.active : ""}
+          className={list.active ? cl.active : ''}
         >
           {list.body}
         </li>
       ))}
     </div>
-  );
-};
+  )
+}
 
-export default Menu;
+export default Menu

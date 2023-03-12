@@ -1,43 +1,41 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { noticeService } from "../../services/notice-service";
-import Image from "../../shared/hooks/onLoadImage/onLoadImage";
-import { useFetching } from "../../shared/hooks/useFetching";
-import cl from "./styles/load-art.module.css";
+import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
+
+import { noticeService } from '../../services/notice-service'
+import Image from '../../shared/hooks/onLoadImage/onLoadImage'
+import { useFetching } from '../../shared/hooks/useFetching'
+import cl from './styles/load-art.module.css'
+
 const LoadArt = () => {
-  const url = "http://localhost:5000/api/uploads/";
-  const params = useParams();
-  const [arts, setArts] = useState([]);
-  const [artsRevers, setArtsRevers] = useState([]);
+  const url = 'http://localhost:5000/api/uploads/'
+  const params = useParams()
+  const [arts, setArts] = useState([])
+  const [artsRevers, setArtsRevers] = useState([])
 
   const [fetching, isLoading, error] = useFetching(async () => {
-    const { notices, users, count } = await noticeService.fetchByUser(
-      parseInt(params.id),
-      10,
-      0
-    );
+    const { notices, users, count } = await noticeService.fetchByUser(parseInt(params.id), 10, 0)
     notices.forEach((notice) => {
-      setArts((prev) => [...notice.notice_images, ...prev]);
-    });
-  });
+      setArts((prev) => [...notice.notice_images, ...prev])
+    })
+  })
   useEffect(() => {
-    fetching();
+    fetching()
     return () => {
-      setArts([]);
-    };
-  }, []);
+      setArts([])
+    }
+  }, [])
   useEffect(() => {
-    setArtsRevers([...arts.reverse()]);
-  }, [arts]);
+    setArtsRevers([...arts.reverse()])
+  }, [arts])
   return arts.length ? (
     <div className={cl.wrapPreview}>
       {artsRevers.map((image, i) => {
-        return <Image key={`${image.id}${i}`} src={url + image.minimize} />;
+        return <Image key={`${image.id}${i}`} src={url + image.minimize} />
       })}
     </div>
   ) : (
-    ""
-  );
-};
+    ''
+  )
+}
 
-export default LoadArt;
+export default LoadArt

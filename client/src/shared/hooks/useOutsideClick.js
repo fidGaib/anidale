@@ -1,38 +1,33 @@
-import { useEffect } from "react";
+import { useEffect } from 'react'
 
 const useOutsideClick = (ref, handler, notOutRef) => {
   useEffect(() => {
-    document.addEventListener("mousedown", (e) => {
-      const el = ref?.current;
-      const notOut = notOutRef?.current;
-      if (
-        !el ||
-        el.contains(e.target) ||
-        !notOut ||
-        notOut.contains(e.target)
-      ) {
-        return;
+    document.addEventListener('mousedown', (e) => {
+      const el = ref?.current
+      const notOut = notOutRef?.current
+      if (!el || el.contains(e.target) || !notOut || notOut.contains(e.target)) {
+        return
       }
-      handler(e);
-    });
+      handler(e)
+    })
     return () => {
-      document.removeEventListener("mousedown", handler, true);
-    };
-  }, [ref, handler]);
-};
-export default useOutsideClick;
+      document.removeEventListener('mousedown', handler, true)
+    }
+  }, [ref, handler])
+}
+export default useOutsideClick
 
 export const useOutsideClickModal = (ref, handler) => {
   useEffect(() => {
-    document.addEventListener("mousedown", (e) => {
-      const el = ref?.current;
+    document.addEventListener('mousedown', (e) => {
+      const el = ref?.current
       if (!el || el.contains(e.target)) {
-        return;
+        return
       }
-      handler(e);
-    });
+      handler(e)
+    })
     return () => {
-      document.removeEventListener("mousedown", handler, true);
-    };
-  }, [ref, handler]);
-};
+      document.removeEventListener('mousedown', handler, true)
+    }
+  }, [ref, handler])
+}

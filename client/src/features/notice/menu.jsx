@@ -1,17 +1,19 @@
-import { observer } from "mobx-react-lite";
-import { useContext } from "react";
-import { Context } from "../..";
-import { nController } from "../../entities/notices/model";
-import Icon from "../../shared/icons/icon";
-import cl from "./style.module.css";
+import { observer } from 'mobx-react-lite'
+import { useContext } from 'react'
+
+import { Context } from '../..'
+import { nController } from '../../entities/notices/model'
+import Icon from '../../shared/icons/icon'
+import cl from './style.module.css'
+
 const Menu = ({ index, userId, notId }) => {
-  const { loginStore } = useContext(Context);
+  const { loginStore } = useContext(Context)
   const del = () => {
-    nController.removeNotice(index, notId, loginStore.user.id);
-  };
+    nController.removeNotice(index, notId, loginStore.user.id)
+  }
   return (
     <>
-      <Icon className={cl.menuNotice} id="menu-notice" />
+      <Icon className={cl.menuNotice} id='menu-notice' />
       {loginStore.user.id === userId ? (
         <ul className={cl.listNotice}>
           <li>Сохранить в закладках</li>
@@ -28,7 +30,7 @@ const Menu = ({ index, userId, notId }) => {
         </ul>
       )}
     </>
-  );
-};
+  )
+}
 
-export default observer(Menu);
+export default observer(Menu)

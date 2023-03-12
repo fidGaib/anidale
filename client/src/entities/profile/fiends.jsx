@@ -1,19 +1,21 @@
-import { useEffect, useState } from "react";
-import UserService from "../../services/user-service";
-import Image from "../../shared/hooks/onLoadImage/onLoadImage";
-import { useFetching } from "../../shared/hooks/useFetching";
-import Icon from "../../shared/icons/icon";
-import cl from "./styles/friends.module.css";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+
+import UserService from '../../services/user-service'
+import Image from '../../shared/hooks/onLoadImage/onLoadImage'
+import { useFetching } from '../../shared/hooks/useFetching'
+import Icon from '../../shared/icons/icon'
+import cl from './styles/friends.module.css'
+
 const Fiends = () => {
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState([])
   const [fetching, isLoading, error] = useFetching(async () => {
-    const { data } = await UserService.fetchUsers();
-    setUsers([...data.users]);
-  });
+    const { data } = await UserService.fetchUsers()
+    setUsers([...data.users])
+  })
   useEffect(() => {
-    fetching();
-  }, []);
+    fetching()
+  }, [])
   return (
     <div className={cl.wrapUsers}>
       {users.map((user) => (
@@ -22,12 +24,12 @@ const Fiends = () => {
             <Image className={cl.avatar} src={user.avatar} />
             <div className={cl.login}>{user.login}</div>
           </Link>
-          <Icon className={cl.messUser} id="messages" />
-          <Icon className={cl.removeUser} id="remove-user" />
+          <Icon className={cl.messUser} id='messages' />
+          <Icon className={cl.removeUser} id='remove-user' />
         </div>
       ))}
     </div>
-  );
-};
+  )
+}
 
-export default Fiends;
+export default Fiends

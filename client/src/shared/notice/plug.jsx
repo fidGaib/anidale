@@ -1,4 +1,5 @@
-import cl from "./styles/plug.module.css";
+import cl from './styles/plug.module.css'
+
 const Plug = () => {
   return (
     <div className={cl.notice}>
@@ -19,7 +20,7 @@ const Plug = () => {
         <div key={9} className={cl.img}></div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Plug;
+export default Plug

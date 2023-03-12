@@ -1,20 +1,22 @@
-import "./index.css";
-import { BrowserRouter } from "react-router-dom";
-import { Suspense, useContext, useEffect } from "react";
-import { observer } from "mobx-react-lite";
-import { Context } from "..";
-import Header from "../widgets/header/ui";
-import Loader from "../shared/loader/ui";
-import AppRouter from "./providers/AppRouter";
+import { observer } from 'mobx-react-lite'
+import { Suspense, useContext, useEffect } from 'react'
+import { BrowserRouter } from 'react-router-dom'
+
+import { Context } from '..'
+import Loader from '../shared/loader/ui'
+import Header from '../widgets/header/ui'
+import './index.css'
+import AppRouter from './providers/AppRouter'
+
 function App() {
-  const { loginStore } = useContext(Context);
+  const { loginStore } = useContext(Context)
   useEffect(() => {
-    if (localStorage.getItem("token")) {
-      loginStore.checkAuth();
+    if (localStorage.getItem('token')) {
+      loginStore.checkAuth()
     }
-  }, []);
+  }, [])
   if (loginStore.isLoading) {
-    return <Loader />;
+    return <Loader />
   } else {
     return (
       <BrowserRouter>
@@ -23,8 +25,8 @@ function App() {
           <AppRouter />
         </Suspense>
       </BrowserRouter>
-    );
+    )
   }
 }
 
-export default observer(App);
+export default observer(App)

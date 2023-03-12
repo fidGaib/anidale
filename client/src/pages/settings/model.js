@@ -1,21 +1,21 @@
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable } from 'mobx'
 
 class SettingController {
-  changeID = 0;
+  changeID = 0
   listSett = [
-    { id: 0, active: true, body: "Профиль" },
-    { id: 1, active: false, body: "Оформление" },
-  ];
+    { id: 0, active: true, body: 'Профиль' },
+    { id: 1, active: false, body: 'Оформление' },
+  ]
   constructor() {
-    makeAutoObservable(this);
+    makeAutoObservable(this)
   }
   handleSett(id) {
-    this.changeID = id;
+    this.changeID = id
     this.listSett.map((list) => {
-      if (id === list.id) return (list.active = true);
-      else return (list.active = false);
-    });
+      if (id === list.id) return (list.active = true)
+      else return (list.active = false)
+    })
   }
 }
 
-export const settingController = new SettingController();
+export const settingController = new SettingController()
