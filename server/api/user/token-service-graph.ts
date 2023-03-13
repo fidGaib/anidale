@@ -4,10 +4,20 @@ import Token from '../../db/models/token-model'
 import ErrorGraphQLMiddleware from '../middleware/ErrorGraphQLMiddleware'
 
 class TokenServiceGraph {
+  private accessSecret: string
+  private refreshSecret: string
+
+  constructor() {
+    if (!process.env.JWT_ACCESS_SECRET || !process.env.JWT_REFRESH_SECRET) {
+      throw Error('No jwt secrets found')
+    }
+    this.accessSecret = process.env.JWT_ACCESS_SECRET
+    this.refreshSecret = process.env.JWT_REFRESH_SECRET
+  }
+
   async generateTokens(payload: any) {
-    if (!process.env.JWT_ACCESS_SECRET || !process.env.JWT_REFRESH_SECRET) return
-    const accessToken = sign(payload, process.env.JWT_ACCESS_SECRET, { expiresIn: process.env.JWT_ACCESS_LIFE })
-    const refreshToken = sign(payload, process.env.JWT_REFRESH_SECRET, { expiresIn: process.env.JWT_REFRESH_LIFE })
+    const accessToken = sign(payload, this.accessSecret, { expiresIn: process.env.JWT_ACCESS_LIFE })
+    const refreshToken = sign(payload, this.refreshSecret, { expiresIn: process.env.JWT_REFRESH_LIFE })
     return {
       accessToken,
       refreshToken,
@@ -52,8 +62,7 @@ class TokenServiceGraph {
   }
   validateAccessToken(token: string) {
     try {
-      if (!process.env.JWT_ACCESS_SECRET) return
-      const userData = verify(token, process.env.JWT_ACCESS_SECRET)
+      const userData = verify(token, this.accessSecret)
       return userData
     } catch (e) {
       return null
@@ -61,8 +70,7 @@ class TokenServiceGraph {
   }
   validateRefreshToken(token: string) {
     try {
-      if (!process.env.JWT_REFRESH_SECRET) return
-      const userData = verify(token, process.env.JWT_REFRESH_SECRET)
+      const userData = verify(token, this.refreshSecret)
       return userData
     } catch (e) {
       return null
