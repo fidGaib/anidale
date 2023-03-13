@@ -6,8 +6,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "cross-env NODE_ENV=development nodemon -r dotenv/config --loader ts-node/esm --loader ./commonjs-extension-resolution-loader.js index.ts",
-    "start": "node -r dotenv/config --loader ts-node/esm --loader ./commonjs-extension-resolution-loader.js index.ts"
+    "dev": "cross-env NODE_ENV=development nodemon -e js,ts,graphql -r dotenv/config --loader ts-node/esm --loader ./commonjs-extension-resolution-loader.js index.ts",
+    "start": "node -r dotenv/config -e js,ts,graphql --loader ts-node/esm --loader ./commonjs-extension-resolution-loader.js index.ts"
   },
   "keywords": [],
   "author": "",
