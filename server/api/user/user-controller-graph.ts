@@ -1,7 +1,8 @@
 import { Request } from 'express'
+import { GraphQLError } from 'graphql'
 import { getCookie, setCookie } from 'typescript-cookie'
 
-import ErrorGrapgQl from '../error/GraphQLError'
+import ErrorGraphQL from '../error/GraphQLError'
 import ErrorGraphQLMiddleware from '../middleware/ErrorGraphQLMiddleware'
 import userServiceGraph from './user-service-graph'
 
@@ -29,13 +30,17 @@ class UserControllerGraph {
     try {
       const { email, pass, pass2 } = user
       if (!email.trim() || !pass.trim() || !pass2.trim()) {
-        throw ErrorGrapgQl.badRequest('У вас пустые поля')
+        throw ErrorGraphQL.badRequest('У вас пустые поля')
       } else if (!email.match(re)) {
-        throw ErrorGrapgQl.badRequest('Некорректный E-mail')
+        throw ErrorGraphQL.badRequest('Некорректный E-mail')
       } else if (pass !== pass2) {
-        throw ErrorGrapgQl.badRequest('Пароли не совпадают')
+        throw ErrorGraphQL.badRequest('Пароли не совпадают')
       }
       const userData = await userServiceGraph.registration(email, pass)
+      if (userData instanceof GraphQLError) {
+        return userData
+      }
+
       setCookie('refreshToken', userData.refreshToken, {
         maxAge: 14 * 24 * 60 * 60 * 1000,
         httpOnly: true,
@@ -49,9 +54,9 @@ class UserControllerGraph {
     try {
       const { email, pass } = user
       if (!email.trim() || !pass.trim()) {
-        throw ErrorGrapgQl.badRequest('У вас пустые поля')
+        throw ErrorGraphQL.badRequest('У вас пустые поля')
       } else if (!email.match(re)) {
-        throw ErrorGrapgQl.badRequest('Некорректный E-mail')
+        throw ErrorGraphQL.badRequest('Некорректный E-mail')
       }
       return await userServiceGraph.login(email, pass)
     } catch (e) {
@@ -75,7 +80,7 @@ class UserControllerGraph {
   async updateUser(id: string, user: UpdateUser) {
     try {
       if (!user.email.match(re)) {
-        throw ErrorGrapgQl.badRequest('Некорректный E-mail')
+        throw ErrorGraphQL.badRequest('Некорректный E-mail')
       }
       const userData = await userServiceGraph.update(id, user)
       return userData

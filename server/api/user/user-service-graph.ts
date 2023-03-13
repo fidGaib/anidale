@@ -4,7 +4,7 @@ import { v4 } from 'uuid'
 import User from '../../db/models/user-model'
 import avatar from '../dtos/avatar-random'
 import UserDto from '../dtos/user-dto'
-import ErrorGrapgQl from '../error/GraphQLError'
+import ErrorGraphQL from '../error/GraphQLError'
 import ErrorGraphQLMiddleware from '../middleware/ErrorGraphQLMiddleware'
 import tokenServiceGraph from './token-service-graph'
 
@@ -20,7 +20,7 @@ class UserServiceGraph {
   async registration(email: string, pass: string) {
     try {
       const candidate = await User.findUnique({ where: { email: email.trim() } })
-      if (candidate) throw ErrorGrapgQl.badRequest('E-mail занят')
+      if (candidate) throw ErrorGraphQL.badRequest('E-mail занят')
       let defaultLogin = Math.round(Math.random() * 99999999)
       const avatar_random = Math.round(Math.random() * avatar.length)
       const hashPass = await hash(pass + process.env.SALT, 5)
@@ -50,9 +50,9 @@ class UserServiceGraph {
   async login(email: string, pass: string) {
     try {
       const userData = await User.findUnique({ where: { email } })
-      if (!userData) throw ErrorGrapgQl.badRequest('Пользователь не найден')
+      if (!userData) throw ErrorGraphQL.badRequest('Пользователь не найден')
       const isPassEquals = await compare(pass, userData.pass)
-      if (!isPassEquals) throw ErrorGrapgQl.badRequest('Не верный пароль.')
+      if (!isPassEquals) throw ErrorGraphQL.badRequest('Не верный пароль.')
       return userData
     } catch (e) {
       return ErrorGraphQLMiddleware(e)
@@ -61,7 +61,7 @@ class UserServiceGraph {
   async getUser(id: number) {
     try {
       const user = await User.findUnique({ where: { id } })
-      if (!user) throw ErrorGrapgQl.badRequest('Пользователь не найден')
+      if (!user) throw ErrorGraphQL.badRequest('Пользователь не найден')
       return user
     } catch (e) {
       return ErrorGraphQLMiddleware(e)
@@ -77,7 +77,7 @@ class UserServiceGraph {
   async update(id: string, user: UpdateUser) {
     try {
       const candidate = await User.findUnique({ where: { id: parseInt(id) } })
-      if (!candidate) throw ErrorGrapgQl.badRequest('Пользователь не найден')
+      if (!candidate) throw ErrorGraphQL.badRequest('Пользователь не найден')
       if (user.pass) {
         const hashPass = await hash(user.pass + process.env.SALT, 5)
         user.pass = hashPass

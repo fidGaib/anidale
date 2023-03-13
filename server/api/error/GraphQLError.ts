@@ -1,9 +1,9 @@
-export default class ErrorGrapgQl extends Error {
+export default class ErrorGraphQL extends Error {
   constructor(message: string, refreshToken?: undefined) {
     super()
     this.message = message
   }
   static badRequest(message: string) {
-    return new ErrorGrapgQl(message)
+    return new ErrorGraphQL(message)
   }
 }
