@@ -16,8 +16,8 @@ class TokenServiceGraph {
   }
 
   async generateTokens(payload: any) {
-    const accessToken = jwt.sign(payload, this.accessSecret, { expiresIn: process.env.JWT_ACCESS_LIFE })
-    const refreshToken = jwt.sign(payload, this.refreshSecret, { expiresIn: process.env.JWT_REFRESH_LIFE })
+    const accessToken = jwt.sign(payload, this.accessSecret, { expiresIn: '15m' })
+    const refreshToken = jwt.sign(payload, this.refreshSecret, { expiresIn: '14d' })
     return {
       accessToken,
       refreshToken,
