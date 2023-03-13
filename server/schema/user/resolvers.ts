@@ -12,11 +12,13 @@ export const UserResolvers = {
     },
   },
   Mutation: {
-    async registration(parent: any, args: Registration) {
-      return await userControllerGraph.registration(args.user)
+    async registration(parent: any, args: Registration, ctx: { req: Request; res: Response }) {
+      const { req, res } = ctx
+      return await userControllerGraph.registration(args.user, req, res)
     },
-    async login(parent: any, args: Login) {
-      return await userControllerGraph.login(args.user)
+    async login(parent: any, args: Login, ctx: { req: Request; res: Response }) {
+      const { req, res } = ctx
+      return await userControllerGraph.login(args.user, req, res)
     },
     async update(parent: any, args: UpdateUser) {
       let { id, user } = args

@@ -32,33 +32,25 @@ class TokenServiceGraph {
     }
   }
   async saveToken(userId: number, refreshToken: any) {
-    try {
-      const tokenData = await Token.findMany({ where: { userId } })
-      if (tokenData.length > 0) {
-        return Token.update({
-          where: { id: tokenData[0].id },
-          data: {
-            refreshToken,
-          },
-        })
-      }
-      const token = await Token.create({ data: { userId, refreshToken } })
-      return token
-    } catch (e) {
-      return ErrorGraphQLMiddleware(e)
-    }
-  }
-  async removeToken(refreshToken: string) {
-    try {
-      const tokenData = await Token.deleteMany({
-        where: {
+    const tokenData = await Token.findMany({ where: { userId } })
+    if (tokenData.length > 0) {
+      return Token.update({
+        where: { id: tokenData[0].id },
+        data: {
           refreshToken,
         },
       })
-      return tokenData
-    } catch (e) {
-      return ErrorGraphQLMiddleware(e)
     }
+    const token = await Token.create({ data: { userId, refreshToken } })
+    return token
+  }
+  async removeToken(refreshToken: string) {
+    const tokenData = await Token.deleteMany({
+      where: {
+        refreshToken,
+      },
+    })
+    return tokenData
   }
   validateAccessToken(token: string) {
     try {

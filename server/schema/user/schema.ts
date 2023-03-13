@@ -8,7 +8,6 @@ export const UserSchema = /* GraphQL */ `
     login(user: Login!): User
     update(id: ID, user: UpdateUser): User
   }
-  scalar Date
   type User {
     id: ID
     email: String
@@ -17,7 +16,9 @@ export const UserSchema = /* GraphQL */ `
     avatar: String
     activationLink: String
     isActivated: Boolean
-    createdAt: Date
+    createdAt: String
+    accessToken: String
+    refreshToken: String
   }
   input UpdateUser {
     email: String

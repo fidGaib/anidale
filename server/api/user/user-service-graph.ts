@@ -37,7 +37,6 @@ class UserServiceGraph {
       })
       const userDto = new UserDto(user)
       const tokens = await tokenServiceGraph.generateTokens({ ...userDto })
-      if (!tokens) return ErrorGraphQLMiddleware('Не предвиденная ошибка на сервере')
       await tokenServiceGraph.saveToken(userDto.id, tokens.refreshToken)
       return {
         ...tokens,
@@ -49,11 +48,17 @@ class UserServiceGraph {
   }
   async login(email: string, pass: string) {
     try {
-      const userData = await User.findUnique({ where: { email } })
-      if (!userData) throw ErrorGraphQL.badRequest('Пользователь не найден')
-      const isPassEquals = await compare(pass, userData.pass)
+      const candidate = await User.findUnique({ where: { email } })
+      if (!candidate) throw ErrorGraphQL.badRequest('Пользователь не найден')
+      const isPassEquals = await compare(pass + process.env.SALT, candidate.pass)
       if (!isPassEquals) throw ErrorGraphQL.badRequest('Не верный пароль.')
-      return userData
+      const userDto = new UserDto(candidate)
+      const tokens = await tokenServiceGraph.generateTokens({ ...userDto })
+      await tokenServiceGraph.saveToken(userDto.id, tokens.refreshToken)
+      return {
+        ...tokens,
+        user: userDto,
+      }
     } catch (e) {
       return ErrorGraphQLMiddleware(e)
     }
@@ -87,6 +92,18 @@ class UserServiceGraph {
     } catch (e) {
       return ErrorGraphQLMiddleware(e)
     }
+  }
+  async remove(id: string) {
+    const userData = await User.deleteMany({
+      where: {
+        id: parseInt(id),
+      },
+    })
+    return userData
+  }
+  async logout(refreshToken: string) {
+    const token = await tokenServiceGraph.removeToken(refreshToken)
+    return token
   }
 }
 export default new UserServiceGraph()

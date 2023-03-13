@@ -25,7 +25,7 @@ interface UpdateUser {
 const re =
   /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
 class UserControllerGraph {
-  async registration(user: Registration) {
+  async registration(user: Registration, req: any, res: any) {
     try {
       const { email, pass, pass2 } = user
       if (!email.trim() || !pass.trim() || !pass2.trim()) {
@@ -40,16 +40,20 @@ class UserControllerGraph {
         return userData
       }
 
-      setCookie('refreshToken', userData.refreshToken, {
+      res.cookie('refreshToken', userData.refreshToken, {
         maxAge: 14 * 24 * 60 * 60 * 1000,
         httpOnly: true,
       })
-      return userData
+      return {
+        accessToken: userData.accessToken,
+        refreshToken: userData.refreshToken,
+        ...userData.user,
+      }
     } catch (e: any) {
       return ErrorGraphQLMiddleware(e)
     }
   }
-  async login(user: Login) {
+  async login(user: Login, req: any, res: any) {
     try {
       const { email, pass } = user
       if (!email.trim() || !pass.trim()) {
@@ -57,7 +61,19 @@ class UserControllerGraph {
       } else if (!email.match(re)) {
         throw ErrorGraphQL.badRequest('Некорректный E-mail')
       }
-      return await userServiceGraph.login(email, pass)
+      const userData = await userServiceGraph.login(email, pass)
+      if (userData instanceof GraphQLError) {
+        return userData
+      }
+      res.cookie('refreshToken', userData.refreshToken, {
+        maxAge: 14 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+      })
+      return {
+        accessToken: userData.accessToken,
+        refreshToken: userData.refreshToken,
+        ...userData.user,
+      }
     } catch (e) {
       return ErrorGraphQLMiddleware(e)
     }
