@@ -18,7 +18,8 @@
     "baseUrl": ".",
     "paths": {
       "@schema/*": ["schema/*"]
-    }
+    },
+    "outDir": "dist"
   },
   "include": ["api/**/*", "db/**/*", "routes/**/*", "schema/**/*", "generate-env.ts", "codegen.ts"],
   "ts-node": {
