@@ -1,3 +1,5 @@
+import { Request, Response } from 'express'
+
 import userControllerGraph from '../../api/user/user-controller-graph'
 import { Login, Registration, UpdateUser, UserQuery } from './types'
 

@@ -1,4 +1,4 @@
-import { Request } from 'express'
+import { Request, Response } from 'express'
 import { GraphQLError } from 'graphql'
 import { getCookie, setCookie } from 'typescript-cookie'
 
