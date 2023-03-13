@@ -4,7 +4,7 @@
 
   "compilerOptions": {
     "lib": ["es2022"],
-    "module": "commonJS",
+    "module": "es2022",
     "target": "es2022",
 
     "strict": true,
@@ -17,6 +17,7 @@
   },
   "include": ["src/**/*", "generate-env.ts"],
   "ts-node": {
-    "esm": true
+    "esm": true,
+    "swc": true
   }
 }

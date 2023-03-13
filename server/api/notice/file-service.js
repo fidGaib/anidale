@@ -1,7 +1,10 @@
 import { mkdirSync, unlink } from 'fs'
 import { join } from 'path'
 import sharp from 'sharp'
+import * as url from 'url'
 import { v4 } from 'uuid'
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
 
 class fileService {
   directory = join(__dirname, '../uploads')

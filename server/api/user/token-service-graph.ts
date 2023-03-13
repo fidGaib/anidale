@@ -1,4 +1,4 @@
-import { sign, verify } from 'jsonwebtoken'
+import jwt from 'jsonwebtoken'
 
 import Token from '../../db/models/token-model'
 import ErrorGraphQLMiddleware from '../middleware/ErrorGraphQLMiddleware'
@@ -16,8 +16,8 @@ class TokenServiceGraph {
   }
 
   async generateTokens(payload: any) {
-    const accessToken = sign(payload, this.accessSecret, { expiresIn: process.env.JWT_ACCESS_LIFE })
-    const refreshToken = sign(payload, this.refreshSecret, { expiresIn: process.env.JWT_REFRESH_LIFE })
+    const accessToken = jwt.sign(payload, this.accessSecret, { expiresIn: process.env.JWT_ACCESS_LIFE })
+    const refreshToken = jwt.sign(payload, this.refreshSecret, { expiresIn: process.env.JWT_REFRESH_LIFE })
     return {
       accessToken,
       refreshToken,
@@ -62,7 +62,7 @@ class TokenServiceGraph {
   }
   validateAccessToken(token: string) {
     try {
-      const userData = verify(token, this.accessSecret)
+      const userData = jwt.verify(token, this.accessSecret)
       return userData
     } catch (e) {
       return null
@@ -70,7 +70,7 @@ class TokenServiceGraph {
   }
   validateRefreshToken(token: string) {
     try {
-      const userData = verify(token, this.refreshSecret)
+      const userData = jwt.verify(token, this.refreshSecret)
       return userData
     } catch (e) {
       return null

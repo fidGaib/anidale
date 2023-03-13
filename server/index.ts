@@ -2,10 +2,13 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import express from 'express'
 import fileUpload from 'express-fileupload'
+import { fileURLToPath } from 'url'
 
 import ErrorHandlingMiddleware from './api/middleware/ErrorHandlingMiddleware'
 import router from './routes'
 import { yoga } from './schema'
+
+const __dirname = fileURLToPath(new URL('.', import.meta.url))
 
 const PORT = process.env.PORT
 
