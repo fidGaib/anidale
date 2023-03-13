@@ -7,6 +7,7 @@ import fileService from './file-service'
 
 class noticeService {
   async create(userId, description, likeness, next) {
+    console.log(likeness)
     try {
       let files = []
       if (!likeness && description) {
@@ -29,7 +30,6 @@ class noticeService {
         data: {
           userId,
           description,
-          date: today,
         },
       })
       if (files.length > 9) {
@@ -84,6 +84,7 @@ class noticeService {
         take: parseInt(limit),
         skip: parseInt(page),
         orderBy: { id: 'desc' },
+        include: { images: true },
       })
       const count = await Notice.count()
       const users = []

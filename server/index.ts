@@ -5,6 +5,7 @@ import fileUpload from 'express-fileupload'
 
 import ErrorHandlingMiddleware from './api/middleware/ErrorHandlingMiddleware'
 import router from './routes'
+import { yoga } from './schema'
 
 const PORT = process.env.PORT
 
@@ -22,6 +23,7 @@ app.use(express.static(__dirname + '/api/uploads'))
 app.use(fileUpload({ createParentPath: true }))
 app.use(cookieParser())
 app.use('/api', router)
+app.use('/graphql', yoga)
 app.use(ErrorHandlingMiddleware)
 const start = async () => {
   try {

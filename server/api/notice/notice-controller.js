@@ -15,7 +15,7 @@ class noticeController {
         likeness = false
         throw next(ApiError.badRequest('У вас пустая нота.'))
       }
-      const noticeData = await noticeService.create(user_id, description, likeness)
+      const noticeData = await noticeService.create(parseInt(user_id), description, likeness)
       return res.json(noticeData)
     } catch (e) {
       console.log(e)

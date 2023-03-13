@@ -41,7 +41,7 @@ const Notices = ({ id }) => {
         <Wrapper key={notice.id} id={nController.delId == notice.id ? 'delShow' : ''}>
           <AvtorInfo avtor={nController.avtors[index]} notice={notice} />
           <Menu index={index} notId={notice.id} userId={nController.avtors[index].id} />
-          {notice?.[0]?.id ? <NoticeImages images={notice.images} /> : ''}
+          {notice?.images[0]?.id ? <NoticeImages images={notice.images} /> : ''}
           {notice.description ? <Description description={notice.description} /> : ''}
           <RaitingNotice />
         </Wrapper>

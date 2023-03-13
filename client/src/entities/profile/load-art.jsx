@@ -15,7 +15,7 @@ const LoadArt = () => {
   const [fetching, isLoading, error] = useFetching(async () => {
     const { notices, users, count } = await noticeService.fetchByUser(parseInt(params.id), 10, 0)
     notices.forEach((notice) => {
-      setArts((prev) => [...notice.notice_images, ...prev])
+      setArts((prev) => [...notice.images, ...prev])
     })
   })
   useEffect(() => {
