@@ -13,9 +13,14 @@
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
     "strictPropertyInitialization": true,
-    "allowJs": true
+    "allowJs": true,
+
+    "baseUrl": ".",
+    "paths": {
+      "@schema/*": ["schema/*"]
+    }
   },
-  "include": ["src/**/*", "generate-env.ts"],
+  "include": ["api/**/*", "db/**/*", "routes/**/*", "schema/**/*", "generate-env.ts", "codegen.ts"],
   "ts-node": {
     "esm": true,
     "swc": true

@@ -1,7 +1,9 @@
+import { Resolvers } from '@schema/resolvers-types'
+
 import userControllerGraph from '../../api/user/user-controller-graph'
 import { Login, Registration, UpdateUser, UserQuery } from './types'
 
-export const UserResolvers = {
+export const UserResolvers: Resolvers = {
   Query: {
     async getUsers(parent: any, args: UserQuery) {
       return await userControllerGraph.fetchMany()
