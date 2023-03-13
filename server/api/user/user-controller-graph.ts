@@ -1,6 +1,5 @@
-import { Request, Response } from 'express'
 import { GraphQLError } from 'graphql'
-import { getCookie, setCookie } from 'typescript-cookie'
+import { setCookie } from 'typescript-cookie'
 
 import ErrorGraphQL from '../error/GraphQLError'
 import ErrorGraphQLMiddleware from '../middleware/ErrorGraphQLMiddleware'
@@ -26,7 +25,7 @@ interface UpdateUser {
 const re =
   /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
 class UserControllerGraph {
-  async registration(user: Registration, req: Request, res: Response) {
+  async registration(user: Registration) {
     try {
       const { email, pass, pass2 } = user
       if (!email.trim() || !pass.trim() || !pass2.trim()) {
