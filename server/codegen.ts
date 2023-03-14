@@ -5,6 +5,11 @@ const config: CodegenConfig = {
   generates: {
     './schema/resolvers-types.ts': {
       plugins: ['typescript', 'typescript-resolvers'],
+      config: {
+        scalars: {
+          Date: 'string',
+        },
+      },
     },
   },
 }
