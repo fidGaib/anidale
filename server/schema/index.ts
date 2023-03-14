@@ -2,12 +2,12 @@ import { loadFilesSync } from '@graphql-tools/load-files'
 import { makeExecutableSchema } from '@graphql-tools/schema'
 import { createYoga } from 'graphql-yoga'
 
-import { TokenResolver } from './token/resolvers'
+import { PostResolvers } from './notice/resolvers'
 import { UserResolvers } from './user/resolvers'
 
 const executableSchema = makeExecutableSchema({
   typeDefs: loadFilesSync('**/*.graphql'),
-  resolvers: [UserResolvers, TokenResolver],
+  resolvers: [UserResolvers, PostResolvers],
 })
 
 export const yoga = createYoga({

@@ -1,6 +1,5 @@
 import { Notice, NoticeImage } from '../../db/models/notice-model'
 import User from '../../db/models/user-model'
-import { today } from '../dtos/date-fetch'
 import UserDto from '../dtos/user-dto'
 import ApiError from '../error/ApiError'
 import fileService from './file-service'

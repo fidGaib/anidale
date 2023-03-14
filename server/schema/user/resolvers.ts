@@ -1,8 +1,12 @@
 import { Resolvers } from '@schema/resolvers-types'
+import { GraphQLScalarType } from 'graphql'
 
 import userControllerGraph from '../../api/user/user-controller-graph'
+import { dateScalarConfig } from '../scalars/date'
 
+const dateScalar = new GraphQLScalarType(dateScalarConfig)
 export const UserResolvers: Resolvers = {
+  Date: dateScalar,
   Query: {
     async getUsers() {
       return await userControllerGraph.fetchMany()

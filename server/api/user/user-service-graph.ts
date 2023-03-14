@@ -6,7 +6,6 @@ import Token from '../../db/models/token-model'
 import User from '../../db/models/user-model'
 import avatar from '../dtos/avatar-random'
 import UserDto from '../dtos/user-dto'
-import ErrorGraphQL from '../error/GraphQLError'
 import tokenServiceGraph from './token-service-graph'
 
 interface UpdateUser {
@@ -50,9 +49,9 @@ class UserServiceGraph {
   async login(email: string, pass: string) {
     try {
       const candidate = await User.findUnique({ where: { email } })
-      if (!candidate) throw ErrorGraphQL.badRequest('Пользователь не найден')
+      if (!candidate) throw createGraphQLError('Пользователь не найден')
       const isPassEquals = await compare(pass + process.env.SALT, candidate.pass)
-      if (!isPassEquals) throw ErrorGraphQL.badRequest('Не верный пароль.')
+      if (!isPassEquals) throw createGraphQLError('Не верный пароль.')
       const userDto = new UserDto(candidate)
       const tokens = await tokenServiceGraph.generateTokens({ ...userDto })
       await tokenServiceGraph.saveToken(userDto.id, tokens.refreshToken)

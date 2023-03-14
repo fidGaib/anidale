@@ -1,0 +1,36 @@
+type Query {
+  getPosts(limit: Int!, page: Int!): [Post]
+  getPostByUser(id: Int!, limit: Int!, page: Int!): [Post]
+}
+type Mutation {
+  createPost(post: CreatePost!): Post
+}
+input CreatePost {
+  description: String
+  images: String
+  owner: Int
+}
+type Post {
+  id: Int
+  description: String
+  images: [PostImages]
+  countLikes: Int
+  countComm: Int
+  date: Date
+  owner: Owner
+}
+type Owner {
+  id: Int
+  avatar: String
+  login: String
+}
+type PostImages {
+  id: Int
+  #   high: String
+  #   medium: String
+  #   small: String
+  oversize: String
+  minimize: String
+  postId: Int
+  date: Date
+}

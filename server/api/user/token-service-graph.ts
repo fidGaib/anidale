@@ -1,7 +1,7 @@
+import { createGraphQLError } from 'graphql-yoga'
 import jwt from 'jsonwebtoken'
 
 import Token from '../../db/models/token-model'
-import ErrorGraphQLMiddleware from '../middleware/ErrorGraphQLMiddleware'
 
 declare module 'jsonwebtoken' {
     export interface UserIDJwtPayload extends jwt.JwtPayload {
@@ -30,12 +30,8 @@ class TokenServiceGraph {
     }
   }
   async findToken(refreshToken: any) {
-    try {
       const tokenData = await Token.findMany({ where: { refreshToken }, include: { user: true } })
       return tokenData[0]
-    } catch (e) {
-      return ErrorGraphQLMiddleware(e)
-    }
   }
   async saveToken(userId: number, refreshToken: any) {
     const tokenData = await Token.findMany({ where: { userId } })

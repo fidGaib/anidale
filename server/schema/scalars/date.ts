@@ -1,21 +1,22 @@
-import { GraphQLScalarType, Kind } from 'graphql'
+import { Kind } from 'graphql'
+import { createGraphQLError } from 'graphql-yoga'
 
-const dateScalar = new GraphQLScalarType({
+export const dateScalarConfig = {
   name: 'Date',
   description: 'Date custom scalar type',
-  serialize(value) {
+  serialize(value: any) {
     if (value instanceof Date) {
       return value.getTime() // Convert outgoing Date to integer for JSON
     }
-    throw Error('GraphQL Date Scalar serializer expected a `Date` object')
+    throw createGraphQLError('GraphQL Date Scalar serializer expected a `Date` object')
   },
-  parseValue(value) {
+  parseValue(value: any) {
     if (typeof value === 'number') {
       return new Date(value) // Convert incoming integer to Date
     }
-    throw new Error('GraphQL Date Scalar parser expected a `number`')
+    throw createGraphQLError('GraphQL Date Scalar parser expected a `number`')
   },
-  parseLiteral(ast) {
+  parseLiteral(ast: any) {
     if (ast.kind === Kind.INT) {
       // Convert hard-coded AST string to integer and then to Date
       return new Date(parseInt(ast.value, 10))
@@ -23,4 +24,4 @@ const dateScalar = new GraphQLScalarType({
     // Invalid hard-coded value (not an integer)
     return null
   },
-})
+}
