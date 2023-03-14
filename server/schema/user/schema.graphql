@@ -10,7 +10,6 @@ type Mutation {
   logout(refreshToken: String!): Boolean
   refresh: Refresh
 }
-scalar Date
 type Refresh {
   refreshToken: String
   accessToken: String

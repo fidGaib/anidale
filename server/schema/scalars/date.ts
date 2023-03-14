@@ -1,7 +1,8 @@
 import { Kind } from 'graphql'
+import { GraphQLScalarType } from 'graphql'
 import { createGraphQLError } from 'graphql-yoga'
 
-export const dateScalarConfig = {
+export const dateScalar = new GraphQLScalarType({
   name: 'Date',
   description: 'Date custom scalar type',
   serialize(value: any) {
@@ -24,4 +25,4 @@ export const dateScalarConfig = {
     // Invalid hard-coded value (not an integer)
     return null
   },
-}
+})

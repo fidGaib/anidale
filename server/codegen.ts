@@ -8,6 +8,7 @@ const config: CodegenConfig = {
       config: {
         scalars: {
           Date: 'Date',
+          FILE: 'File',
         },
       },
     },
