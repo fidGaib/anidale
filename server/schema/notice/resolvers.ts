@@ -2,7 +2,7 @@ import { Resolvers } from '@schema/resolvers-types'
 
 import noticeControllerGraphql from '../../api/notice/notice-controller-graphql'
 
-export const PostResolvers: Resolvers = {
+const PostResolvers: Resolvers = {
   Query: {
     async getPosts(parent, args) {
       const { limit, page } = args
@@ -15,3 +15,5 @@ export const PostResolvers: Resolvers = {
   },
   //   Mutation: {},
 }
+
+export default PostResolvers

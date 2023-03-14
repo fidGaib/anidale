@@ -1,15 +1,21 @@
-import { loadFilesSync } from '@graphql-tools/load-files'
+import { loadFiles, loadFilesSync } from '@graphql-tools/load-files'
 import { makeExecutableSchema } from '@graphql-tools/schema'
 import { createYoga } from 'graphql-yoga'
 
-// import { PostResolvers } from './notice/resolvers'
-// import { ScalarResolvers } from './scalars/resolvers'
-// import { UserResolvers } from './user/resolvers'
+async function loadResolvers(glob: string) {
+  const resolversArray = await loadFiles(glob, {
+    ignoreIndex: true,
+    requireMethod: async (path: string) => {
+      return await import(path)
+    },
+  })
+
+  return resolversArray
+}
 
 const executableSchema = makeExecutableSchema({
   typeDefs: loadFilesSync('**/*.graphql'),
-  resolvers: loadFilesSync('./**/*resolvers.ts'),
-  // resolvers: [UserResolvers, PostResolvers, ScalarResolvers],
+  resolvers: await loadResolvers('./**/*resolvers.ts'),
 })
 
 export const yoga = createYoga({

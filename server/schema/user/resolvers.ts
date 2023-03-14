@@ -2,7 +2,7 @@ import { Resolvers } from '@schema/resolvers-types'
 
 import userControllerGraph from '../../api/user/user-controller-graph'
 
-export const UserResolvers: Resolvers = {
+const UserResolvers: Resolvers = {
   Query: {
     async getUsers() {
       return await userControllerGraph.fetchMany()
@@ -38,3 +38,5 @@ export const UserResolvers: Resolvers = {
     },
   },
 }
+
+export default UserResolvers

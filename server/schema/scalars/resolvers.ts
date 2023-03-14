@@ -1,7 +1,9 @@
 import { dateScalar } from './date'
 import { fileScalar } from './file'
 
-export const ScalarResolvers = {
+const ScalarResolvers = {
   Date: dateScalar,
   FILE: fileScalar,
 }
+
+export default ScalarResolvers
