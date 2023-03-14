@@ -4,11 +4,17 @@ type Query {
 }
 type Mutation {
   createPost(post: CreatePost!): Post
+  removePost(id: Int!): Boolean
+  updatePost(id: Int!, post: UpdatePost): Post
+}
+input UpdatePost {
+  description: String
+  images: [FILE]
 }
 input CreatePost {
   description: String
-  images: String
-  owner: Int
+  images: [FILE]
+  owner: Int!
 }
 type Post {
   id: Int
@@ -17,12 +23,7 @@ type Post {
   countLikes: Int
   countComm: Int
   date: Date
-  owner: Owner
-}
-type Owner {
-  id: Int
-  avatar: String
-  login: String
+  owner: User
 }
 type PostImages {
   id: Int

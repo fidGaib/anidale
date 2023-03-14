@@ -16,7 +16,7 @@ interface UpdateUser {
   activationLink?: string
   isActivated?: boolean
 }
-class UserServiceGraph {
+class UserService {
   async registration(email: string, pass: string) {
     try {
       const candidate = await User.findUnique({ where: { email: email.trim() } })
@@ -138,4 +138,4 @@ class UserServiceGraph {
     }
   }
 }
-export default new UserServiceGraph()
+export default new UserService()

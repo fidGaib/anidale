@@ -1,6 +1,6 @@
 import { createGraphQLError } from 'graphql-yoga'
 
-import userServiceGraph from './user-service-graph'
+import UserService from './service'
 
 interface Registration {
   email: string
@@ -32,7 +32,7 @@ class UserControllerGraph {
       } else if (pass !== pass2) {
         throw createGraphQLError('Пароли не совпадают')
       }
-      const userData = await userServiceGraph.registration(email, pass)
+      const userData = await UserService.registration(email, pass)
 
       res.cookie('refreshToken', userData.refreshToken, {
         maxAge: 14 * 24 * 60 * 60 * 1000,
@@ -55,7 +55,7 @@ class UserControllerGraph {
       } else if (!email.match(re)) {
         throw createGraphQLError('Некорректный E-mail')
       }
-      const userData = await userServiceGraph.login(email, pass)
+      const userData = await UserService.login(email, pass)
       res.cookie('refreshToken', userData.refreshToken, {
         maxAge: 14 * 24 * 60 * 60 * 1000,
         httpOnly: true,
@@ -71,14 +71,14 @@ class UserControllerGraph {
   }
   async fetchOne(id: number) {
     try {
-      return await userServiceGraph.getUser(id)
+      return await UserService.getUser(id)
     } catch (e: any) {
       throw createGraphQLError(e.message)
     }
   }
   async fetchMany() {
     try {
-      return await userServiceGraph.getUsers()
+      return await UserService.getUsers()
     } catch (e: any) {
       throw createGraphQLError(e.message)
     }
@@ -89,7 +89,7 @@ class UserControllerGraph {
       if (user.email && !user.email.match(re)) {
         throw createGraphQLError('Некорректный E-mail')
       }
-      const userData = await userServiceGraph.update(id, user)
+      const userData = await UserService.update(id, user)
       return userData
     } catch (e: any) {
       throw createGraphQLError(e.message)
@@ -97,14 +97,14 @@ class UserControllerGraph {
   }
   async remove(id: number) {
     try {
-      return await userServiceGraph.remove(id)
+      return await UserService.remove(id)
     } catch (e: any) {
       throw createGraphQLError(e.message)
     }
   }
   async logout(refreshToken: string) {
     try {
-      return await userServiceGraph.logout(refreshToken)
+      return await UserService.logout(refreshToken)
     } catch (e: any) {
       throw createGraphQLError(e.message)
     }
@@ -112,7 +112,7 @@ class UserControllerGraph {
   async refresh(req: any, res: any) {
     try {
       const { refreshToken } = req.cookies
-      const user = await userServiceGraph.refresh(refreshToken)
+      const user = await UserService.refresh(refreshToken)
       res.cookie('refreshToken', user.refreshToken, {
         maxAge: 14 * 24 * 60 * 60 * 1000,
         httpOnly: true,
