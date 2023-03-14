@@ -1,12 +1,12 @@
 export interface UserQuery {
   id: string
-  email: string
-  pass: string
-  login: string
-  avatar: string
-  activationLink: string
-  isActivated: boolean
-  createdAt: Date
+  email?: string
+  pass?: string
+  login?: string
+  avatar?: string
+  activationLink?: string
+  isActivated?: boolean
+  createdAt?: Date
   //   notices   :  Notice[]
   //   tokens   :   Token[]
 }

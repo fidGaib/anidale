@@ -25,13 +25,13 @@
     "express": "^4.18.2",
     "express-fileupload": "^1.4.0",
     "express-validator": "^6.15.0",
+    "graphql-scalars": "^1.20.4",
     "graphql-yoga": "^3.7.2",
     "jsonwebtoken": "^9.0.0",
     "lodash": "^4.17.21",
     "pg": "^8.9.0",
     "pg-hstore": "^2.3.4",
     "sharp": "^0.31.3",
-    "typescript-cookie": "^1.0.4",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

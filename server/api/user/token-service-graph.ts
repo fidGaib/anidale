@@ -3,6 +3,12 @@ import jwt from 'jsonwebtoken'
 import Token from '../../db/models/token-model'
 import ErrorGraphQLMiddleware from '../middleware/ErrorGraphQLMiddleware'
 
+declare module 'jsonwebtoken' {
+    export interface UserIDJwtPayload extends jwt.JwtPayload {
+        id: number
+    }
+}
+
 class TokenServiceGraph {
   private accessSecret: string
   private refreshSecret: string
@@ -23,7 +29,7 @@ class TokenServiceGraph {
       refreshToken,
     }
   }
-  async findToken(refreshToken: string) {
+  async findToken(refreshToken: any) {
     try {
       const tokenData = await Token.findMany({ where: { refreshToken }, include: { user: true } })
       return tokenData[0]
@@ -41,16 +47,15 @@ class TokenServiceGraph {
         },
       })
     }
-    const token = await Token.create({ data: { userId, refreshToken } })
-    return token
+    return await Token.create({ data: { userId, refreshToken } })
   }
   async removeToken(refreshToken: string) {
-    const tokenData = await Token.deleteMany({
+    await Token.deleteMany({
       where: {
         refreshToken,
       },
     })
-    return tokenData
+    return true
   }
   validateAccessToken(token: string) {
     try {
@@ -60,9 +65,9 @@ class TokenServiceGraph {
       return null
     }
   }
-  validateRefreshToken(token: string) {
+  validateRefreshToken(token: any) {
     try {
-      const userData = jwt.verify(token, this.refreshSecret)
+      const userData = <jwt.UserIDJwtPayload>jwt.verify(token, this.refreshSecret)
       return userData
     } catch (e) {
       return null

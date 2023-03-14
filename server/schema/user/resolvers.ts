@@ -1,30 +1,40 @@
 import { Resolvers } from '@schema/resolvers-types'
 
 import userControllerGraph from '../../api/user/user-controller-graph'
-import { Login, Registration, UpdateUser, UserQuery } from './types'
 
 export const UserResolvers: Resolvers = {
   Query: {
-    async getUsers(parent: any, args: UserQuery) {
+    async getUsers() {
       return await userControllerGraph.fetchMany()
     },
-    async getUser(parent: any, args: UserQuery) {
-      let id = parseInt(args.id)
-      return await userControllerGraph.fetchOne(id)
+    async getUser(parent, args) {
+      return await userControllerGraph.fetchOne(args.id)
     },
   },
   Mutation: {
-    async registration(parent: any, args: Registration, ctx: { req: Request; res: Response }) {
+    async registration(parent, args, ctx) {
       const { req, res } = ctx
       return await userControllerGraph.registration(args.user, req, res)
     },
-    async login(parent: any, args: Login, ctx: { req: Request; res: Response }) {
+    async login(parent, args, ctx) {
       const { req, res } = ctx
       return await userControllerGraph.login(args.user, req, res)
     },
-    async update(parent: any, args: UpdateUser) {
+    async update(parent, args: any) {
       let { id, user } = args
       return await userControllerGraph.updateUser(id, user)
+    },
+    async remove(parent, args) {
+      let { id } = args
+      return await userControllerGraph.remove(id)
+    },
+    async logout(parent, args) {
+      let { refreshToken } = args
+      return await userControllerGraph.logout(refreshToken)
+    },
+    async refresh(parent, args, ctx) {
+      const { req, res } = ctx
+      return await userControllerGraph.refresh(req, res)
     },
   },
 }
