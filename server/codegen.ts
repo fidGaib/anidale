@@ -7,7 +7,7 @@ const config: CodegenConfig = {
       plugins: ['typescript', 'typescript-resolvers'],
       config: {
         scalars: {
-          Date: 'string',
+          Date: 'Date',
         },
       },
     },
