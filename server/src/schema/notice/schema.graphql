@@ -1,6 +1,6 @@
 type Query {
-  getPosts(limit: Int!, page: Int!): [Post]
-  getPostByUser(id: Int!, limit: Int!, page: Int!): [Post]
+  getPosts(limit: Int!, page: Int!): [Post!]
+  getPostByUser(id: Int!, limit: Int!, page: Int!): [Post!]
 }
 type Mutation {
   createPost(post: CreatePost!): Post
@@ -9,17 +9,17 @@ type Mutation {
 }
 input UpdatePost {
   description: String
-  images: [FILE]
+  images: [FILE!]
 }
 input CreatePost {
   description: String
-  images: [FILE]
+  images: [FILE!]
   owner: Int!
 }
 type Post {
   id: Int
   description: String
-  images: [PostImages]
+  images: [PostImages!]
   countLikes: Int
   countComm: Int
   date: Date
