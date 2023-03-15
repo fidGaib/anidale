@@ -10,6 +10,7 @@ const config: CodegenConfig = {
           Date: 'Date',
           FILE: 'File',
         },
+        maybeValue: 'T',
       },
     },
   },
