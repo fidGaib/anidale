@@ -1,10 +1,13 @@
+import { User } from '@prisma/client'
+
 export default class userDto {
-  email
-  login
-  isActivated
-  avatar
-  createdAt
-  constructor(model) {
+  id: number
+  email: string
+  login: string
+  isActivated: boolean
+  avatar: string
+  createdAt: Date
+  constructor(model: User) {
     this.email = model.email
     this.id = model.id
     this.isActivated = model.isActivated
