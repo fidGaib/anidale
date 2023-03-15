@@ -30,7 +30,7 @@ class NoticeService {
     return notices
   }
   //not completed
-  async create(owner: number, description: string, images: File[]) {
+  async create(owner: number, description: string | null, images: File[] | null) {
     try {
       if (!images?.length && description) {
         const notice = await Notice.create({

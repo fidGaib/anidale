@@ -1,14 +1,15 @@
+import { InputMaybe } from '@schema/resolvers-types'
 import { createGraphQLError } from 'graphql-yoga'
 
-import noticeServiceGraphql from './service'
+import NoticeService from './service'
 
 class NoticeController {
-  async create(owner: number, description: any, images: any) {
+  async create(owner: number, description?: InputMaybe<string>, images?: InputMaybe<File[]>) {
     try {
       if (!owner) throw createGraphQLError('Вы не авторизованы или произошла непредвиденная ошибка')
       if (!description?.trim() && !images) throw createGraphQLError('У вас пустые поля')
       if (!description?.trim() && !images?.length) throw createGraphQLError('У вас пустые поля')
-      return await noticeServiceGraphql.create(owner, description, images)
+      return await NoticeService.create(owner, description ?? null, images ?? null)
     } catch (e: any) {
       throw createGraphQLError(e.message)
     }
@@ -16,7 +17,7 @@ class NoticeController {
   async getPosts(limit: number, page: number) {
     try {
       if (limit < 0) return []
-      return await noticeServiceGraphql.findAll(limit, page)
+      return await NoticeService.findAll(limit, page)
     } catch (e: any) {
       throw createGraphQLError(e.message)
     }
@@ -24,14 +25,14 @@ class NoticeController {
   async getPost(id: number, limit: number, page: number) {
     try {
       if (limit < 0) return []
-      return await noticeServiceGraphql.findByUser(id, limit, page)
+      return await NoticeService.findByUser(id, limit, page)
     } catch (e: any) {
       throw createGraphQLError(e.message)
     }
   }
   async remove(id: number) {
     try {
-      return await noticeServiceGraphql.remove(id)
+      return await NoticeService.remove(id)
     } catch (e: any) {
       throw createGraphQLError(e.message)
     }
@@ -40,7 +41,7 @@ class NoticeController {
     try {
       if (!description?.trim() && !images) throw createGraphQLError('У вас пустые поля')
       if (!description?.trim() && !images?.length) throw createGraphQLError('У вас пустые поля')
-      return await noticeServiceGraphql.update(id, description, images)
+      return await NoticeService.update(id, description, images)
     } catch (e: any) {
       throw createGraphQLError(e.message)
     }
