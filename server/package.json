@@ -9,7 +9,8 @@
     "dev": "cross-env NODE_ENV=development nodemon -e js,ts,graphql -r dotenv/config --loader ts-node/esm --loader ./commonjs-extension-resolution-loader.js src/index.ts",
     "start": "node -r dotenv/config --loader ts-node/esm --loader ./commonjs-extension-resolution-loader.js src/index.ts",
     "generate": "graphql-codegen",
-    "lint": "eslint src/ generate-env.ts codegen.ts"
+    "lint": "eslint src/ generate-env.ts codegen.ts",
+    "lint:fix": "eslint --fix src/ generate-env.ts codegen.ts"
   },
   "keywords": [],
   "author": "",
