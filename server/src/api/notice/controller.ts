@@ -21,7 +21,7 @@ class NoticeController {
       throw createGraphQLError(e.message)
     }
   }
-  async getPost(id: number, limit: number, page: number) {
+  async getPostsByUser(id: number, limit: number, page: number) {
     try {
       if (limit < 0) return []
       return await NoticeService.findByUser(id, limit, page)

@@ -9,9 +9,9 @@ const PostResolvers: Resolvers = {
       const { limit, page } = args
       return await noticeController.getPosts(limit, page)
     },
-    async getPostByUser(parent, args) {
+    async getPostsByUser(parent, args) {
       const { id, limit, page } = args
-      return await noticeController.getPost(id, limit, page)
+      return await noticeController.getPostsByUser(id, limit, page)
     },
   },
   Mutation: {

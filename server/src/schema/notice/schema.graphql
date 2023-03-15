@@ -1,6 +1,6 @@
 type Query {
   getPosts(limit: Int!, page: Int!): [Post!]
-  getPostByUser(id: Int!, limit: Int!, page: Int!): [Post!]
+  getPostsByUser(id: Int!, limit: Int!, page: Int!): [Post!]
 }
 type Mutation {
   createPost(post: CreatePost!): Post
