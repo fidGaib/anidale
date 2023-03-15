@@ -7,7 +7,6 @@ class NoticeController {
   async create(owner: number, description?: InputMaybe<string>, images?: InputMaybe<File[]>) {
     try {
       if (!owner) throw createGraphQLError('Вы не авторизованы или произошла непредвиденная ошибка')
-      if (!description?.trim() && !images) throw createGraphQLError('У вас пустые поля')
       if (!description?.trim() && !images?.length) throw createGraphQLError('У вас пустые поля')
       return await NoticeService.create(owner, description ?? null, images ?? null)
     } catch (e: any) {
