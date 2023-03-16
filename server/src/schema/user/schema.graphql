@@ -1,6 +1,7 @@
 type Query {
   getUser(id: Int!): User
   getUsers: [User!]!
+  refresh: Refresh
 }
 type Mutation {
   registration(user: Registration!): User
@@ -8,7 +9,6 @@ type Mutation {
   update(id: Int!, user: UpdateUser): UpdateUserQuery
   remove(id: Int!): Boolean
   logout(refreshToken: String!): Boolean
-  refresh: Refresh
 }
 type Refresh {
   refreshToken: String

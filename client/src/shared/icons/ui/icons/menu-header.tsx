@@ -1,6 +1,6 @@
 import { forwardRef } from 'react'
 
-const MenuHeaderIcon = forwardRef((props, ref) => {
+const MenuHeaderIcon = forwardRef((props, ref?: any) => {
   return (
     <svg
       ref={ref}

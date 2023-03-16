@@ -9,3 +9,18 @@ export const GET_USERS = gql`
     }
   }
 `
+export const REFRESH = gql`
+  query {
+    refresh {
+      accessToken
+    }
+  }
+`
+export const PROFILE = gql`
+  query {
+    getUser(id: id) {
+      login
+      avatar
+    }
+  }
+`

@@ -1,12 +1,12 @@
 import { lazy } from 'react'
 
-import { Registration } from '@/pages/registration/'
+import { Registration } from '@/providers/auth/registration/'
 
 const Feed = lazy(() => import('@/pages/feed'))
 const Friends = lazy(() => import('@/pages/friends'))
 const Profile = lazy(() => import('@/pages/profile'))
-const Signin = lazy(() => import('@/pages/signin'))
-const Signout = lazy(() => import('@/pages/signout'))
+const Signin = lazy(() => import('@/providers/auth/signin'))
+const Signout = lazy(() => import('@/providers/auth/signout'))
 
 // private routers
 export const privateRouters = [

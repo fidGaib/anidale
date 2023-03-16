@@ -1,5 +1,4 @@
-import { Resolvers } from '@schema/resolvers-types'
-
+import { Resolvers } from '../../../schema/resolvers-types'
 import UserController from '../../api/user/controller'
 
 const UserResolvers: Resolvers = {
@@ -9,6 +8,10 @@ const UserResolvers: Resolvers = {
     },
     async getUser(parent, args) {
       return await UserController.fetchOne(args.id)
+    },
+    async refresh(parent: any, args: any, ctx: any) {
+      const { req, res } = ctx
+      return await UserController.refresh(req, res)
     },
   },
   Mutation: {
@@ -31,10 +34,6 @@ const UserResolvers: Resolvers = {
     async logout(parent, args) {
       const { refreshToken } = args
       return await UserController.logout(refreshToken)
-    },
-    async refresh(parent, args, ctx) {
-      const { req, res } = ctx
-      return await UserController.refresh(req, res)
     },
   },
 }
