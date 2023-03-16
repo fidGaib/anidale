@@ -11,7 +11,16 @@ const Feed = lazy(() => import('@/pages/feed'))
 
 const AppRouter = () => {
   const { data, loading, error } = useQuery(REFRESH)
-  if (error) {
+  if (data?.refresh) {
+    return (
+      <Routes>
+        {privateRouters.map((route) => (
+          <Route key={route.path} element={<route.element />} path={route.path} />
+        ))}
+        <Route element={<Feed />} path={'/*'} />
+      </Routes>
+    )
+  } else {
     return (
       <Routes>
         {publicRouters.map((route) => (
@@ -21,13 +30,5 @@ const AppRouter = () => {
       </Routes>
     )
   }
-  return (
-    <Routes>
-      {privateRouters.map((route) => (
-        <Route key={route.path} element={<route.element />} path={route.path} />
-      ))}
-      <Route element={<Feed />} path={'/*'} />
-    </Routes>
-  )
 }
 export default AppRouter

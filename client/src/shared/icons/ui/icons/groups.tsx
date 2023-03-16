@@ -1,4 +1,4 @@
-const Groups = (props) => {
+const GroupsIcon = (props: any) => {
   return (
     <svg fill='#a52a2a' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' xmlSpace='preserve' {...props}>
       <g id='SVGRepo_bgCarrier' strokeWidth='0'></g>
@@ -25,4 +25,4 @@ const Groups = (props) => {
   )
 }
 
-export default Groups
+export default GroupsIcon

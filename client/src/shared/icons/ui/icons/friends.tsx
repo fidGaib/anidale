@@ -1,4 +1,4 @@
-const Friends = (props) => {
+const FriendsIcon = (props: any) => {
   return (
     <svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg' strokeWidth='5' stroke='#a52a2a' fill='none' {...props}>
       <g id='SVGRepo_bgCarrier' strokeWidth='0'></g>
@@ -13,4 +13,4 @@ const Friends = (props) => {
   )
 }
 
-export default Friends
+export default FriendsIcon

@@ -1,4 +1,4 @@
-const Arts = (props) => {
+const ArtsIcon = (props: any) => {
   return (
     <svg fill='#a52a2a' width='64px' height='64px' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' {...props}>
       <g id='SVGRepo_bgCarrier' strokeWidth='0'></g>
@@ -11,4 +11,4 @@ const Arts = (props) => {
   )
 }
 
-export default Arts
+export default ArtsIcon

@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Feed = (props) => {
+const FeedIcon = (props: any) => {
   return (
     <svg
       fill='#a52a2a'
@@ -32,4 +32,4 @@ const Feed = (props) => {
   )
 }
 
-export default Feed
+export default FeedIcon

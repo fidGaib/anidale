@@ -1,4 +1,4 @@
-const Like = (props) => {
+const LikeIcon = (props: any) => {
   return (
     <svg fill='#c0c0c0' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' {...props}>
       <g id='SVGRepo_bgCarrier' strokeWidth='0'></g>
@@ -10,4 +10,4 @@ const Like = (props) => {
   )
 }
 
-export default Like
+export default LikeIcon

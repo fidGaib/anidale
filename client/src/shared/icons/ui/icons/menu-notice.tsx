@@ -1,4 +1,4 @@
-const MenuNotice = (props) => {
+const MenuNoticeIcon = (props: any) => {
   return (
     <svg
       {...props}
@@ -19,4 +19,4 @@ const MenuNotice = (props) => {
   )
 }
 
-export default MenuNotice
+export default MenuNoticeIcon
