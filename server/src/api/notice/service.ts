@@ -1,4 +1,3 @@
-import { InputMaybe } from '@schema/resolvers-types'
 import { createGraphQLError } from 'graphql-yoga'
 
 import { Notice } from '../../db/models/notice-model'
@@ -44,8 +43,8 @@ class NoticeService {
         //not completed
         return {}
       }
-    } catch (e: any) {
-      throw createGraphQLError(e.message)
+    } catch (e: unknown) {
+      throw createGraphQLError(e instanceof Error ? e.message : String(e))
     }
   }
   async remove(id: number) {
@@ -56,19 +55,19 @@ class NoticeService {
         },
       })
       return true
-    } catch (e: any) {
-      throw createGraphQLError(e.message)
+    } catch (e: unknown) {
+      throw createGraphQLError(e instanceof Error ? e.message : String(e))
     }
   }
-  async update(id: number, description: string, images: File[]) {
+  async update(id: number, description?: string, images?: File[]) {
     try {
       const newNotice = {
         description,
       }
       const notice = await Notice.update({ where: { id }, data: newNotice, include: { user: true } })
       return notice
-    } catch (e: any) {
-      throw createGraphQLError(e.message)
+    } catch (e: unknown) {
+      throw createGraphQLError(e instanceof Error ? e.message : String(e))
     }
   }
 }

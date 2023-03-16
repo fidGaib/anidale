@@ -1,5 +1,4 @@
 import { Resolvers } from '@schema/resolvers-types'
-import { createGraphQLError } from 'graphql-yoga'
 
 import noticeController from '../../api/notice/controller'
 

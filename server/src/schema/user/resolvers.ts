@@ -20,16 +20,16 @@ const UserResolvers: Resolvers = {
       const { req, res } = ctx
       return await UserController.login(args.user, req, res)
     },
-    async update(parent, args: any) {
-      let { id, user } = args
+    async update(parent, args) {
+      const { id, user } = args
       return await UserController.updateUser(id, user)
     },
     async remove(parent, args) {
-      let { id } = args
+      const { id } = args
       return await UserController.remove(id)
     },
     async logout(parent, args) {
-      let { refreshToken } = args
+      const { refreshToken } = args
       return await UserController.logout(refreshToken)
     },
     async refresh(parent, args, ctx) {

@@ -4,9 +4,9 @@ import { createGraphQLError } from 'graphql-yoga'
 export const fileScalar = new GraphQLScalarType({
   name: 'File',
   description: 'The `File` scalar type represents a file upload.',
-  parseValue: (value: any) => value,
-  parseLiteral: (ast: any) => {
+  parseValue: (value: unknown) => value,
+  parseLiteral: () => {
     throw createGraphQLError('File cannot be passed via literal.')
   },
-  serialize: (value: any) => value,
+  serialize: (value: unknown) => value,
 })

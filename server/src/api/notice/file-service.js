@@ -9,21 +9,17 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
 class fileService {
   directory = join(__dirname, '../uploads')
   async validate(file, maxSize, mimetype) {
-    try {
-      const size = file.size
-      let type = file.mimetype.split('/')
-      type = type[0]
-      let max_size = maxSize * 1024 * 1024
-      if (mimetype !== type) {
-        return { error: 'Загружать можно лишь арты.' }
-      }
-      if (size > max_size) {
-        return { error: `Размер арта не должен превышать ${maxSize}мб.` }
-      }
-      return true
-    } catch (e) {
-      next(e)
+    const size = file.size
+    let type = file.mimetype.split('/')
+    type = type[0]
+    let max_size = maxSize * 1024 * 1024
+    if (mimetype !== type) {
+      return { error: 'Загружать можно лишь арты.' }
     }
+    if (size > max_size) {
+      return { error: `Размер арта не должен превышать ${maxSize}мб.` }
+    }
+    return true
   }
   async upload_one(file, user_id, cat, compress, maxWidth, maxHeight) {
     try {
@@ -73,9 +69,9 @@ class fileService {
     //max
     images.map((i) => {
       let min = join(pth, i.minimize)
-      unlink(min, () => {})
+      unlink(min, null)
       let max = join(pth, i.oversize)
-      unlink(max, () => {})
+      unlink(max, null)
     })
     return true
   }

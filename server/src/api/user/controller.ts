@@ -1,33 +1,18 @@
+import { Login, Registration, UpdateUser } from '@schema/resolvers-types'
+import { Request, Response } from 'express'
 import { createGraphQLError } from 'graphql-yoga'
 
 import UserService from './service'
 
-interface Registration {
-  email: string
-  pass: string
-  pass2: string
-}
-interface Login {
-  email: string
-  pass: string
-}
-interface UpdateUser {
-  email?: string
-  pass?: string
-  login?: string
-  avatar?: string
-  activationLink?: string
-  isActivated?: boolean
-}
-const re =
-  /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
+const emailRegex =
+  /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i
 class UserControllerGraph {
-  async registration(user: Registration, req: any, res: any) {
+  async registration(user: Registration, req: Request, res: Response) {
     try {
       const { email, pass, pass2 } = user
       if (!email.trim() || !pass.trim() || !pass2.trim()) {
         throw createGraphQLError('У вас пустые поля')
-      } else if (!email.match(re)) {
+      } else if (!email.match(emailRegex)) {
         throw createGraphQLError('Некорректный E-mail')
       } else if (pass !== pass2) {
         throw createGraphQLError('Пароли не совпадают')
@@ -43,16 +28,16 @@ class UserControllerGraph {
         refreshToken: userData.refreshToken,
         ...userData.user,
       }
-    } catch (e: any) {
-      throw createGraphQLError(e.message)
+    } catch (e: unknown) {
+      throw createGraphQLError(e instanceof Error ? e.message : String(e))
     }
   }
-  async login(user: Login, req: any, res: any) {
+  async login(user: Login, req: Request, res: Response) {
     try {
       const { email, pass } = user
       if (!email.trim() || !pass.trim()) {
         throw createGraphQLError('У вас пустые поля')
-      } else if (!email.match(re)) {
+      } else if (!email.match(emailRegex)) {
         throw createGraphQLError('Некорректный E-mail')
       }
       const userData = await UserService.login(email, pass)
@@ -65,51 +50,54 @@ class UserControllerGraph {
         refreshToken: userData.refreshToken,
         ...userData.user,
       }
-    } catch (e: any) {
-      throw createGraphQLError(e.message)
+    } catch (e: unknown) {
+      throw createGraphQLError(e instanceof Error ? e.message : String(e))
     }
   }
   async fetchOne(id: number) {
     try {
       return await UserService.getUser(id)
-    } catch (e: any) {
-      throw createGraphQLError(e.message)
+    } catch (e: unknown) {
+      throw createGraphQLError(e instanceof Error ? e.message : String(e))
     }
   }
   async fetchMany() {
     try {
       return await UserService.getUsers()
-    } catch (e: any) {
-      throw createGraphQLError(e.message)
+    } catch (e: unknown) {
+      throw createGraphQLError(e instanceof Error ? e.message : String(e))
     }
   }
-  async updateUser(id: number, user: UpdateUser) {
+  async updateUser(id: number, user?: UpdateUser) {
     try {
       if (!user) return {}
-      if (user.email && !user.email.match(re)) {
+      if (user.email && !user.email.match(emailRegex)) {
         throw createGraphQLError('Некорректный E-mail')
       }
+
+      user.email = user.email ?? undefined
+
       const userData = await UserService.update(id, user)
       return userData
-    } catch (e: any) {
-      throw createGraphQLError(e.message)
+    } catch (e: unknown) {
+      throw createGraphQLError(e instanceof Error ? e.message : String(e))
     }
   }
   async remove(id: number) {
     try {
       return await UserService.remove(id)
-    } catch (e: any) {
-      throw createGraphQLError(e.message)
+    } catch (e: unknown) {
+      throw createGraphQLError(e instanceof Error ? e.message : String(e))
     }
   }
   async logout(refreshToken: string) {
     try {
       return await UserService.logout(refreshToken)
-    } catch (e: any) {
-      throw createGraphQLError(e.message)
+    } catch (e: unknown) {
+      throw createGraphQLError(e instanceof Error ? e.message : String(e))
     }
   }
-  async refresh(req: any, res: any) {
+  async refresh(req: Request, res: Response) {
     try {
       const { refreshToken } = req.cookies
       const user = await UserService.refresh(refreshToken)
@@ -118,8 +106,8 @@ class UserControllerGraph {
         httpOnly: true,
       })
       return user
-    } catch (e: any) {
-      throw createGraphQLError(e.message)
+    } catch (e: unknown) {
+      throw createGraphQLError(e instanceof Error ? e.message : String(e))
     }
   }
 }

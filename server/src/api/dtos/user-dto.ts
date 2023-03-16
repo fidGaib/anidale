@@ -1,6 +1,6 @@
 import { User } from '@prisma/client'
 
-export default class userDto {
+export default class UserDto {
   id: number
   email: string
   login: string

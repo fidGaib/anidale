@@ -1,3 +1,4 @@
+import { UpdateUser } from '@schema/resolvers-types'
 import { compare, hash } from 'bcrypt'
 import { createGraphQLError } from 'graphql-yoga'
 import { v4 } from 'uuid'
@@ -8,20 +9,12 @@ import avatar from '../dtos/avatar-random'
 import UserDto from '../dtos/user-dto'
 import tokenServiceGraph from './token-service-graph'
 
-interface UpdateUser {
-  email?: string
-  pass?: string
-  login?: string
-  avatar?: string
-  activationLink?: string
-  isActivated?: boolean
-}
 class UserService {
   async registration(email: string, pass: string) {
     try {
       const candidate = await User.findUnique({ where: { email: email.trim() } })
       if (candidate) throw createGraphQLError('E-mail занят')
-      let defaultLogin = Math.round(Math.random() * 99999999)
+      const defaultLogin = Math.round(Math.random() * 99999999)
       const avatar_random = Math.round(Math.random() * avatar.length)
       const hashPass = await hash(pass + process.env.SALT, 5)
       const activationLink = v4()
@@ -42,8 +35,8 @@ class UserService {
         ...tokens,
         user: userDto,
       }
-    } catch (e: any) {
-      throw createGraphQLError(e.message)
+    } catch (e: unknown) {
+      throw createGraphQLError(e instanceof Error ? e.message : String(e))
     }
   }
   async login(email: string, pass: string) {
@@ -59,8 +52,8 @@ class UserService {
         ...tokens,
         user: userDto,
       }
-    } catch (e: any) {
-      throw createGraphQLError(e.message)
+    } catch (e: unknown) {
+      throw createGraphQLError(e instanceof Error ? e.message : String(e))
     }
   }
   async getUser(id: number) {
@@ -85,8 +78,8 @@ class UserService {
       }
       const userData = await User.update({ where: { id }, data: user })
       return userData
-    } catch (e: any) {
-      throw createGraphQLError(e.message)
+    } catch (e: unknown) {
+      throw createGraphQLError(e instanceof Error ? e.message : String(e))
     }
   }
   async remove(id: number) {
@@ -108,15 +101,15 @@ class UserService {
         },
       })
       return true
-    } catch (e: any) {
-      throw createGraphQLError(e.message)
+    } catch (e: unknown) {
+      throw createGraphQLError(e instanceof Error ? e.message : String(e))
     }
   }
   async logout(refreshToken: string) {
     const token = await tokenServiceGraph.removeToken(refreshToken)
     return token
   }
-  async refresh(refreshToken: any) {
+  async refresh(refreshToken?: string) {
     try {
       if (!refreshToken) throw createGraphQLError('НЕ АВТОРИЗОВАН')
       const userData = tokenServiceGraph.validateRefreshToken(refreshToken)
@@ -124,7 +117,7 @@ class UserService {
 
       if (!userData || !tokenFromDb) throw createGraphQLError('НЕ АВТОРИЗОВАН')
       const user = await User.findUnique({ where: { id: userData.id } })
-      const userDto = new UserDto(user)
+      const userDto = new UserDto(user!)
       const tokens = await tokenServiceGraph.generateTokens({ ...userDto })
 
       await tokenServiceGraph.saveToken(userDto.id, tokens.refreshToken)
@@ -133,8 +126,8 @@ class UserService {
         ...tokens,
         user: userDto,
       }
-    } catch (e: any) {
-      throw createGraphQLError(e.message)
+    } catch (e: unknown) {
+      throw createGraphQLError(e instanceof Error ? e.message : String(e))
     }
   }
 }

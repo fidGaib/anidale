@@ -1,4 +1,4 @@
-import { createGraphQLError } from 'graphql-yoga'
+import UserDto from 'api/dtos/user-dto'
 import jwt from 'jsonwebtoken'
 
 import Token from '../../db/models/token-model'
@@ -21,7 +21,7 @@ class TokenServiceGraph {
     this.refreshSecret = process.env.JWT_REFRESH_SECRET
   }
 
-  async generateTokens(payload: any) {
+  async generateTokens(payload: UserDto) {
     const accessToken = jwt.sign(payload, this.accessSecret, { expiresIn: '15m' })
     const refreshToken = jwt.sign(payload, this.refreshSecret, { expiresIn: '14d' })
     return {
@@ -29,11 +29,11 @@ class TokenServiceGraph {
       refreshToken,
     }
   }
-  async findToken(refreshToken: any) {
+  async findToken(refreshToken: string) {
       const tokenData = await Token.findMany({ where: { refreshToken }, include: { user: true } })
       return tokenData[0]
   }
-  async saveToken(userId: number, refreshToken: any) {
+  async saveToken(userId: number, refreshToken: string) {
     const tokenData = await Token.findMany({ where: { userId } })
     if (tokenData.length > 0) {
       return Token.update({
@@ -61,7 +61,7 @@ class TokenServiceGraph {
       return null
     }
   }
-  validateRefreshToken(token: any) {
+  validateRefreshToken(token: string) {
     try {
       const userData = <jwt.UserIDJwtPayload>jwt.verify(token, this.refreshSecret)
       return userData
