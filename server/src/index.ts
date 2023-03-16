@@ -4,8 +4,8 @@ import express from 'express'
 import fileUpload from 'express-fileupload'
 import { fileURLToPath } from 'url'
 
-import ErrorHandlingMiddleware from './api/middleware/ErrorHandlingMiddleware'
-import router from './routes'
+// import ErrorHandlingMiddleware from './api/middleware/ErrorHandlingMiddleware'
+// import router from './routes'
 import { yoga } from './schema'
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
@@ -21,13 +21,13 @@ app.use(
   }),
 )
 app.use(express.json())
-app.use('/api/uploads', express.static(__dirname + '/api/uploads'))
-app.use(express.static(__dirname + '/api/uploads'))
+app.use('/api/uploads', express.static(__dirname + '../api/uploads'))
+app.use(express.static(__dirname + '../api/uploads'))
 app.use(fileUpload({ createParentPath: true }))
 app.use(cookieParser())
-app.use('/api', router)
+// app.use('/api', router)
 app.use('/graphql', yoga)
-app.use(ErrorHandlingMiddleware)
+// app.use(ErrorHandlingMiddleware)
 const start = async () => {
   try {
     app.listen(PORT, () => console.log(`Server started on port ${PORT}`))
