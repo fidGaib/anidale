@@ -1,12 +1,10 @@
-/*eslint-env node*/
-
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { defineConfig } = require('eslint-define-config')
 
 /** @type 'eslint/config' */
 module.exports = defineConfig({
   env: {
-    browser: true,
+    node: true,
     es2022: true,
   },
   extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
@@ -18,4 +16,5 @@ module.exports = defineConfig({
   },
   plugins: ['@typescript-eslint'],
   rules: {},
+  ignorePatterns: ['**/resolvers-types.ts'],
 })
