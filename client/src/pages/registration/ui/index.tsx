@@ -1,9 +1,9 @@
 import { useState } from 'react'
 
-import Content from '../../shared/content'
-import cl from './index.module.less'
+import Content from '../../../shared/content'
+import cl from './styles/index.module.less'
 
-const Registration = () => {
+export const Registration = () => {
   const [email, setEmail] = useState('')
   const [pass, setPass] = useState('')
   return (
@@ -35,5 +35,3 @@ const Registration = () => {
     </Content>
   )
 }
-
-export default Registration

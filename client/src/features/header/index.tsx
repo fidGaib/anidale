@@ -9,7 +9,7 @@ const MenuHeader = () => {
         <Link to={'/feed'}>Лента</Link>
       </li>
       <li>
-        <Link to={'/profile'}>Профиль</Link>
+        <Link to={'/profile/0'}>Профиль</Link>
       </li>
       <li>
         <Link to={'/friends'}>Друзья</Link>

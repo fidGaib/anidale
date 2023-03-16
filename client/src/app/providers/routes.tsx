@@ -1,9 +1,12 @@
-import Feed from '../../pages/feed'
-import Friends from '../../pages/friends'
-import Profile from '../../pages/profile'
-import Registration from '../../pages/registration'
-import Signin from '../../pages/signin'
-import Signout from '../../pages/signout'
+import { lazy } from 'react'
+
+import { Registration } from '@/pages/registration/'
+
+const Feed = lazy(() => import('@/pages/feed'))
+const Friends = lazy(() => import('@/pages/friends'))
+const Profile = lazy(() => import('@/pages/profile'))
+const Signin = lazy(() => import('@/pages/signin'))
+const Signout = lazy(() => import('@/pages/signout'))
 
 // private routers
 export const privateRouters = [

@@ -1,11 +1,3 @@
-import Content from '../../shared/content'
-
-const Feed = () => {
-  return (
-    <Content>
-      <div>Feed</div>
-    </Content>
-  )
-}
+import { Feed } from './ui/feed'
 
 export default Feed

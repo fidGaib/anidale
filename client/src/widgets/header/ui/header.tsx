@@ -1,8 +1,9 @@
-import MenuHeader from '../../features/header'
-import Icon from '../../shared/icons'
+import MenuHeader from '@/features/header'
+import Icon from '@/shared/icons'
+
 import cl from './styles/header.module.less'
 
-const Header = () => {
+export const Header = () => {
   return (
     <header className={cl.wrapper}>
       <Icon id={'logo'} className={cl.logo} />
@@ -10,5 +11,3 @@ const Header = () => {
     </header>
   )
 }
-
-export default Header

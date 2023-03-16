@@ -1,8 +1,10 @@
+import { lazy } from 'react'
 import { Route, Routes } from 'react-router-dom'
 
-import { privateRouters, publicRouters } from '.'
-import Feed from '../../pages/feed'
-import Signin from '../../pages/signin'
+import { privateRouters, publicRouters } from './routes'
+
+const Signin = lazy(() => import('@/pages/signin'))
+const Feed = lazy(() => import('@/pages/feed'))
 
 const AppRouter = () => {
   return true ? (

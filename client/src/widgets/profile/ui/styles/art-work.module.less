@@ -1,0 +1,32 @@
+.wrapper {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  border-radius: var(--playground-border);
+  background: var(--playground);
+}
+.artwork {
+  display: flex;
+  width: 100%;
+  height: 230px;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+.artwork .avatar {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+}
+.artwork .nickname {
+  border-radius: 20px;
+  background: rgb(235, 235, 235);
+  padding: 3px 15px;
+  font-weight: bold;
+  overflow: hidden;
+  font-family: monospace;
+  z-index: 9;
+  position: absolute;
+  font-size: var(--size-text-main);
+  bottom: 10px;
+}

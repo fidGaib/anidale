@@ -1,4 +1,4 @@
-import Logo from './ui/logo'
+import Logo from './icons/logo'
 
 const icons = {
   logo: (cl?: string) => <Logo className={cl} />,
@@ -7,8 +7,6 @@ interface PropsType {
   id: keyof typeof icons
   className?: string
 }
-const Icon = (props: PropsType) => {
+export const Icon = (props: PropsType) => {
   return icons[props.id](props.className)
 }
-
-export default Icon

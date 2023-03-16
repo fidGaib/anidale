@@ -1,7 +1,8 @@
 import { gql, useQuery } from '@apollo/client'
 import { Link } from 'react-router-dom'
 
-import cl from '../../../../pages/friends/index.module.less'
+import cl from '@/pages/friends/ui/styles/index.module.less'
+
 import { GET_USERS } from '../../schema'
 
 const GetUsers = () => {

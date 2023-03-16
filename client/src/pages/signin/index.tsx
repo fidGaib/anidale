@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 import Content from '../../shared/content'
-import cl from '../registration/index.module.less'
+import cl from '../registration/ui/styles/index.module.less'
 
 const Signin = () => {
   const [email, setEmail] = useState('')
