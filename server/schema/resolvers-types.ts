@@ -393,6 +393,7 @@ export type QueryResolvers<
   getUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryGetUserArgs, 'id'>>
   getUsers?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>
   refresh?: any
+  logout?: any
 }
 
 export type RefreshResolvers<

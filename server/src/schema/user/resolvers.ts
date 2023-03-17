@@ -13,6 +13,10 @@ const UserResolvers: Resolvers = {
       const { req, res } = ctx
       return await UserController.refresh(req, res)
     },
+    async logout(parent: any, args: any, ctx: any) {
+      const { req, res } = ctx
+      return await UserController.logout(req, res)
+    },
   },
   Mutation: {
     async registration(parent, args, ctx) {
@@ -30,10 +34,6 @@ const UserResolvers: Resolvers = {
     async remove(parent, args) {
       const { id } = args
       return await UserController.remove(id)
-    },
-    async logout(parent, args) {
-      const { refreshToken } = args
-      return await UserController.logout(refreshToken)
     },
   },
 }

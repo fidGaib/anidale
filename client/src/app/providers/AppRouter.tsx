@@ -6,7 +6,7 @@ import { REFRESH } from '@/shared/graphql/schema'
 
 import { privateRouters, publicRouters } from './routes'
 
-const Signin = lazy(() => import('@/pages/signin'))
+const Signin = lazy(() => import('@/providers/auth/signin'))
 const Feed = lazy(() => import('@/pages/feed'))
 
 const AppRouter = () => {

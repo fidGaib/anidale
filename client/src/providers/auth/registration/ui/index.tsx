@@ -1,13 +1,26 @@
+import { gql, useMutation } from '@apollo/client'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 
 import Content from '@/shared/content'
+import { REGISTRATION } from '@/shared/graphql/schema'
 
 import cl from './styles/index.module.less'
 
 export const Registration = () => {
   const [email, setEmail] = useState('')
   const [pass, setPass] = useState('')
+  const [pass2, setPass2] = useState('')
+  const [isError, setError] = useState('')
+  const [REG, { data, loading, error }] = useMutation(REGISTRATION)
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (!email || !pass || !pass2) return
+    REG({ variables: { email, pass, pass2 } })
+  }
+  if (data?.registration.accessToken) {
+    return <Navigate to='/signin' replace={false} />
+  }
   return (
     <Content>
       <div className={cl.wrapLogin}>
@@ -18,19 +31,18 @@ export const Registration = () => {
           />
         </div>
         <div className={cl.conteiner}>
-          <form>
-            {/* <p>{loginStore.error}</p> */}
+          <form onSubmit={(e) => onSubmit(e)}>
+            {error && <p>{error.message}</p>}
+            {isError && <p>{isError}</p>}
             <input onChange={(e) => setEmail(e.target.value)} value={email} type='email' placeholder='E-mail...' />
             <input onChange={(e) => setPass(e.target.value)} value={pass} type='password' placeholder='Пароль...' />
             <input
-              onChange={(e) => setPass(e.target.value)}
-              value={pass}
+              onChange={(e) => setPass2(e.target.value)}
+              value={pass2}
               type='password'
               placeholder='Подтвердите пароль...'
             />
-            <button onClick={(e) => '' /*loginStore.login(e, email, pass) */} className={cl.sign}>
-              Регистрация
-            </button>
+            <button className={cl.sign}>Регистрация</button>
             <p className={cl.redirect}>
               Есть аккаунт? - <Link to={'/signin'}>Войти</Link>
             </p>

@@ -2,13 +2,13 @@ type Query {
   getUser(id: Int!): User
   getUsers: [User!]!
   refresh: Refresh
+  logout: Boolean
 }
 type Mutation {
   registration(user: Registration!): User
   login(user: Login!): User
   update(id: Int!, user: UpdateUser): UpdateUserQuery
   remove(id: Int!): Boolean
-  logout(refreshToken: String!): Boolean
 }
 type Refresh {
   refreshToken: String

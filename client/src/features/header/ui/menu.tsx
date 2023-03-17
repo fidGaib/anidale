@@ -17,7 +17,7 @@ export const MenuHeader = forwardRef((props, ref?: any) => {
           <>
             <li>
               <Icon id='profile' className={cl.menuSvg} />
-              <Link to={`/profile/${data}`}>Профиль</Link>
+              <Link to={`/profile/${data.refresh.user.id}`}>Профиль</Link>
             </li>
             <li>
               <Icon id='feed' className={cl.menuSvg} />

@@ -90,8 +90,9 @@ class UserControllerGraph {
       throw createGraphQLError(e instanceof Error ? e.message : String(e))
     }
   }
-  async logout(refreshToken: string) {
+  async logout(req: Request, res: Response) {
     try {
+      const { refreshToken } = req.cookies
       return await UserService.logout(refreshToken)
     } catch (e: unknown) {
       throw createGraphQLError(e instanceof Error ? e.message : String(e))

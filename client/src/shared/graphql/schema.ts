@@ -13,12 +13,36 @@ export const REFRESH = gql`
   query {
     refresh {
       accessToken
+      user {
+        id
+      }
     }
   }
 `
-export const PROFILE = gql`
+export const LOGOUT = gql`
   query {
-    getUser(id: id) {
+    logout
+  }
+`
+export const REGISTRATION = gql`
+  mutation REG($email: String!, $pass: String!, $pass2: String!) {
+    registration(user: { email: $email, pass: $pass, pass2: $pass2 }) {
+      id
+      accessToken
+    }
+  }
+`
+export const SIGNIN = gql`
+  mutation LOGIN($email: String!, $pass: String!) {
+    login(user: { email: $email, pass: $pass }) {
+      id
+      accessToken
+    }
+  }
+`
+export const PROFILE = (id?: number) => gql`
+  query {
+    getUser(id: ${id}) {
       login
       avatar
     }
