@@ -22,6 +22,10 @@ model User {
   createdAt   DateTime @default(now())
   notices     Notice[]
   tokens      Token[]
+  chats       Chat[]
+  messages    Message[]
+  friends     User[]   @relation(name: "Friendship")
+  friendTo    User[]   @relation(name: "Friendship")
 }
 
 model Notice {
@@ -29,7 +33,7 @@ model Notice {
   description String
   date        DateTime @default(now())
   images      NoticeImage[]
-  user        User    @relation(fields: [userId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
   userId      Int
 }
 
@@ -48,4 +52,20 @@ model Token {
   user        User     @relation(fields: [userId], references: [id])
   userId      Int
   refreshToken String
+}
+
+model Chat {
+  id          Int      @id @default(autoincrement())
+  users       User[]
+  messages    Message[] 
+}
+
+model Message {
+  id          Int      @id @default(autoincrement())
+  chat        Chat     @relation(fields: [chatId], references: [id])
+  chatId      Int
+  sender      User     @relation(fields: [senderId], references: [id])
+  senderId    Int
+  text        String
+  sentAt      DateTime @default(now())
 }
