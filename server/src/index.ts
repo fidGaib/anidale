@@ -21,8 +21,8 @@ app.use(
   }),
 )
 app.use(express.json())
-app.use('/public', express.static(__dirname + '/public/images'))
-app.use(express.static(__dirname + '/public/images'))
+app.use('/public', express.static(__dirname + '../public/images'))
+app.use(express.static(__dirname + '../public/images'))
 app.use(fileUpload({ createParentPath: true }))
 app.use(cookieParser())
 // app.use('/api', router)
