@@ -3,7 +3,7 @@ import cl from './styles/style.module.css'
 export const Loader = () => {
   return (
     <div className={cl.loader}>
-      <img src='http://localhost:5000/public/loading.gif' />
+      <img src='http://localhost:5000/storage/files-site/images/loading.gif' />
     </div>
   )
 }
