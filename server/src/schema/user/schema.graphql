@@ -7,30 +7,13 @@ type Query {
 type Mutation {
   registration(user: Registration!): User
   login(user: Login!): User
-  update(id: Int!, user: UpdateUser): UpdateUserQuery
+  update(id: Int!, user: UpdateUser): User
   remove(id: Int!): Boolean
 }
 type Refresh {
   refreshToken: String
   accessToken: String
-  user: RefreshUserQuery
-}
-type RefreshUserQuery {
-  id: Int
-  email: String
-  login: String
-  avatar: String
-  isActivated: Boolean
-  createdAt: Date
-}
-type UpdateUserQuery {
-  id: Int
-  email: String
-  login: String
-  avatar: String
-  activationLink: String
-  isActivated: Boolean
-  createdAt: Date
+  user: User
 }
 type User {
   id: Int
