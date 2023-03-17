@@ -1,7 +1,7 @@
 import Router from 'express'
 import { body } from 'express-validator'
 
-import userController from '../../api/user/user-controller'
+import userController from '@/api/user/user-controller'
 
 const router = Router()
 

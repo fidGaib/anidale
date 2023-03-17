@@ -1,7 +1,7 @@
 import Router from 'express'
 import { body } from 'express-validator'
 
-import noticeController from '../../api/notice/notice-controller'
+import noticeController from '@/api/notice/notice-controller'
 
 const router = Router()
 

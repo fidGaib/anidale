@@ -1,5 +1,5 @@
-import { Resolvers } from '../../../schema/resolvers-types'
-import UserController from '../../api/user/controller'
+import UserController from '@/api/user/controller'
+import { Resolvers } from '@/schema/resolvers-types'
 
 const UserResolvers: Resolvers = {
   Query: {

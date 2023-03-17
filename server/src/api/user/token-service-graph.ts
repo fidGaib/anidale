@@ -1,7 +1,7 @@
-import UserDto from 'api/dtos/user-dto'
+import UserDto from '@/api/dtos/user-dto'
 import jwt from 'jsonwebtoken'
 
-import Token from '../../db/models/token-model'
+import Token from '@/db/models/token-model'
 
 declare module 'jsonwebtoken' {
     export interface UserIDJwtPayload extends jwt.JwtPayload {

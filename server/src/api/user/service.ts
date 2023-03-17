@@ -1,10 +1,11 @@
-import { UpdateUser } from '@schema/resolvers-types'
 import { compare, hash } from 'bcrypt'
 import { createGraphQLError } from 'graphql-yoga'
 import { v4 } from 'uuid'
 
-import Token from '../../db/models/token-model'
-import User from '../../db/models/user-model'
+import Token from '@/db/models/token-model'
+import User from '@/db/models/user-model'
+import { UpdateUser } from '@/schema/resolvers-types'
+
 import avatar from '../dtos/avatar-random'
 import UserDto from '../dtos/user-dto'
 import tokenServiceGraph from './token-service-graph'

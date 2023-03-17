@@ -1,6 +1,5 @@
-import { Resolvers } from '@schema/resolvers-types'
-
-import noticeController from '../../api/notice/controller'
+import noticeController from '@/api/notice/controller'
+import { Resolvers } from '@/schema/resolvers-types'
 
 const PostResolvers: Resolvers = {
   Query: {

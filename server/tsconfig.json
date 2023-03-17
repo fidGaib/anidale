@@ -15,11 +15,9 @@
     "strictPropertyInitialization": true,
     "allowJs": true,
 
-    "baseUrl": "src",
+    "baseUrl": ".",
     "paths": {
-      "@schema/*": ["src/schema/*"],
-      "@api/*": ["src/api/*"],
-      "@db/*": ["src/db/*"]
+      "@/*": ["src/*"]
     },
     "outDir": "dist"
   },

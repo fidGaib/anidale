@@ -1,5 +1,6 @@
-import { InputMaybe } from '@schema/resolvers-types'
 import { createGraphQLError } from 'graphql-yoga'
+
+import { InputMaybe } from '@/schema/resolvers-types'
 
 import NoticeService from './service'
 

@@ -1,6 +1,7 @@
-import { Login, Registration, UpdateUser } from '@schema/resolvers-types'
 import { Request, Response } from 'express'
 import { createGraphQLError } from 'graphql-yoga'
+
+import { Login, Registration, UpdateUser } from '@/schema/resolvers-types'
 
 import UserService from './service'
 

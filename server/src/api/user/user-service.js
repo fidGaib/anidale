@@ -1,7 +1,8 @@
 import { compare, hash } from 'bcrypt'
 import { v4 } from 'uuid'
 
-import User from '../../db/models/user-model'
+import User from '@/db/models/user-model'
+
 import avatar from '../dtos/avatar-random'
 import UserDto from '../dtos/user-dto'
 import ApiError from '../error/ApiError'

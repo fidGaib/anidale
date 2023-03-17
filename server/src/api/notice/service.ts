@@ -1,6 +1,6 @@
 import { createGraphQLError } from 'graphql-yoga'
 
-import { Notice } from '../../db/models/notice-model'
+import { Notice } from '@/db/models/notice-model'
 
 class NoticeService {
   async findAll(limit: number, page: number) {
