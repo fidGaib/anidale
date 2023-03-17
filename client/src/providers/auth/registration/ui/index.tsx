@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 
 import Content from '@/shared/content'
 
@@ -28,8 +29,11 @@ export const Registration = () => {
               placeholder='Подтвердите пароль...'
             />
             <button onClick={(e) => '' /*loginStore.login(e, email, pass) */} className={cl.sign}>
-              Зарегистрироваться
+              Регистрация
             </button>
+            <p className={cl.redirect}>
+              Есть аккаунт? - <Link to={'/signin'}>Войти</Link>
+            </p>
           </form>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 
 import Content from '@/shared/content'
 
@@ -24,6 +25,10 @@ const Signin = () => {
             <button onClick={(e) => '' /*loginStore.login(e, email, pass) */} className={cl.sign}>
               Войти
             </button>
+
+            <p className={cl.redirect}>
+              Нет аккаунта? - <Link to={'/registration'}>Регистрация</Link>
+            </p>
           </form>
         </div>
       </div>
