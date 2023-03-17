@@ -33,8 +33,6 @@ input UpdateUser {
   avatar: String
   activationLink: String
   isActivated: Boolean
-  accessToken: String
-  refreshToken: String
 }
 input Registration {
   email: String!

@@ -18,10 +18,14 @@ class UserControllerGraph {
       } else if (pass !== pass2) {
         throw createGraphQLError('Пароли не совпадают')
       }
-      const userData = await UserService.registration(email, pass)
+      const userData = await UserService.registration(email.trim(), pass.trim())
 
       res.cookie('refreshToken', userData.refreshToken, {
         maxAge: 14 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+      })
+      res.cookie('accessToken', userData.accessToken, {
+        maxAge: 15 * 60 * 1000,
         httpOnly: true,
       })
       return {
@@ -41,9 +45,13 @@ class UserControllerGraph {
       } else if (!email.match(emailRegex)) {
         throw createGraphQLError('Некорректный E-mail')
       }
-      const userData = await UserService.login(email, pass)
+      const userData = await UserService.login(email.trim(), pass.trim())
       res.cookie('refreshToken', userData.refreshToken, {
         maxAge: 14 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+      })
+      res.cookie('accessToken', userData.accessToken, {
+        maxAge: 15 * 60 * 1000,
         httpOnly: true,
       })
       return {
@@ -105,6 +113,10 @@ class UserControllerGraph {
       const user = await UserService.refresh(refreshToken)
       res.cookie('refreshToken', user.refreshToken, {
         maxAge: 14 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+      })
+      res.cookie('accessToken', user.accessToken, {
+        maxAge: 15 * 60 * 1000,
         httpOnly: true,
       })
       return user
