@@ -44,7 +44,7 @@ class UserService {
     try {
       const candidate = await User.findUnique({ where: { email } })
       if (!candidate) throw createGraphQLError('Пользователь не найден')
-      const isPassEquals = await compare(pass + process.env.SALT, candidate.pass)
+      const isPassEquals = await compare(pass + process.env.PASS_PEPPER, candidate.pass)
       if (!isPassEquals) throw createGraphQLError('Не верный пароль.')
       const userDto = new UserDto(candidate)
       const tokens = await tokenServiceGraph.generateTokens({ ...userDto })
