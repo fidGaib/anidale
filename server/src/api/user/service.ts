@@ -17,7 +17,7 @@ class UserService {
       if (candidate) throw createGraphQLError('E-mail занят')
       const defaultLogin = Math.round(Math.random() * 99999999)
       const avatar_random = Math.round(Math.random() * avatar.length)
-      const hashPass = await hash(pass + process.env.SALT, 5)
+      const hashPass = await hash(pass + process.env.PASS_PEPPER, 10)
       const activationLink = v4()
       const user = await User.create({
         data: {
@@ -74,7 +74,7 @@ class UserService {
         if (email) throw createGraphQLError('E-mail занят')
       }
       if (user.pass) {
-        const hashPass = await hash(user.pass + process.env.SALT, 5)
+        const hashPass = await hash(user.pass + process.env.PASS_PEPPER, 10)
         user.pass = hashPass
       }
       const userData = await User.update({ where: { id }, data: user })
