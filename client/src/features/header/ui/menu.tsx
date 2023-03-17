@@ -54,10 +54,6 @@ export const MenuHeader = forwardRef((props, ref?: any) => {
               <Icon id='signin' className={cl.menuSvg} />
               <Link to={'/signin'}>Войти</Link>
             </li>
-            <li>
-              <Icon id='registration' className={cl.menuSvg} />
-              <Link to={'/registration'}>Регистрация</Link>
-            </li>
           </>
         )}
       </ul>
