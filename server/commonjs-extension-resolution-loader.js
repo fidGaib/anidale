@@ -19,10 +19,16 @@ export function resolve(specifier, context, next) {
   }
   const parentPath = fileURLToPath(parentURL)
 
+  // typescript for alias
+  const iSTsAlias = specifier.startsWith('@/')
+
+  const specifierToResolve = iSTsAlias ? `./${specifier.slice(2)}` : specifier
+  const basedir = iSTsAlias ? `${fileURLToPath(baseURL)}src` : dirname(parentPath)
+
   let url
   try {
-    const resolution = Resolve.sync(specifier, {
-      basedir: dirname(parentPath),
+    const resolution = Resolve.sync(specifierToResolve, {
+      basedir,
       // For whatever reason, --experimental-specifier-resolution=node doesn't search for .mjs extensions
       // but it does search for index.mjs files within directories
       extensions: ['.js', '.ts', '.json', '.node', '.mjs'],

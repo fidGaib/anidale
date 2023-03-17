@@ -9,11 +9,11 @@ const UserResolvers: Resolvers = {
     async getUser(parent, args) {
       return await UserController.fetchOne(args.id)
     },
-    async refresh(parent: any, args: any, ctx: any) {
+    async refresh(parent, args, ctx) {
       const { req, res } = ctx
       return await UserController.refresh(req, res)
     },
-    async logout(parent: any, args: any, ctx: any) {
+    async logout(parent, args, ctx) {
       const { req, res } = ctx
       return await UserController.logout(req, res)
     },
