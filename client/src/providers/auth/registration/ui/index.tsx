@@ -18,7 +18,7 @@ export const Registration = () => {
     setError('')
     if (!email || !pass || !pass2) return
     if (pass !== pass2) return setError('Пароли не совпадают')
-    REG({ variables: { email, pass, pass2 } })
+    REG({ variables: { email, pass, pass2 }, fetchPolicy: 'network-only' })
   }
   if (data?.registration.id) return <Navigate to='/signin' replace={false} />
   return (

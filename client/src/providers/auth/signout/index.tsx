@@ -5,7 +5,7 @@ import { isAuth } from '@/app/providers/AppRouter'
 import { LOGOUT } from '@/shared/graphql/schema'
 
 const Signout = () => {
-  const { data, error, loading } = useQuery(LOGOUT)
+  useQuery(LOGOUT, { fetchPolicy: 'network-only' })
   isAuth(false)
   return <Navigate to='/signin' replace={false} />
 }

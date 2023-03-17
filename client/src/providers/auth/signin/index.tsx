@@ -15,7 +15,7 @@ const Signin = () => {
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!email || !pass) return
-    LOGIN({ variables: { email, pass } })
+    LOGIN({ variables: { email, pass }, fetchPolicy: 'network-only' })
   }
   if (data?.login.id) isAuth(true)
   return (

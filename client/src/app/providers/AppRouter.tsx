@@ -2,8 +2,6 @@ import { makeVar, useReactiveVar } from '@apollo/client'
 import { lazy } from 'react'
 import { Route, Routes } from 'react-router-dom'
 
-// import { REFRESH } from '@/shared/graphql/schema'
-// const { data, loading, error } = useQuery(REFRESH)
 import { privateRouters, publicRouters } from './routes'
 
 const Signin = lazy(() => import('@/providers/auth/signin'))
