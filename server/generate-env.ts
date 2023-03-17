@@ -22,7 +22,7 @@ JWT_REFRESH_SECRET='${randomBytes(128).toString('base64')}'
 # api option
 API_URL='http://localhost:5000'
 CLIENT_URL='http://localhost:5173'
-PASS_SALT = 'salt'
+PASS_PEPPER = '${randomBytes(8).toString('base64')}'
 `,
   )
 }
