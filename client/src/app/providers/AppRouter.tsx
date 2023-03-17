@@ -1,34 +1,35 @@
-import { useQuery } from '@apollo/client'
+import { makeVar, useReactiveVar } from '@apollo/client'
 import { lazy } from 'react'
 import { Route, Routes } from 'react-router-dom'
 
-import { REFRESH } from '@/shared/graphql/schema'
-
+// import { REFRESH } from '@/shared/graphql/schema'
+// const { data, loading, error } = useQuery(REFRESH)
 import { privateRouters, publicRouters } from './routes'
 
 const Signin = lazy(() => import('@/providers/auth/signin'))
 const Feed = lazy(() => import('@/pages/feed'))
+export const isAuth = makeVar(false)
 
 const AppRouter = () => {
-  const { data, loading, error } = useQuery(REFRESH)
-  if (data?.refresh) {
-    return (
-      <Routes>
-        {privateRouters.map((route) => (
-          <Route key={route.path} element={<route.element />} path={route.path} />
-        ))}
-        <Route element={<Feed />} path={'/*'} />
-      </Routes>
-    )
-  } else {
-    return (
-      <Routes>
-        {publicRouters.map((route) => (
-          <Route key={route.path} element={<route.element />} path={route.path} />
-        ))}
-        <Route element={<Signin />} path={'/*'} />
-      </Routes>
-    )
-  }
+  const changeAuth = useReactiveVar(isAuth)
+  return (
+    <>
+      {changeAuth ? (
+        <Routes>
+          {privateRouters.map((route) => (
+            <Route key={route.path} element={<route.element />} path={route.path} />
+          ))}
+          <Route element={<Feed />} path={'/*'} />
+        </Routes>
+      ) : (
+        <Routes>
+          {publicRouters.map((route) => (
+            <Route key={route.path} element={<route.element />} path={route.path} />
+          ))}
+          <Route element={<Signin />} path={'/*'} />
+        </Routes>
+      )}
+    </>
+  )
 }
 export default AppRouter

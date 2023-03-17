@@ -1,4 +1,4 @@
-import { gql, useMutation } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import { useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 
@@ -12,15 +12,15 @@ export const Registration = () => {
   const [pass, setPass] = useState('')
   const [pass2, setPass2] = useState('')
   const [isError, setError] = useState('')
-  const [REG, { data, loading, error }] = useMutation(REGISTRATION)
+  const [REG, { data, error }] = useMutation(REGISTRATION)
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    setError('')
     if (!email || !pass || !pass2) return
+    if (pass !== pass2) return setError('Пароли не совпадают')
     REG({ variables: { email, pass, pass2 } })
   }
-  if (data?.registration.accessToken) {
-    return <Navigate to='/signin' replace={false} />
-  }
+  if (data?.registration.id) return <Navigate to='/signin' replace={false} />
   return (
     <Content>
       <div className={cl.wrapLogin}>
