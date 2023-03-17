@@ -24,6 +24,8 @@ model User {
   tokens      Token[]
   chats       Chat[]
   messages    Message[]
+  friends     User[]   @relation(name: "Friendship")
+  friendTo    User[]   @relation(name: "Friendship")
 }
 
 model Notice {
