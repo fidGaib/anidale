@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { isAuth } from '@/app/providers/AppRouter'
 import Content from '@/shared/content'
 import { SIGNIN } from '@/shared/graphql/schema'
+import { Me } from '@/widgets/header/ui/header'
 
 import cl from '../registration/ui/styles/index.module.less'
 
@@ -17,7 +18,10 @@ const Signin = () => {
     if (!email || !pass) return
     LOGIN({ variables: { email, pass }, fetchPolicy: 'network-only' })
   }
-  if (data?.login.id) isAuth(true)
+  if (data?.login.id) {
+    isAuth(true)
+    Me(data.login)
+  }
   return (
     <Content>
       <div className={cl.wrapLogin}>
