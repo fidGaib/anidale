@@ -64,7 +64,7 @@ class fileService {
       console.log(e)
     }
   }
-  async removeNoticeImage(images) {
+  async removePostImage(images) {
     let pth = join(__dirname, '../uploads')
     //max
     images.map((i) => {

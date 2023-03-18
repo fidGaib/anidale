@@ -1,11 +1,11 @@
 import { createGraphQLError } from 'graphql-yoga'
 
-import { Notice } from '@/db/models/notice-model'
+import { Post } from '@/db/models/post-model'
 import User from '@/db/models/user-model'
 
-class NoticeService {
+class PostService {
   async findAll(limit: number, page: number) {
-    const notices = await Notice.findMany({
+    const posts = await Post.findMany({
       take: limit,
       skip: page,
       orderBy: { id: 'desc' },
@@ -14,10 +14,10 @@ class NoticeService {
         user: true,
       },
     })
-    return notices
+    return posts
   }
   async findByUser(id: number, limit: number, page: number) {
-    const notices = await Notice.findMany({
+    const posts = await Post.findMany({
       take: limit,
       skip: page,
       where: { userId: id },
@@ -27,21 +27,21 @@ class NoticeService {
         user: true,
       },
     })
-    return notices
+    return posts
   }
   //not completed
   async create(owner: number, description: string | null, images: File[] | null) {
     try {
       if (!images?.length && description) {
         const user = await User.findUnique({ where: { id: owner } })
-        const notice = await Notice.create({
+        const post = await Post.create({
           data: {
             userId: owner,
             description,
             feedId: user!.feedId,
           },
         })
-        return notice
+        return post
       } else {
         //not completed
         return {}
@@ -52,7 +52,7 @@ class NoticeService {
   }
   async remove(id: number) {
     try {
-      await Notice.delete({
+      await Post.delete({
         where: {
           id,
         },
@@ -64,14 +64,14 @@ class NoticeService {
   }
   async update(id: number, description?: string, images?: File[]) {
     try {
-      const newNotice = {
+      const newPost = {
         description,
       }
-      const notice = await Notice.update({ where: { id }, data: newNotice, include: { user: true } })
-      return notice
+      const post = await Post.update({ where: { id }, data: newPost, include: { user: true } })
+      return post
     } catch (e: unknown) {
       throw createGraphQLError(e instanceof Error ? e.message : String(e))
     }
   }
 }
-export default new NoticeService()
+export default new PostService()

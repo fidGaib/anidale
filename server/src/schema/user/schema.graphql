@@ -16,7 +16,7 @@ type Refresh {
   user: User
 }
 type User {
-  id: Int
+  id: Int!
   email: String
   login: String
   avatar: String
@@ -25,7 +25,14 @@ type User {
   createdAt: Date
   accessToken: String
   refreshToken: String
+  feed: Feed!
 }
+
+type Feed {
+  id: Int
+  posts: [Post!]!
+}
+
 input UpdateUser {
   email: String
   pass: String

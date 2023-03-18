@@ -19,7 +19,7 @@ model User {
   activationLink String?
   isActivated Boolean
   createdAt   DateTime @default(now())
-  notices     Notice[]
+  posts     Post[]
   tokens      Token[]
   chats       Chat[]
   messages    Message[]
@@ -29,30 +29,30 @@ model User {
   feedId      Int      @unique
 }
 
-model Notice {
+model Post {
   id          Int      @id @default(autoincrement())
   description String
   date        DateTime @default(now())
-  images      NoticeImage[]
+  images      PostImage[]
   user        User     @relation(fields: [userId], references: [id])
   userId      Int
   feed        Feed     @relation(fields: [feedId], references: [id])
   feedId      Int
 }
 
-model NoticeImage {
+model PostImage {
   id          Int      @id @default(autoincrement())
   minimize    String
   oversize    String
   vertical    Boolean
   date        DateTime @default(now())
-  notice      Notice   @relation(fields: [noticeId], references: [id])
-  noticeId    Int
+  post      Post   @relation(fields: [postId], references: [id])
+  postId    Int
 }
 
 model Feed {
   id          Int      @id @default(autoincrement())
-  notices     Notice[]
+  posts     Post[]
   updatedAt   DateTime @updatedAt
   user        User?
   userId      Int?

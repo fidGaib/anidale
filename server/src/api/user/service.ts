@@ -33,16 +33,16 @@ class UserService {
           avatar: avatar[avatar_random],
           feedId: feed.id,
         },
+        include: { feed: { include: { posts: true } }, friends: true },
       })
 
       Feed.update({ where: { id: feed.id }, data: { userId: user.id } })
 
-      const userDto = new UserDto(user)
-      const tokens = await tokenServiceGraph.generateTokens({ ...userDto })
-      await tokenServiceGraph.saveToken(userDto.id, tokens.refreshToken)
+      const tokens = await tokenServiceGraph.generateTokens(user)
+      await tokenServiceGraph.saveToken(user.id, tokens.refreshToken)
       return {
         ...tokens,
-        user: userDto,
+        user,
       }
     } catch (e: unknown) {
       throw createGraphQLError(e instanceof Error ? e.message : String(e))
@@ -50,28 +50,33 @@ class UserService {
   }
   async login(email: string, pass: string) {
     try {
-      const candidate = await User.findUnique({ where: { email } })
+      const candidate = await User.findUnique({
+        where: { email },
+        include: { feed: { include: { posts: true } }, friends: true },
+      })
       if (!candidate) throw createGraphQLError('Пользователь не найден')
       const isPassEquals = await compare(pass + process.env.PASS_PEPPER, candidate.pass)
       if (!isPassEquals) throw createGraphQLError('Не верный пароль.')
-      const userDto = new UserDto(candidate)
-      const tokens = await tokenServiceGraph.generateTokens({ ...userDto })
-      await tokenServiceGraph.saveToken(userDto.id, tokens.refreshToken)
+      const tokens = await tokenServiceGraph.generateTokens(candidate)
+      await tokenServiceGraph.saveToken(candidate.id, tokens.refreshToken)
       return {
         ...tokens,
-        user: userDto,
+        user: candidate,
       }
     } catch (e: unknown) {
       throw createGraphQLError(e instanceof Error ? e.message : String(e))
     }
   }
   async getUser(id: number) {
-    const user = await User.findUnique({ where: { id } })
+    const user = await User.findUnique({
+      where: { id },
+      include: { feed: { include: { posts: true } }, friends: true },
+    })
     if (!user) throw createGraphQLError('Пользователь не найден')
     return user
   }
   async getUsers() {
-    return await User.findMany()
+    return await User.findMany({ include: { feed: { include: { posts: true } }, friends: true } })
   }
   async update(id: number, user: UpdateUser) {
     try {
@@ -85,7 +90,11 @@ class UserService {
         const hashPass = await hash(user.pass + process.env.PASS_PEPPER, 10)
         user.pass = hashPass
       }
-      const userData = await User.update({ where: { id }, data: user })
+      const userData = await User.update({
+        where: { id },
+        data: user,
+        include: { feed: { include: { posts: true } }, friends: true },
+      })
       return userData
     } catch (e: unknown) {
       throw createGraphQLError(e instanceof Error ? e.message : String(e))
@@ -125,15 +134,22 @@ class UserService {
       const tokenFromDb = await tokenServiceGraph.findToken(refreshToken)
 
       if (!userData || !tokenFromDb) throw createGraphQLError('НЕ АВТОРИЗОВАН')
-      const user = await User.findUnique({ where: { id: userData.id } })
-      const userDto = new UserDto(user!)
-      const tokens = await tokenServiceGraph.generateTokens({ ...userDto })
+      const user = await User.findUnique({
+        where: { id: userData.id },
+        include: { feed: { include: { posts: true } }, friends: true },
+      })
 
-      await tokenServiceGraph.saveToken(userDto.id, tokens.refreshToken)
+      if (!user) {
+        throw Error('User not found')
+      }
+
+      const tokens = await tokenServiceGraph.generateTokens({ ...user })
+
+      await tokenServiceGraph.saveToken(user.id, tokens.refreshToken)
 
       return {
         ...tokens,
-        user: userDto,
+        user,
       }
     } catch (e: unknown) {
       throw createGraphQLError(e instanceof Error ? e.message : String(e))
