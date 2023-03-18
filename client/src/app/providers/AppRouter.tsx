@@ -2,7 +2,7 @@ import { useReactiveVar } from '@apollo/client'
 import { lazy } from 'react'
 import { Route, Routes } from 'react-router-dom'
 
-import { isAuthVar } from '@/shared/store/state'
+import { useAuth } from '@/entities/viewer'
 
 import { privateRouters, publicRouters } from './routes'
 
@@ -10,7 +10,7 @@ const Signin = lazy(() => import('@/providers/auth/signin'))
 const Feed = lazy(() => import('@/pages/feed'))
 
 const AppRouter = () => {
-  const isAuth = useReactiveVar(isAuthVar)
+  const isAuth = useAuth()
   return (
     <>
       {isAuth ? (

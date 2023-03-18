@@ -1,4 +1,4 @@
-import FormSignin from '@/entities/auth/signin'
+import { FormSignin } from '@/features/auth'
 import Content from '@/shared/content'
 
 import cl from '../signup/ui/styles/index.module.less'

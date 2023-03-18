@@ -1,11 +1,11 @@
 import { useQuery } from '@apollo/client'
 import { useEffect, useRef, useState } from 'react'
 
+import { ViewerVar } from '@/entities/viewer'
 import MenuHeader from '@/features/header'
 import { REFRESH } from '@/shared/graphql/schema'
 import useOutsideClick from '@/shared/hooks/useOutsideClick'
 import Icon from '@/shared/icons'
-import { MeVar, isAuthVar } from '@/shared/store/state'
 
 import cl from './styles/header.module.less'
 
@@ -20,10 +20,9 @@ export const Header = () => {
 
   useEffect(() => {
     if (data?.refresh.user) {
-      MeVar(data?.refresh.user)
-      setUserData(MeVar())
-      isAuthVar(true)
-    } else isAuthVar(false)
+      ViewerVar(data?.refresh.user)
+      setUserData(ViewerVar()!)
+    } else ViewerVar(null)
   }, [data?.refresh.user])
   const [showMenu, setShowMenu] = useState(false)
   const notCloseMenuRef = useRef(null)

@@ -14,7 +14,7 @@ interface InputValues {
   pass: string
 }
 
-export const AuthByCredentials = () => {
+export const FormSignin = () => {
   const { register, handleSubmit } = useForm<InputValues>()
   const [LOGIN, { data, error }] = useMutation(SIGNIN)
 

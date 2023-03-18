@@ -2,8 +2,8 @@ import { useMutation } from '@apollo/client'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
+import { ViewerVar } from '@/entities/viewer'
 import { SIGNIN } from '@/shared/graphql/schema'
-import { MeVar, isAuthVar } from '@/shared/store/state'
 import Input from '@/shared/ui/input/intex'
 
 import cl from './styles.module.less'
@@ -18,8 +18,7 @@ export const FormSignin = () => {
     LOGIN({ variables: { email, pass }, fetchPolicy: 'network-only' })
   }
   if (data?.login.id) {
-    isAuthVar(true)
-    MeVar(data.login)
+    ViewerVar(null)
   }
   return (
     <div className={cl.conteiner}>
