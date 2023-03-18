@@ -1,18 +1,20 @@
+import { useReactiveVar } from '@apollo/client'
 import { forwardRef } from 'react'
 import { Link } from 'react-router-dom'
 
-import { isAuth } from '@/app/providers/AppRouter'
 import Icon from '@/shared/icons'
 
 import cl from './styles/index.module.less'
+import { isAuthVar } from '@/shared/store/state'
 
 interface Props {
   id?: number
 }
 export const MenuHeader = forwardRef((props: Props, ref?: any) => {
+  const isAuth = useReactiveVar(isAuthVar)
   return (
     <ul className={cl.menu} ref={ref}>
-      {isAuth() ? (
+      {isAuth ? (
         <>
           <li>
             <Icon id='profile' className={cl.menuSvg} />

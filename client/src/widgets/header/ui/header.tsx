@@ -1,11 +1,11 @@
-import { makeVar, useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import { useEffect, useRef, useState } from 'react'
 
-import { isAuth } from '@/app/providers/AppRouter'
 import MenuHeader from '@/features/header'
 import { REFRESH } from '@/shared/graphql/schema'
 import useOutsideClick from '@/shared/hooks/useOutsideClick'
 import Icon from '@/shared/icons'
+import { Me, isAuthVar } from '@/shared/store/state'
 
 import cl from './styles/header.module.less'
 
@@ -14,7 +14,6 @@ interface UserType {
   login?: string
   avatar?: string
 }
-export const Me = makeVar<UserType>({})
 export const Header = () => {
   const { data } = useQuery(REFRESH, { fetchPolicy: 'network-only' })
   const [userData, setUserData] = useState<UserType>({})
@@ -22,8 +21,8 @@ export const Header = () => {
     if (data?.refresh.user) {
       Me(data?.refresh.user)
       setUserData(Me())
-      isAuth(true)
-    } else isAuth(false)
+      isAuthVar(true)
+    } else isAuthVar(false)
   }, [data?.refresh.user])
   const [showMenu, setShowMenu] = useState(false)
   const notCloseMenuRef = useRef(null)

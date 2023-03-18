@@ -1,11 +1,10 @@
-import { useMutation, useReactiveVar } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
-import { isAuth } from '@/app/providers/AppRouter'
 import Content from '@/shared/content'
 import { SIGNIN } from '@/shared/graphql/schema'
-import { Me } from '@/widgets/header/ui/header'
+import { Me, isAuthVar } from '@/shared/store/state'
 
 import cl from '../registration/ui/styles/index.module.less'
 
@@ -19,7 +18,7 @@ const Signin = () => {
     LOGIN({ variables: { email, pass }, fetchPolicy: 'network-only' })
   }
   if (data?.login.id) {
-    isAuth(true)
+    isAuthVar(true)
     Me(data.login)
   }
   return (

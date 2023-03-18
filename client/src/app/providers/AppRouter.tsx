@@ -1,18 +1,19 @@
-import { makeVar, useReactiveVar } from '@apollo/client'
+import { useReactiveVar } from '@apollo/client'
 import { lazy } from 'react'
 import { Route, Routes } from 'react-router-dom'
+
+import { isAuthVar } from '@/shared/store/state'
 
 import { privateRouters, publicRouters } from './routes'
 
 const Signin = lazy(() => import('@/providers/auth/signin'))
 const Feed = lazy(() => import('@/pages/feed'))
-export const isAuth = makeVar(false)
 
 const AppRouter = () => {
-  const changeAuth = useReactiveVar(isAuth)
+  const isAuth = useReactiveVar(isAuthVar)
   return (
     <>
-      {changeAuth ? (
+      {isAuth ? (
         <Routes>
           {privateRouters.map((route) => (
             <Route key={route.path} element={<route.element />} path={route.path} />

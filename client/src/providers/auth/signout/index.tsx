@@ -1,12 +1,12 @@
 import { useQuery } from '@apollo/client'
 import { Navigate } from 'react-router-dom'
 
-import { isAuth } from '@/app/providers/AppRouter'
 import { LOGOUT } from '@/shared/graphql/schema'
+import { isAuthVar } from '@/shared/store/state'
 
 const Signout = () => {
   useQuery(LOGOUT, { fetchPolicy: 'network-only' })
-  isAuth(false)
+  isAuthVar(false)
   return <Navigate to='/signin' replace={false} />
 }
 
