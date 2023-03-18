@@ -1,21 +1,15 @@
-import { loadFiles, loadFilesSync } from '@graphql-tools/load-files'
 import { makeExecutableSchema } from '@graphql-tools/schema'
 import { createYoga } from 'graphql-yoga'
 
-async function loadResolvers(glob: string) {
-  const resolversArray = await loadFiles(glob, {
-    ignoreIndex: true,
-    requireMethod: async (path: string) => {
-      return await import(path)
-    },
-  })
+import { Resolvers } from './resolvers-types'
 
-  return resolversArray
-}
+const resolvers = import.meta.glob('./**/*resolvers.ts', { import: 'default', eager: true })
+
+const schemasRaw = import.meta.glob('./**/*schema.graphql', { eager: true, as: 'raw' })
 
 const executableSchema = makeExecutableSchema({
-  typeDefs: loadFilesSync('**/*.graphql'),
-  resolvers: await loadResolvers('./**/*resolvers.ts'),
+  typeDefs: Object.values(schemasRaw),
+  resolvers: Object.values(resolvers) as Resolvers,
 })
 
 export const yoga = createYoga({
