@@ -1,4 +1,4 @@
-import cl from './styles/style.module.css'
+import cl from './ui.module.css'
 
 export const Loader = () => {
   return (

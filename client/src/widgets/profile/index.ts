@@ -1,3 +1,3 @@
-import { ArtWork as ArtWorkWidget } from './ui/art-work'
+import { ArtWork } from './ui'
 
-export const ArtWork = ArtWorkWidget
+export default ArtWork

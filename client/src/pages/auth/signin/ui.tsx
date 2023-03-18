@@ -1,9 +1,9 @@
-import { FormSignup } from '@/features/auth'
+import { FormSignin } from '@/features/auth'
 import Content from '@/shared/content'
 
-import cl from './styles/index.module.less'
+import cl from '../signup/ui.module.less'
 
-export const Registration = () => {
+export const Signin = () => {
   return (
     <Content>
       <div className={cl.wrapLogin}>
@@ -13,7 +13,7 @@ export const Registration = () => {
             alt=''
           />
         </div>
-        <FormSignup />
+        <FormSignin />
       </div>
     </Content>
   )

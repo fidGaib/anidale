@@ -25,6 +25,7 @@ const icons = {
   signin: (props: any, ref: any) => <LoginIcon {...props} />,
   signout: (props: any, ref: any) => <LogoutIcon {...props} />,
   registration: (props: any, ref: any) => <LoginIcon {...props} />,
+  comm: (props: any, ref: any) => <CommIcon {...props} />,
   //
 }
 interface PropsType {

@@ -1,4 +1,4 @@
-import cl from './styles/art-work.module.less'
+import cl from './ui.module.less'
 
 interface Props {
   avatar?: string

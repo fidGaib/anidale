@@ -1,3 +1,3 @@
-import { Friends } from './ui/friends'
+import { Friends } from './ui'
 
 export default Friends

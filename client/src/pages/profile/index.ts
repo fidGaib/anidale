@@ -1,3 +1,3 @@
-import { Profile } from './ui/profile'
+import { Profile } from './ui'
 
 export default Profile

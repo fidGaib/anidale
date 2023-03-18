@@ -1,3 +1,3 @@
-import { MenuHeader } from './ui/menu'
+import { MenuHeader } from './menu'
 
 export default MenuHeader

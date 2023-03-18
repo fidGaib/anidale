@@ -1,11 +1,10 @@
-import { useReactiveVar } from '@apollo/client'
 import { forwardRef } from 'react'
 import { Link } from 'react-router-dom'
 
 import { useViewer } from '@/entities/viewer'
 import Icon from '@/shared/icons'
 
-import cl from './styles/index.module.less'
+import cl from './ui.module.less'
 
 export const MenuHeader = forwardRef((props, ref?: any) => {
   const viewer = useViewer()

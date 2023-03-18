@@ -7,21 +7,14 @@ import { REFRESH } from '@/shared/graphql/schema'
 import useOutsideClick from '@/shared/hooks/useOutsideClick'
 import Icon from '@/shared/icons'
 
-import cl from './styles/header.module.less'
+import cl from './ui.module.less'
 
-interface UserType {
-  id?: number
-  login?: string
-  avatar?: string
-}
 export const Header = () => {
   const { data } = useQuery(REFRESH, { fetchPolicy: 'network-only' })
-  const [userData, setUserData] = useState<UserType>({})
 
   useEffect(() => {
     if (data?.refresh.user) {
       ViewerVar(data?.refresh.user)
-      setUserData(ViewerVar()!)
     } else ViewerVar(null)
   }, [data?.refresh.user])
   const [showMenu, setShowMenu] = useState(false)

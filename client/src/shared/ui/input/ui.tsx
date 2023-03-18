@@ -1,6 +1,6 @@
 import { InputHTMLAttributes, forwardRef } from 'react'
 
-import cl from './index.module.less'
+import cl from './ui.module.less'
 
 interface Props extends InputHTMLAttributes<HTMLInputElement> {}
 

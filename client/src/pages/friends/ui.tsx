@@ -4,15 +4,13 @@ import { Link } from 'react-router-dom'
 import Content from '@/shared/content'
 import { GET_USERS } from '@/shared/graphql/schema'
 
-import cl from './styles/index.module.less'
+import cl from './ui.module.less'
 
 export const Friends = () => {
-  const { loading, error, data } = useQuery(GET_USERS)
-  if (loading) return <p>Loading...</p>
-  if (error) return <p>Error : {error.message}</p>
+  const { data } = useQuery(GET_USERS)
   return (
-    <Content>
-      {data.getUsers.map(({ id, login, avatar }: { id: number; login: string; avatar: string }) => (
+    <Content id={cl.content}>
+      {data?.getUsers.map(({ id, login, avatar }: { id: number; login: string; avatar: string }) => (
         <div key={id} className={cl.oneUser}>
           <Link to={`/profile/${id}`}>
             <div className={cl.wrapAvatar}>

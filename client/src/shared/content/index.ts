@@ -1,3 +1,3 @@
-import { Content } from './ui/content'
+import { Content } from './ui'
 
 export default Content

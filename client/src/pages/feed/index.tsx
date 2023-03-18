@@ -1,3 +1,3 @@
-import { Feed } from './ui/feed'
+import { Feed } from './ui'
 
 export default Feed

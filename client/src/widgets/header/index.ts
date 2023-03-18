@@ -1,3 +1,3 @@
-import { Header } from './ui/header'
+import { Header } from './ui'
 
 export default Header
