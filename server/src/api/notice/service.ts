@@ -1,6 +1,7 @@
 import { createGraphQLError } from 'graphql-yoga'
 
 import { Notice } from '@/db/models/notice-model'
+import User from '@/db/models/user-model'
 
 class NoticeService {
   async findAll(limit: number, page: number) {
@@ -32,10 +33,12 @@ class NoticeService {
   async create(owner: number, description: string | null, images: File[] | null) {
     try {
       if (!images?.length && description) {
+        const user = await User.findUnique({ where: { id: owner } })
         const notice = await Notice.create({
           data: {
             userId: owner,
             description,
+            feedId: user!.feedId,
           },
         })
         return notice

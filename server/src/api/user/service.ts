@@ -2,6 +2,7 @@ import { compare, hash } from 'bcrypt'
 import { createGraphQLError } from 'graphql-yoga'
 import { v4 } from 'uuid'
 
+import Feed from '@/db/models/feed-model'
 import Token from '@/db/models/token-model'
 import User from '@/db/models/user-model'
 import { UpdateUser } from '@/schema/resolvers-types'
@@ -19,6 +20,9 @@ class UserService {
       const avatar_random = Math.round(Math.random() * avatar.length)
       const hashPass = await hash(pass + process.env.PASS_PEPPER, 10)
       const activationLink = v4()
+
+      const feed = await Feed.create({ data: {} })
+
       const user = await User.create({
         data: {
           email,
@@ -27,8 +31,12 @@ class UserService {
           isActivated: false,
           login: `bot#` + defaultLogin,
           avatar: avatar[avatar_random],
+          feedId: feed.id,
         },
       })
+
+      Feed.update({ where: { id: feed.id }, data: { userId: user.id } })
+
       const userDto = new UserDto(user)
       const tokens = await tokenServiceGraph.generateTokens({ ...userDto })
       await tokenServiceGraph.saveToken(userDto.id, tokens.refreshToken)
