@@ -9,7 +9,6 @@ datasource db {
 generator client {
   provider = "prisma-client-js"
 }
- 
 
 model User {
   id          Int      @id @default(autoincrement())
@@ -26,6 +25,8 @@ model User {
   messages    Message[]
   friends     User[]   @relation(name: "Friendship")
   friendTo    User[]   @relation(name: "Friendship")
+  feed        Feed     @relation(fields: [feedId], references: [id])
+  feedId      Int      @unique
 }
 
 model Notice {
@@ -35,6 +36,8 @@ model Notice {
   images      NoticeImage[]
   user        User     @relation(fields: [userId], references: [id])
   userId      Int
+  feed        Feed     @relation(fields: [feedId], references: [id])
+  feedId      Int
 }
 
 model NoticeImage {
@@ -45,6 +48,14 @@ model NoticeImage {
   date        DateTime @default(now())
   notice      Notice   @relation(fields: [noticeId], references: [id])
   noticeId    Int
+}
+
+model Feed {
+  id          Int      @id @default(autoincrement())
+  notices     Notice[]
+  updatedAt   DateTime @updatedAt
+  user        User?
+  userId      Int?
 }
 
 model Token {
