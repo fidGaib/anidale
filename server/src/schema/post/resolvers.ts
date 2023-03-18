@@ -1,32 +1,32 @@
-import noticeController from '@/api/notice/controller'
+import postController from '@/api/post/controller'
 import { Resolvers } from '@/schema/resolvers-types'
 
 const PostResolvers: Resolvers = {
   Query: {
     async getPosts(parent, args) {
       const { limit, page } = args
-      return await noticeController.getPosts(limit, page)
+      return await postController.getPosts(limit, page)
     },
     async getPostsByUser(parent, args) {
       const { id, limit, page } = args
-      return await noticeController.getPostsByUser(id, limit, page)
+      return await postController.getPostsByUser(id, limit, page)
     },
   },
   Mutation: {
     async createPost(parent, args) {
       const { owner, description, images } = args.post
-      return await noticeController.create(owner, description, images)
+      return await postController.create(owner, description, images)
     },
     async updatePost(parent, args) {
       const { id } = args
       let description, images
       if (args.post?.description) description = args.post.description
       if (args.post?.images) images = args.post.images
-      return await noticeController.update(id, description, images)
+      return await postController.update(id, description, images)
     },
     async removePost(parent, args) {
       const { id } = args
-      return await noticeController.remove(id)
+      return await postController.remove(id)
     },
   },
 }

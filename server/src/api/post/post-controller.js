@@ -1,9 +1,9 @@
 import { validationResult } from 'express-validator'
 
 import ApiError from '../error/ApiError'
-import noticeService from './notice-service'
+import postService from './post-service'
 
-class noticeController {
+class postController {
   async create(req, res, next) {
     try {
       const errors = validationResult(req)
@@ -15,8 +15,8 @@ class noticeController {
         likeness = false
         throw next(ApiError.badRequest('У вас пустая нота.'))
       }
-      const noticeData = await noticeService.create(parseInt(user_id), description, likeness)
-      return res.json(noticeData)
+      const postData = await postService.create(parseInt(user_id), description, likeness)
+      return res.json(postData)
     } catch (e) {
       console.log(e)
       next(e)
@@ -33,8 +33,8 @@ class noticeController {
   async remove(req, res, next) {
     try {
       const { norice_id, user_id } = req.body
-      const notice = await noticeService.remove(norice_id, user_id)
-      return res.json(notice)
+      const post = await postService.remove(norice_id, user_id)
+      return res.json(post)
     } catch (e) {
       next(e)
     }
@@ -42,8 +42,8 @@ class noticeController {
   async fetchAll(req, res, next) {
     try {
       const { limit, page } = req.query
-      const notices = await noticeService.fetchAll(limit, page)
-      return res.json(notices)
+      const posts = await postService.fetchAll(limit, page)
+      return res.json(posts)
     } catch (e) {
       next(e)
     }
@@ -51,11 +51,11 @@ class noticeController {
   async fetchByUser(req, res, next) {
     try {
       const { id, limit, page } = req.query
-      const notices = await noticeService.fetchByUser(id, limit, page)
-      return res.json(notices)
+      const posts = await postService.fetchByUser(id, limit, page)
+      return res.json(posts)
     } catch (e) {
       next(e)
     }
   }
 }
-export default new noticeController()
+export default new postController()

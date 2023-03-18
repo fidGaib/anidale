@@ -79,15 +79,12 @@ class UserControllerGraph {
   }
   async updateUser(id: number, user?: UpdateUser) {
     try {
-      if (!user) return {}
+      if (!user) throw Error('User not found')
       if (user.email && !user.email.match(emailRegex)) {
         throw createGraphQLError('Некорректный E-mail')
       }
 
-      user.email = user.email ?? undefined
-
-      const userData = await UserService.update(id, user)
-      return userData
+      return await UserService.update(id, user)
     } catch (e: unknown) {
       throw createGraphQLError(e instanceof Error ? e.message : String(e))
     }
