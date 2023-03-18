@@ -46,3 +46,21 @@ export const PROFILE = (id?: number) => gql`
     }
   }
 `
+export const NOTICES_BY_USER = (id: number, limit: number, page: number) => gql`
+  query {
+    getPostsByUser(id: ${id}, limit: ${limit}, page: ${page}) {
+      id
+      description
+      owner
+    }
+  }
+`
+export const NOTICES = (id: number, limit: number, page: number) => gql`
+  query {
+    getPostsByUser(id: ${id}, limit: ${limit}, page: ${page}) {
+      id
+      description
+      owner
+    }
+  }
+`

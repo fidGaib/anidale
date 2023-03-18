@@ -15,12 +15,10 @@ const client = new ApolloClient({
 })
 export const withRouter = (component: () => React.ReactNode) => () => {
   return (
-    <React.StrictMode>
-      <ApolloProvider client={client}>
-        <BrowserRouter>
-          <Suspense fallback={<Loader />}>{component()}</Suspense>
-        </BrowserRouter>
-      </ApolloProvider>
-    </React.StrictMode>
+    <ApolloProvider client={client}>
+      <BrowserRouter>
+        <Suspense fallback={<Loader />}>{component()}</Suspense>
+      </BrowserRouter>
+    </ApolloProvider>
   )
 }
