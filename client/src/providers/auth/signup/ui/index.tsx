@@ -1,4 +1,4 @@
-import FormSignup from '@/entities/auth/signup'
+import { FormSignup } from '@/features/auth'
 import Content from '@/shared/content'
 
 import cl from './styles/index.module.less'
