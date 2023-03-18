@@ -1,4 +1,4 @@
-import { ApolloClient, ApolloProvider, InMemoryCache, createHttpLink, useQuery } from '@apollo/client'
+import { ApolloClient, ApolloProvider, InMemoryCache, createHttpLink } from '@apollo/client'
 import React, { Suspense } from 'react'
 import { BrowserRouter } from 'react-router-dom'
 
@@ -15,10 +15,12 @@ const client = new ApolloClient({
 })
 export const withRouter = (component: () => React.ReactNode) => () => {
   return (
-    <ApolloProvider client={client}>
-      <BrowserRouter>
-        <Suspense fallback={<Loader />}>{component()}</Suspense>
-      </BrowserRouter>
-    </ApolloProvider>
+    <React.StrictMode>
+      <ApolloProvider client={client}>
+        <BrowserRouter>
+          <Suspense fallback={<Loader />}>{component()}</Suspense>
+        </BrowserRouter>
+      </ApolloProvider>
+    </React.StrictMode>
   )
 }

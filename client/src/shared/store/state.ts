@@ -1,7 +1,7 @@
 import { makeVar } from '@apollo/client'
 
 export const isAuthVar = makeVar(false)
-export const Me = makeVar<UserType>({})
+export const MeVar = makeVar<UserType>({})
 
 interface UserType {
   id?: number

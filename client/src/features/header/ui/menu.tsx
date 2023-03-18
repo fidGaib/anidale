@@ -3,22 +3,20 @@ import { forwardRef } from 'react'
 import { Link } from 'react-router-dom'
 
 import Icon from '@/shared/icons'
+import { MeVar, isAuthVar } from '@/shared/store/state'
 
 import cl from './styles/index.module.less'
-import { isAuthVar } from '@/shared/store/state'
 
-interface Props {
-  id?: number
-}
-export const MenuHeader = forwardRef((props: Props, ref?: any) => {
+export const MenuHeader = forwardRef((props, ref?: any) => {
   const isAuth = useReactiveVar(isAuthVar)
+  const Me = useReactiveVar(MeVar)
   return (
     <ul className={cl.menu} ref={ref}>
       {isAuth ? (
         <>
           <li>
             <Icon id='profile' className={cl.menuSvg} />
-            <Link to={`/profile/${props.id}`}>Профиль</Link>
+            <Link to={`/profile/${Me.id}`}>Профиль</Link>
           </li>
           <li>
             <Icon id='feed' className={cl.menuSvg} />

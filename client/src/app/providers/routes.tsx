@@ -1,6 +1,6 @@
 import { lazy } from 'react'
 
-import { Registration } from '@/providers/auth/registration/'
+import { Registration } from '@/providers/auth/signup/'
 
 const Feed = lazy(() => import('@/pages/feed'))
 const Friends = lazy(() => import('@/pages/friends'))
@@ -19,5 +19,5 @@ export const privateRouters = [
 export const publicRouters = [
   { path: '/feed', element: Feed },
   { path: '/signin', element: Signin },
-  { path: '/registration', element: Registration },
+  { path: '/signup', element: Registration },
 ]

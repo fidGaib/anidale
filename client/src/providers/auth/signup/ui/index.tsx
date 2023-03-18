@@ -1,9 +1,9 @@
-import FormSignin from '@/enteties/auth/signin'
+import FormSignup from '@/enteties/auth/signup'
 import Content from '@/shared/content'
 
-import cl from '../signup/ui/styles/index.module.less'
+import cl from './styles/index.module.less'
 
-const Signin = () => {
+export const Registration = () => {
   return (
     <Content>
       <div className={cl.wrapLogin}>
@@ -13,10 +13,8 @@ const Signin = () => {
             alt=''
           />
         </div>
-        <FormSignin />
+        <FormSignup />
       </div>
     </Content>
   )
 }
-
-export default Signin
