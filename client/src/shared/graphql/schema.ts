@@ -15,6 +15,8 @@ export const REFRESH = gql`
       accessToken
       user {
         id
+        login
+        avatar
       }
     }
   }
@@ -35,6 +37,8 @@ export const SIGNIN = gql`
   mutation LOGIN($email: String!, $pass: String!) {
     login(user: { email: $email, pass: $pass }) {
       id
+      login
+      avatar
     }
   }
 `
@@ -46,21 +50,42 @@ export const PROFILE = (id?: number) => gql`
     }
   }
 `
-export const NOTICES_BY_USER = (id: number, limit: number, page: number) => gql`
+export const POST_BY_USER = ($id: number, $limit: number, $page: number) => gql`
   query {
-    getPostsByUser(id: ${id}, limit: ${limit}, page: ${page}) {
+    getPostsByUser(id: ${$id}, limit: ${$limit}, page: ${$page}) {
       id
       description
-      owner
+      user {
+        id
+        login
+        avatar
+      }
     }
   }
 `
-export const NOTICES = (id: number, limit: number, page: number) => gql`
+export const POSTS = ($limit: number, $page: number) => gql`
   query {
-    getPostsByUser(id: ${id}, limit: ${limit}, page: ${page}) {
+    getPosts(limit: ${$limit}, page: ${$page}) {
       id
       description
-      owner
+      user{
+        id 
+        avatar
+        login
+      }
+    }
+  }
+`
+export const CREATE_POST = gql`
+  mutation create($owner: Int!, $description: String!) {
+    createPost(post: { owner: $owner, description: $description }) {
+      id
+      description
+      user {
+        id
+        avatar
+        login
+      }
     }
   }
 `

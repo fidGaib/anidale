@@ -1,15 +1,18 @@
 import { forwardRef } from 'react'
 
+import AddPhotoIcon from './icons/add-photo'
 import CommIcon from './icons/comm'
 import FeedIcon from './icons/feed'
 import FriendsIcon from './icons/friends'
 import GroupsIcon from './icons/groups'
+import LikeIcon from './icons/like'
 import LoginIcon from './icons/login'
 import Logo from './icons/logo'
 import LogoutIcon from './icons/logout'
 import MenuHeaderIcon from './icons/menu-header'
 import MessageIcon from './icons/message'
 import ProfileIcon from './icons/profile'
+import SendIcon from './icons/send'
 import SettingsIcon from './icons/settings'
 
 const icons = {
@@ -26,6 +29,9 @@ const icons = {
   signout: (props: any, ref: any) => <LogoutIcon {...props} />,
   registration: (props: any, ref: any) => <LoginIcon {...props} />,
   comm: (props: any, ref: any) => <CommIcon {...props} />,
+  send: (props: any, ref: any) => <SendIcon {...props} />,
+  add_photo: (props: any, ref: any) => <AddPhotoIcon {...props} />,
+  like: (props: any, ref: any) => <LikeIcon {...props} />,
   //
 }
 interface PropsType {

@@ -23,7 +23,7 @@ type Post {
   countLikes: Int
   countComm: Int
   date: Date
-  owner: User
+  user: User
 }
 type PostImages {
   id: Int
