@@ -14,10 +14,10 @@ interface Description {
 }
 export const PostOwner = ({ post, setDelShow }: PostAction) => {
   return (
-    <Link to={`/profile/${post.user.id}`} className={cl.wrappOwner}>
-      <img src={post.user.avatar} alt='' />
-      {post.user.login}
-      <RemovePost setDelShow={setDelShow} id={post.id} userId={post.user.id} />
+    <Link to={`/profile/${post?.user?.id}`} className={cl.wrappOwner}>
+      <img src={post?.user?.avatar} alt='' />
+      {post?.user?.login}
+      <RemovePost setDelShow={setDelShow} id={post?.id} userId={post?.user?.id} />
     </Link>
   )
 }

@@ -37,7 +37,7 @@ const usePostAction = ({ id, data, posts, setPosts, delShow }: PostAction) => {
   const newPosts = useNewPosts()
   useEffect(() => {
     setPosts((prev: any) => [newPosts, ...prev])
-  }, [newPosts.id])
+  }, [newPosts?.id])
 }
 export const Posts = ({ id, limit, page }: Props) => {
   const schemaPosts = () => POSTS(limit, page),
