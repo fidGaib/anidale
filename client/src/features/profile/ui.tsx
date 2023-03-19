@@ -63,7 +63,8 @@ export const RemovePost = ({ id, userId, setDelShow }: PorepsMenu) => {
           <li>Скопировать ссылку</li>
           <li>Ахривировать запись</li>
           <li
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault()
               remove({ variables: { id } })
               setDelShow(id)
             }}
