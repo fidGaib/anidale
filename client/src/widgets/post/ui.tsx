@@ -1,6 +1,7 @@
 import { useQuery } from '@apollo/client'
 import { Link } from 'react-router-dom'
 
+import { RemovePost } from '@/features/profile'
 import { POSTS, POST_BY_USER } from '@/shared/graphql/schema'
 import Icon from '@/shared/icons'
 
@@ -51,6 +52,7 @@ export const PostsByUser = ({ id, limit, page }: PostsByUser) => {
           <Link to={`/profile/${post.user.id}`} className={cl.wrappOwner}>
             <img src={post.user.avatar} alt='' />
             {post.user.login}
+            <RemovePost id={post.id} userId={post.user.id} />
           </Link>
           {post.description ? <div className={cl.text}>{post.description}</div> : ''}
           <div className={cl.wrappActions}>

@@ -1,8 +1,8 @@
-import { useMutation } from '@apollo/client'
+import { useMutation, useReactiveVar } from '@apollo/client'
 import { useRef, useState } from 'react'
 
-import { ViewerVar, newPostsVar, useNewPosts } from '@/entities/viewer'
-import { CREATE_POST } from '@/shared/graphql/schema'
+import { ViewerVar } from '@/entities/viewer'
+import { CREATE_POST, REMOVE_POST } from '@/shared/graphql/schema'
 import { useAutosizeTextArea } from '@/shared/hooks/useAutosizeTextArea'
 import Icon from '@/shared/icons'
 
@@ -21,14 +21,11 @@ export const MakePost = ({ user }: Props) => {
   const myUser = ViewerVar()
   useAutosizeTextArea(textRef.current, text, blockRef.current)
   const [create, { data, error }] = useMutation(CREATE_POST)
-  const subPosts = useNewPosts()
   const send = () => {
     if (!text) return
     create({ variables: { owner: myUser?.id, description: text } })
     if (data?.createPost) {
       setText('')
-      subPosts.push(data?.createPost)
-      newPostsVar(subPosts)
     }
   }
   return (
@@ -45,6 +42,37 @@ export const MakePost = ({ user }: Props) => {
         <Icon id='add_photo' className={cl.addPhoto} />
         <Icon id='send' onClick={send} />
       </div>
+    </>
+  )
+}
+
+export const RemovePost = ({ id, userId }: { id: number; userId: number }) => {
+  const someUser = useReactiveVar(ViewerVar)
+  const [remove, {}] = useMutation(REMOVE_POST)
+  return (
+    <>
+      <Icon id='menu_post' className={cl.menuPost} />
+      {someUser?.id === userId ? (
+        <ul className={cl.menuBody}>
+          <li>Сохранить в закладках</li>
+          <li>Редактировать</li>
+          <li>Скопировать ссылку</li>
+          <li>Ахривировать запись</li>
+          <li
+            onClick={() => {
+              remove({ variables: { id } })
+            }}
+          >
+            Удалить
+          </li>
+        </ul>
+      ) : (
+        <ul className={cl.menuBody}>
+          <li>Сохранить в закладках</li>
+          <li>Скопировать ссылку</li>
+          <li>Пожаловаться</li>
+        </ul>
+      )}
     </>
   )
 }

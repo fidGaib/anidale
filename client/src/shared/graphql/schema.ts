@@ -91,3 +91,8 @@ export const CREATE_POST = gql`
     }
   }
 `
+export const REMOVE_POST = gql`
+  mutation remove($id: Int!) {
+    removePost(id: $id)
+  }
+`

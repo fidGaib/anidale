@@ -10,6 +10,7 @@ import LoginIcon from './icons/login'
 import Logo from './icons/logo'
 import LogoutIcon from './icons/logout'
 import MenuHeaderIcon from './icons/menu-header'
+import MenuNoticeIcon from './icons/menu-notice'
 import MessageIcon from './icons/message'
 import ProfileIcon from './icons/profile'
 import SendIcon from './icons/send'
@@ -32,6 +33,7 @@ const icons = {
   send: (props: any, ref: any) => <SendIcon {...props} />,
   add_photo: (props: any, ref: any) => <AddPhotoIcon {...props} />,
   like: (props: any, ref: any) => <LikeIcon {...props} />,
+  menu_post: (props: any, ref: any) => <MenuNoticeIcon {...props} />,
   //
 }
 interface PropsType {
