@@ -13,6 +13,7 @@ import MenuHeaderIcon from './icons/menu-header'
 import MenuNoticeIcon from './icons/menu-notice'
 import MessageIcon from './icons/message'
 import ProfileIcon from './icons/profile'
+import ReloadIcon from './icons/reload'
 import SendIcon from './icons/send'
 import SettingsIcon from './icons/settings'
 
@@ -34,6 +35,7 @@ const icons = {
   add_photo: (props: any, ref: any) => <AddPhotoIcon {...props} />,
   like: (props: any, ref: any) => <LikeIcon {...props} />,
   menu_post: (props: any, ref: any) => <MenuNoticeIcon {...props} />,
+  reload: (props: any, ref: any) => <ReloadIcon {...props} />,
   //
 }
 interface PropsType {

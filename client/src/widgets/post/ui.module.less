@@ -1,3 +1,11 @@
+.wrappPosts {
+  width: 100%;
+  position: relative;
+}
+.reloadPosts {
+  position: absolute;
+  left: 30px;
+}
 .wrapper {
   width: 80%;
   max-height: 300px;
@@ -44,5 +52,39 @@
       width: 23px;
       height: 25px;
     }
+  }
+}
+#delShow {
+  animation-name: delShow;
+  animation-duration: 500ms;
+  animation-timing-function: ease;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+@keyframes delShow {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.5);
+  }
+  90% {
+    height: 0;
+    margin-bottom: 0;
+    margin-top: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    opacity: 0;
+  }
+  100% {
+    transform: scale(0.3);
+    height: 0;
+    margin-bottom: 0;
+    margin-top: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    opacity: 0;
+    display: none;
   }
 }

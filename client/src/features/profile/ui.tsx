@@ -45,8 +45,12 @@ export const MakePost = ({ user }: Props) => {
     </>
   )
 }
-
-export const RemovePost = ({ id, userId }: { id: number; userId: number }) => {
+interface PorepsMenu {
+  id: number
+  userId: number
+  setDelShow: React.Dispatch<React.SetStateAction<number>>
+}
+export const RemovePost = ({ id, userId, setDelShow }: PorepsMenu) => {
   const someUser = useReactiveVar(ViewerVar)
   const [remove, {}] = useMutation(REMOVE_POST)
   return (
@@ -61,6 +65,7 @@ export const RemovePost = ({ id, userId }: { id: number; userId: number }) => {
           <li
             onClick={() => {
               remove({ variables: { id } })
+              setDelShow(id)
             }}
           >
             Удалить
