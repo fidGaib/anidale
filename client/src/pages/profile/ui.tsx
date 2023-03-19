@@ -1,5 +1,4 @@
 import { useQuery } from '@apollo/client'
-import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { useViewer } from '@/entities/viewer'
@@ -20,7 +19,7 @@ export const Profile = () => {
     <Content className={cl.content}>
       <ArtWork login={data?.getUser.login} avatar={data?.getUser.avatar} />
       {user?.id == id && <MakePost user={user} />}
-      <PostsByUser id={3} limit={10} page={0} />
+      <PostsByUser id={parseInt(id || '')} limit={10} page={0} />
     </Content>
   )
 }

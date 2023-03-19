@@ -7,3 +7,5 @@ interface UserType {
   login: string
   avatar: string
 }
+
+export const newPostsVar = makeVar<any>([])

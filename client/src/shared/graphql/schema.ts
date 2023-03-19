@@ -30,6 +30,8 @@ export const REGISTRATION = gql`
   mutation REG($email: String!, $pass: String!, $pass2: String!) {
     registration(user: { email: $email, pass: $pass, pass2: $pass2 }) {
       id
+      login
+      avatar
     }
   }
 `

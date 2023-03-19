@@ -36,8 +36,6 @@ class UserService {
         include: { feed: { include: { posts: true } }, friends: true },
       })
 
-      Feed.update({ where: { id: feed.id }, data: { userId: user.id } })
-
       const tokens = await tokenServiceGraph.generateTokens(user)
       await tokenServiceGraph.saveToken(user.id, tokens.refreshToken)
       return {
@@ -116,6 +114,11 @@ class UserService {
       await User.delete({
         where: {
           id,
+        },
+      })
+      await Feed.deleteMany({
+        where: {
+          id: user.feedId,
         },
       })
       return true

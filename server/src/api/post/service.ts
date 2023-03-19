@@ -40,6 +40,7 @@ class PostService {
             description,
             feedId: user!.feedId,
           },
+          include: { user: true },
         })
         return post
       } else {

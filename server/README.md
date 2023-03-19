@@ -19,7 +19,7 @@ npm i
 - создать .env файл; это можно сделать как вручную, так и создать шаблонный файл при помощи скрипта `generate-env.ts`
 
 ```
-npx ts-node -T generate-env.ts
+npx vite-node generate-env.ts
 ```
 
 - произвести создание базы данных при помощи Prisma

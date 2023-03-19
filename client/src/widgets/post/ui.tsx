@@ -41,6 +41,7 @@ interface PostsByUser {
   limit: number
   page: number
 }
+
 export const PostsByUser = ({ id, limit, page }: PostsByUser) => {
   const { data } = useQuery(POST_BY_USER(id, limit, page))
   return (
