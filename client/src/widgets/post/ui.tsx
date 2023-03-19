@@ -2,6 +2,7 @@ import { useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 
 import { PostActionWrapp, PostDescription, PostOwner } from '@/entities/post'
+import { useNewPosts } from '@/entities/viewer'
 import { POSTS, POST_BY_USER } from '@/shared/graphql/schema'
 
 import cl from './ui.module.less'
@@ -33,13 +34,17 @@ const usePostAction = ({ id, data, posts, setPosts, delShow }: PostAction) => {
       }, 1000)
     }
   }, [delShow])
+  const newPosts = useNewPosts()
+  useEffect(() => {
+    setPosts((prev: any) => [newPosts, ...prev])
+  }, [newPosts.id])
 }
 export const Posts = ({ id, limit, page }: Props) => {
-  const schemaPosts = () => POSTS(limit, page)
-  const schemaPostsByUser = () => POST_BY_USER(id!, limit, page)
-  const { data } = useQuery(id ? schemaPostsByUser() : schemaPosts(), { fetchPolicy: 'no-cache' })
-  const [posts, setPosts] = useState<any>([])
-  const [delShow, setDelShow] = useState(0)
+  const schemaPosts = () => POSTS(limit, page),
+    schemaPostsByUser = () => POST_BY_USER(id!, limit, page),
+    { data } = useQuery(id ? schemaPostsByUser() : schemaPosts(), { fetchPolicy: 'no-cache' }),
+    [posts, setPosts] = useState<any>([]),
+    [delShow, setDelShow] = useState(0)
   usePostAction({ id, data, posts, setPosts, delShow })
   return (
     <>
