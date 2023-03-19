@@ -1,0 +1,31 @@
+.menuPost {
+  margin-left: auto;
+  width: 30px;
+}
+.menuBody {
+  position: absolute;
+  z-index: 2;
+  right: 10px;
+  top: 47px;
+  background: var(--playground);
+  border-radius: var(--playground-border);
+  border: 1px solid #cccccc;
+  display: none;
+  li {
+    font-weight: normal;
+    list-style: none;
+    padding: 10px;
+    font-size: 14px;
+    transition: all 0.3s;
+    border-radius: 5px;
+  }
+  li:hover {
+    background: #cccccc;
+  }
+}
+.menuPost:hover + .menuBody {
+  display: block;
+}
+.menuBody:hover {
+  display: block;
+}
