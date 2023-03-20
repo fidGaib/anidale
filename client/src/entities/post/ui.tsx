@@ -7,17 +7,16 @@ import cl from './ui.module.less'
 
 interface PostAction {
   post: any
-  setDelShow: React.Dispatch<any>
 }
 interface Description {
   description?: string
 }
-export const PostOwner = ({ post, setDelShow }: PostAction) => {
+export const PostOwner = ({ post }: PostAction) => {
   return (
     <Link to={`/profile/${post?.user?.id}`} className={cl.wrappOwner}>
       <img src={post?.user?.avatar} alt='' />
       {post?.user?.login}
-      <RemovePost setDelShow={setDelShow} id={post?.id} userId={post?.user?.id} />
+      <RemovePost id={post?.id} userId={post?.user?.id} />
     </Link>
   )
 }

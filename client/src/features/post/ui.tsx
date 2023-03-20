@@ -4,16 +4,18 @@ import { useViewer } from '@/entities/viewer'
 import { REMOVE_POST } from '@/shared/graphql/schema'
 import Icon from '@/shared/icons'
 
+import { usePostStore } from '../profile/module'
 import cl from './ui.module.less'
 
 interface PorepsMenu {
   id: number
   userId: number
-  setDelShow: React.Dispatch<React.SetStateAction<number>>
 }
-export const RemovePost = ({ id, userId, setDelShow }: PorepsMenu) => {
+export const RemovePost = ({ id, userId }: PorepsMenu) => {
   const someUser = useViewer()
   const [remove, {}] = useMutation(REMOVE_POST)
+  const setRemoveId = usePostStore((state) => state.setRemoveId)
+  const removeFromStore = usePostStore((state) => state.removePost)
   return (
     <>
       <Icon id='menu_post' className={cl.menuPost} />
@@ -27,7 +29,10 @@ export const RemovePost = ({ id, userId, setDelShow }: PorepsMenu) => {
             onClick={(e) => {
               e.preventDefault()
               remove({ variables: { id } })
-              setDelShow(id)
+              setRemoveId(id)
+              setTimeout(() => {
+                removeFromStore(id)
+              }, 1000)
             }}
           >
             Удалить

@@ -79,8 +79,8 @@ export const POSTS = ($limit: number, $page: number) => gql`
   }
 `
 export const CREATE_POST = gql`
-  mutation create($owner: Int!, $description: String!) {
-    createPost(post: { owner: $owner, description: $description }) {
+  mutation ($owner: Int!, $description: String, $images: [File!]) {
+    createPost(post: { owner: $owner, description: $description, images: $images }) {
       id
       description
       user {

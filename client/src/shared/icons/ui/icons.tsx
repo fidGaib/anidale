@@ -43,6 +43,7 @@ interface PropsType {
   className?: string
   onClick?: any
   ref?: any
+  type?: string
 }
 export const Icon = forwardRef((props: PropsType, ref: any) => {
   return icons[props.id](props, ref)

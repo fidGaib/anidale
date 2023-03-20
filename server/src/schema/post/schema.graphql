@@ -13,7 +13,7 @@ input UpdatePost {
 }
 input CreatePost {
   description: String
-  images: [FILE!]
+  images: [FILE]
   owner: Int!
 }
 type Post {
