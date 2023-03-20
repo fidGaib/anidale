@@ -13,14 +13,12 @@ interface Props {
   limit: number
   page: number
 }
-interface DataQueryPost {
-  getPostsByUser: Post[]
-  getPosts: Post[]
-}
+
 export const Posts = ({ id, limit, page }: Props) => {
-  const schemaPosts = () => POSTS(limit, page)
-  const schemaPostsByUser = () => POST_BY_USER(id!, limit, page)
-  const { data } = useQuery<DataQueryPost>(id ? schemaPostsByUser() : schemaPosts(), { fetchPolicy: 'no-cache' })
+  const { data } = useQuery(id ? POST_BY_USER : POSTS, {
+    fetchPolicy: 'no-cache',
+    variables: id ? { id, limit, page } : { limit, page },
+  })
   const posts = usePostStore((state) => state.posts)
   const addPosts = usePostStore((state) => state.addPost)
   const removeId = usePostStore((state) => state.removeId)
@@ -32,13 +30,14 @@ export const Posts = ({ id, limit, page }: Props) => {
   }, [data])
   return (
     <>
-      {posts?.map((post: Post) => (
-        <div key={post.id} className={cl.wrapper} id={removeId === post.id ? cl.delShow : ''}>
-          <PostOwner post={post} />
-          {post.description && <PostDescription description={post.description} />}
-          <PostActionWrapp />
-        </div>
-      ))}
+      {posts &&
+        posts?.map((post: Post) => (
+          <div key={post.id} className={cl.wrapper} id={removeId === post.id ? cl.delShow : ''}>
+            <PostOwner post={post} />
+            {post.description && <PostDescription description={post.description} />}
+            <PostActionWrapp />
+          </div>
+        ))}
     </>
   )
 }

@@ -14,10 +14,19 @@ export const Profile = () => {
   document.title = 'AniDale - Профиль'
   const user = useViewer()
   const { id } = useParams()
-  const { data } = useQuery(PROFILE(parseInt(id || '')))
+  const { data } = useQuery(PROFILE, { variables: { id: parseInt(id || '') } })
+
+  if (!data) {
+    return <div>Loading...</div>
+  }
+
+  if (!data.getUser) {
+    return <div>Error, no data.getUser</div>
+  }
+
   return (
     <Content className={cl.content}>
-      <ArtWork login={data?.getUser.login} avatar={data?.getUser.avatar} />
+      <ArtWork login={data.getUser.login} avatar={data.getUser.avatar} />
       {user?.id == id && <MakePost user={user} />}
       <Posts id={parseInt(id || '')} limit={10} page={0} />
     </Content>

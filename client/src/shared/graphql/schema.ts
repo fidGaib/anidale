@@ -1,16 +1,16 @@
-import { gql } from '@apollo/client'
+import { graphql } from './gql/gql'
 
-export const GET_USERS = gql`
-  query {
+export const GET_USERS = graphql(`
+  query GET_USERS {
     getUsers {
       id
       login
       avatar
     }
   }
-`
-export const REFRESH = gql`
-  query {
+`)
+export const REFRESH = graphql(`
+  query REFRESH {
     refresh {
       accessToken
       user {
@@ -20,13 +20,13 @@ export const REFRESH = gql`
       }
     }
   }
-`
-export const LOGOUT = gql`
-  query {
+`)
+export const LOGOUT = graphql(`
+  query LOGOUT {
     logout
   }
-`
-export const REGISTRATION = gql`
+`)
+export const REGISTRATION = graphql(`
   mutation REG($email: String!, $pass: String!, $pass2: String!) {
     registration(user: { email: $email, pass: $pass, pass2: $pass2 }) {
       id
@@ -34,8 +34,8 @@ export const REGISTRATION = gql`
       avatar
     }
   }
-`
-export const SIGNIN = gql`
+`)
+export const SIGNIN = graphql(`
   mutation LOGIN($email: String!, $pass: String!) {
     login(user: { email: $email, pass: $pass }) {
       id
@@ -43,18 +43,18 @@ export const SIGNIN = gql`
       avatar
     }
   }
-`
-export const PROFILE = (id?: number) => gql`
-  query {
-    getUser(id: ${id}) {
+`)
+export const PROFILE = graphql(`
+  query PROFILE($id: Int!) {
+    getUser(id: $id) {
       login
       avatar
     }
   }
-`
-export const POST_BY_USER = ($id: number, $limit: number, $page: number) => gql`
-  query {
-    getPostsByUser(id: ${$id}, limit: ${$limit}, page: ${$page}) {
+`)
+export const POST_BY_USER = graphql(`
+  query POST_BY_USER($id: Int!, $limit: Int!, $page: Int!) {
+    getPostsByUser(id: $id, limit: $limit, page: $page) {
       id
       description
       user {
@@ -64,22 +64,22 @@ export const POST_BY_USER = ($id: number, $limit: number, $page: number) => gql`
       }
     }
   }
-`
-export const POSTS = ($limit: number, $page: number) => gql`
-  query {
-    getPosts(limit: ${$limit}, page: ${$page}) {
+`)
+export const POSTS = graphql(`
+  query POSTS($limit: Int!, $page: Int!) {
+    getPosts(limit: $limit, page: $page) {
       id
       description
-      user{
-        id 
+      user {
+        id
         avatar
         login
       }
     }
   }
-`
-export const CREATE_POST = gql`
-  mutation ($owner: Int!, $description: String, $images: [File!]) {
+`)
+export const CREATE_POST = graphql(`
+  mutation CREATE_POST($owner: Int!, $description: String, $images: [File!]) {
     createPost(post: { owner: $owner, description: $description, images: $images }) {
       id
       description
@@ -90,9 +90,9 @@ export const CREATE_POST = gql`
       }
     }
   }
-`
-export const REMOVE_POST = gql`
-  mutation remove($id: Int!) {
+`)
+export const REMOVE_POST = graphql(`
+  mutation REMOVE_POST($id: Int!) {
     removePost(id: $id)
   }
-`
+`)
