@@ -37,7 +37,7 @@ const start = async () => {
     const server = app.listen(process.env.PORT, () => console.log(`Server started on port ${process.env.PORT}`))
     onHotReload(server)
   } catch (e) {
-    console.log(e)
+    console.error(e)
   }
 }
 
