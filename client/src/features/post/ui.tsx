@@ -18,7 +18,7 @@ export const RemovePost = ({ id, userId }: PorepsMenu) => {
   const removeFromStore = usePostStore((state) => state.removePost)
   return (
     <>
-      <Icon id='menu_post' className={cl.menuPost} />
+      <Icon iconId='menu_post' className={cl.menuPost} />
       {someUser?.id === userId ? (
         <ul className={cl.menuBody}>
           <li>Сохранить в закладках</li>

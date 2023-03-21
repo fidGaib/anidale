@@ -1,4 +1,4 @@
-import { forwardRef } from 'react'
+import { SVGAttributes, forwardRef } from 'react'
 
 import AddPhotoIcon from './icons/add-photo'
 import CommIcon from './icons/comm'
@@ -38,13 +38,9 @@ const icons = {
   reload: (props: any, ref: any) => <ReloadIcon {...props} />,
   //
 }
-interface PropsType {
-  id: keyof typeof icons
-  className?: string
-  onClick?: any
-  ref?: any
-  type?: string
+interface PropsType extends SVGAttributes<SVGElement> {
+  iconId: keyof typeof icons
 }
-export const Icon = forwardRef((props: PropsType, ref: any) => {
-  return icons[props.id](props, ref)
+export const Icon = forwardRef<SVGElement, PropsType>((props, ref) => {
+  return icons[props.iconId](props, ref)
 })

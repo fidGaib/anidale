@@ -29,8 +29,8 @@ export const Header = () => {
   useOutsideClick(refMenu, handleClicklInsideClose, notCloseMenuRef)
   return (
     <header className={cl.wrapper}>
-      <Icon id={'logo'} className={cl.logo} />
-      <Icon id={'menu_header'} onClick={handleMenu} ref={notCloseMenuRef} className={cl.menuSvg} />
+      <Icon iconId={'logo'} className={cl.logo} />
+      <Icon iconId={'menu_header'} onClick={handleMenu} ref={notCloseMenuRef} className={cl.menuSvg} />
       {showMenu && <MenuHeader ref={refMenu} />}
     </header>
   )

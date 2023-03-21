@@ -66,11 +66,11 @@ export const MakePost = ({ user }: Props) => {
               onKeyDown={handleKeydown}
             />
             <label className={cl.label}>
-              <Icon id='add_photo' className={cl.addPhoto} />
+              <Icon iconId='add_photo' className={cl.addPhoto} />
               <input {...register('images')} multiple type='file' hidden accept='image/*' />
             </label>
             <button type='submit'>
-              <Icon id='send' />
+              <Icon iconId='send' />
             </button>
           </form>
         </div>

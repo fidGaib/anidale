@@ -27,10 +27,10 @@ export const PostActionWrapp = () => {
   return (
     <div className={cl.wrappActions}>
       <div className={cl.icon}>
-        <Icon id='like' />
+        <Icon iconId='like' />
       </div>
       <div className={cl.icon}>
-        <Icon id='comm' />
+        <Icon iconId='comm' />
       </div>
     </div>
   )
