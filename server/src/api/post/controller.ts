@@ -1,15 +1,13 @@
 import { createGraphQLError } from 'graphql-yoga'
 
-import { InputMaybe } from '@/schema/resolvers-types'
-
 import PostService from './service'
 
 class PostController {
-  async create(owner: number, description?: InputMaybe<string>, images?: InputMaybe<File[]>) {
+  async create(owner: number, description?: string, images?: File[]) {
     try {
       if (!owner) throw createGraphQLError('Вы не авторизованы или произошла непредвиденная ошибка')
       if (!description?.trim() && !images?.length) throw createGraphQLError('У вас пустые поля')
-      return await PostService.create(owner, description ?? null, images ?? null)
+      return await PostService.create(owner, description || '', images)
     } catch (e: unknown) {
       throw createGraphQLError(e instanceof Error ? e.message : String(e))
     }

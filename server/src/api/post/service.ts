@@ -1,7 +1,10 @@
 import { createGraphQLError } from 'graphql-yoga'
 
-import { Post } from '@/db/models/post-model'
+import { storagePath } from '@/config'
+import { Post, PostImage } from '@/db/models/post-model'
 import User from '@/db/models/user-model'
+
+import FileStorageService from './file-service'
 
 class PostService {
   async findAll(limit: number, page: number) {
@@ -29,24 +32,32 @@ class PostService {
     })
     return posts
   }
-  //not completed
-  async create(owner: number, description: string | null, images: File[] | null) {
+
+  async create(owner: number, description: string, images?: File[]) {
     try {
-      if (!images?.length && description) {
-        const user = await User.findUnique({ where: { id: owner } })
-        const post = await Post.create({
-          data: {
-            userId: owner,
-            description,
-            feedId: user!.feedId,
-          },
-          include: { user: true },
+      const user = await User.findUnique({ where: { id: owner } })
+      if (!user) throw Error(`Пользователь '${owner}' в базе не найден`)
+      const post = await Post.create({
+        data: {
+          userId: owner,
+          description,
+          feedId: user.feedId,
+        },
+        include: { user: true },
+      })
+
+      if (images) {
+        const StorageService = new FileStorageService(storagePath)
+
+        const imagesInfo = await Promise.all(images.map((image) => StorageService.saveImage(image)))
+        await PostImage.createMany({
+          data: imagesInfo.map((info) => ({
+            postId: post.id,
+            ...info,
+          })),
         })
-        return post
-      } else {
-        //not completed
-        return {}
       }
+      return post
     } catch (e: unknown) {
       throw createGraphQLError(e instanceof Error ? e.message : String(e))
     }
