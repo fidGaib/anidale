@@ -20,10 +20,10 @@ export interface PostStore {
   clearPosts: () => void
   setRemoveId: (id: number) => void
   changeText: (description: string) => void
-  setFiles: (file: FileList | File[], store: PostStore) => void
-  validate: (file: File, store: PostStore) => Promise<boolean | void>
-  removeImage: (image: File, store: PostStore) => void
-  send: (fn: any, store: PostStore, owner: number) => void
-  handleHeight: (e: any, store: PostStore) => void
-  handleKeydown: (a: any, store: PostStore, createPost: any, owner: number) => void
+  setFiles: (file: FileList | File[]) => void
+  validate: (file: File) => Promise<boolean | void>
+  removeImage: (image: File) => void
+  send: (fn: any, owner: number) => void
+  handleHeight: (e: any) => void
+  handleKeydown: (a: any, createPost: any, owner: number) => void
 }

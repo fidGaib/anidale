@@ -2,7 +2,7 @@ import { create } from 'zustand'
 
 import { PostStore } from './types'
 
-export const usePostStore = create<PostStore>()((set) => ({
+export const usePostStore = create<PostStore>()((set, get) => ({
   posts: [],
   removeId: 0,
   description: '',
@@ -14,9 +14,7 @@ export const usePostStore = create<PostStore>()((set) => ({
   },
   //set text
   changeText(description) {
-    if (description.length > 255) {
-      set((state) => ({ error: 'Не более 255 символов' }))
-    }
+    if (description.length > 255) return
     set((state) => ({ description }))
   },
   //add
@@ -35,65 +33,61 @@ export const usePostStore = create<PostStore>()((set) => ({
       removeId: 0,
     })),
   //set images
-  setFiles(fileList, store) {
-    store.setError('')
+  setFiles(fileList) {
+    get().setError('')
     let files = Array.from(fileList)
-    if (files.length + store.images.length <= 9) {
+    if (files.length + get().images.length <= 9) {
       files.map(async (file) => {
-        const a = await store.validate(file, store)
+        const a = await get().validate(file)
         if (a === true) {
-          set((state) => ({
-            images: [...state.images, file],
-          }))
+          set((state) => ({ images: [...get().images, file] }))
         }
       })
     } else {
-      let empty = 9 - store.images.length
-      let delCount = files.length - empty
-      let newArrayFiles = files
+      let delCount = files.length - (9 - get().images.length)
       for (let i = 0; i < delCount; i++) {
-        newArrayFiles.pop()
+        files.pop()
       }
-      store.setFiles(newArrayFiles, store)
-      store.setError(`Последние ${delCount} файла не будут загружены, ограничение 9`)
+      get().setFiles(files)
+      get().setError(`Последние ${delCount} файла не будут загружены, ограничение 9`)
     }
   },
   //validate images
-  async validate(file, { setError }) {
+  async validate(file) {
     const re = /(\.jpg|\.jpeg|\.gif|\.png)$/i
     const size = file.size / 1024 / 1024
     const maxSize = 5
-    if (!re.exec(file.name)) return setError('Загружать можно только арты.')
-    else if (size > maxSize) return setError(`Размер изображения не должен привышать ${maxSize}мб`)
+    if (!re.exec(file.name)) return get().setError('Загружать можно только арты.')
+    else if (size > maxSize) return get().setError(`Размер изображения не должен привышать ${maxSize}мб`)
     else return true
   },
-  removeImage: (image, store) => {
-    let array = store.images.filter((item) => item !== image)
+  removeImage: (image) => {
+    let array = get().images.filter((item) => item !== image)
     set((state) => ({
       images: array,
     }))
   },
-  send: (schemaFn, store, owner) => {
-    if (!store.description.trim() && store.images.length === 0) return
-    if (store.description.trim().length > 255) return store.setError('Не более 255 символов')
-    schemaFn({ variables: { owner, description: store.description, images: store.images } }).then((res: any) => {
+  send: (schemaFn, owner) => {
+    if (!get().description.trim() && get().images.length === 0) return
+    if (get().description.trim().length > 255) return get().setError('Не более 255 символов')
+    schemaFn({ variables: { owner, description: get().description, images: get().images } }).then((res: any) => {
       set((state) => ({
         description: '',
       }))
       const post = res?.data?.createPost
       // @ts-ignore
-      store.addPost([post])
+      get().addPost([post])
     })
   },
-  handleHeight: (e, store) => {
-    store.changeText(e.target.value)
+  handleHeight: (e) => {
+    get().changeText(e.target.value)
     const el = e.target
     if (el) {
       el.style.height = '45px'
       el.style.height = el.scrollHeight + 'px'
     }
   },
-  handleKeydown: ({ key, shiftKey }, store, createPost, owner) => {
-    if (key === 'Enter' && !shiftKey) return store.send(createPost, store, owner)
+  handleKeydown: ({ key, shiftKey }, createPost, owner) => {
+    if (key === 'Enter' && !shiftKey) return get().send(createPost, owner)
   },
 }))

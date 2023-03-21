@@ -39,7 +39,7 @@ export const RemovePost = ({ id, userId }: PorepsMenu) => {
               setRemoveId(id)
               setTimeout(() => {
                 removeFromStore(id)
-              }, 2000)
+              }, 1000)
             }}
           >
             Удалить
