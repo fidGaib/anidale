@@ -1,35 +1,9 @@
-.wrapper {
-  width: 100%;
-  background: var(--playground);
-  margin-top: 5px;
-  border-radius: var(--playground-border);
-  margin-bottom: 10px;
-  display: flex;
-  flex-direction: column;
-}
-.wrapperColumn {
-  padding: 5px 10px;
-  width: 100%;
-  display: flex;
-  align-items: center;
-}
-.wrapperColumn2 {
-  padding: 5px 10px;
-  margin-left: 12%;
-  .preview {
-    width: 100px;
-    margin: 1px;
-    float: left;
-    height: 100px;
-    cursor: pointer;
-    border-radius: 5px;
-  }
-}
 .avatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
 }
+
 textarea {
   background: 0;
   border: 0;
@@ -42,14 +16,21 @@ textarea {
   margin-left: 10px;
   font-size: calibri;
 }
+
+button {
+  all: unset;
+}
+
 svg {
   height: 25px;
   width: 25px;
   cursor: pointer;
 }
+
 .addPhoto {
   margin-right: 10px;
 }
+
 .error {
   width: 100%;
   margin-top: 10px;
@@ -58,8 +39,54 @@ svg {
   font-family: calibri;
   margin-left: 10px;
 }
+
 .label {
-  align-items: center;
   display: flex;
-  margin-left: auto;
+  align-items: center;
+  margin-right: auto;
+}
+
+.makePost {
+  background: var(--playground);
+  margin-top: 5px;
+  border-radius: var(--playground-border);
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+
+.makePostForm {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 10px;
+  gap: 10px;
+}
+
+.textareaWrapper {
+  padding: 5px;
+  flex-grow: 1;
+}
+
+.imagePreviewWrapper {
+  position: relative;
+}
+
+.imagePreviewClose {
+  all: unset;
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: #d3d3d3aa;
+}
+
+.imagePreview {
+  width: 100px;
+  aspect-ratio: 1 / 1;
+}
+
+.imagesPreview {
+  display: flex;
+  gap: 5px;
 }

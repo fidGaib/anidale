@@ -56,24 +56,25 @@ export const MakePost = ({ user }: Props) => {
 
   return (
     <>
-      <div className={cl.wrapper}>
-        <div className={cl.wrapperColumn}>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <img src={user?.avatar} className={cl.avatar} />
+      <div className={cl.makePost}>
+        <form className={cl.makePostForm} onSubmit={handleSubmit(onSubmit)}>
+          <img src={user?.avatar} className={cl.avatar} />
+          <div className={cl.textareaWrapper}>
             <textarea
+              className={cl.textarea}
               {...register('description', { onChange: resizeTextarea })}
               placeholder='Что у вас нового?'
               onKeyDown={handleKeydown}
             />
-            <label className={cl.label}>
-              <Icon iconId='add_photo' className={cl.addPhoto} />
-              <input {...register('images')} multiple type='file' hidden accept='image/*' />
-            </label>
-            <button type='submit'>
-              <Icon iconId='send' />
-            </button>
-          </form>
-        </div>
+          </div>
+          <label className={cl.label}>
+            <Icon iconId='add_photo' className={cl.addPhoto} />
+            <input {...register('images')} multiple type='file' hidden accept='image/*' />
+          </label>
+          <button type='submit'>
+            <Icon iconId='send' />
+          </button>
+        </form>
         {images && images.length ? <ImagesPreview images={images} onRemove={handleRemoveImage} /> : ''}
       </div>
     </>
@@ -84,14 +85,14 @@ function ImagesPreview(props: { images: any[]; onRemove: (image: File) => void }
   if (!props.images) return <></>
 
   return (
-    <div className={cl.wrapperColumn2}>
+    <div className={cl.imagesPreview}>
       {Array.from(props.images).map((image) => (
-        <img
-          className={cl.preview}
-          key={image.size}
-          src={URL.createObjectURL(image)}
-          onClick={() => props.onRemove(image)}
-        />
+        <div className={cl.imagePreviewWrapper}>
+          <button className={cl.imagePreviewClose} onClick={() => props.onRemove(image)}>
+            <Icon iconId='close' />
+          </button>
+          <img className={cl.imagePreview} key={image.size} src={URL.createObjectURL(image)} />
+        </div>
       ))}
     </div>
   )
