@@ -16,18 +16,14 @@ export const Profile = () => {
   const { id } = useParams()
   const { data } = useQuery(PROFILE, { variables: { id: parseInt(id || '') } })
 
-  if (!data) {
-    return <div>Loading...</div>
-  }
+  if (!data) return <div>Loading...</div>
 
-  if (!data.getUser) {
-    return <div>Error, no data.getUser</div>
-  }
+  if (!data.getUser) return <div>Error, no data.getUser</div>
 
   return (
     <Content className={cl.content}>
-      <ArtWork login={data.getUser.login} avatar={data.getUser.avatar} />
-      {user?.id == id && <MakePost user={user} />}
+      <ArtWork login={data.getUser.login || ''} avatar={data.getUser.avatar || ''} />
+      {user?.id == id && <MakePost />}
       <Posts id={parseInt(id || '')} limit={10} page={0} />
     </Content>
   )

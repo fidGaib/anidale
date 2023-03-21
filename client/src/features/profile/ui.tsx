@@ -1,99 +1,44 @@
 import { useMutation } from '@apollo/client'
-import { ChangeEventHandler, KeyboardEventHandler } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
 
+import { MakePostImages } from '@/entities/profile/ui'
 import { useViewer } from '@/entities/viewer'
 import { CREATE_POST } from '@/shared/graphql/schema'
 import Icon from '@/shared/icons'
 
+import { usePostStore } from './module'
 import cl from './ui.module.less'
 
-interface Props {
-  user: {
-    id: number
-    avatar: string
-  } | null
-}
-
-interface InputValues {
-  description: string
-  images: File[]
-}
-
-const resizeTextarea: ChangeEventHandler<HTMLTextAreaElement> = (e) => {
-  const el = e.target
-  if (el) {
-    el.style.height = '0px'
-    el.style.height = el.scrollHeight + 'px'
-  }
-}
-
-export const MakePost = ({ user }: Props) => {
-  const { register, handleSubmit, watch, setValue } = useForm<InputValues>()
-  const images = watch('images')
-
-  const [createPost, {}] = useMutation(CREATE_POST)
+export const MakePost = () => {
+  const store = usePostStore((state) => state)
+  const [createPost] = useMutation(CREATE_POST)
   const myUser = useViewer()
-
-  const onSubmit: SubmitHandler<InputValues> = ({ images, description }) => {
-    if (!description && images.length === 0) {
-      alert('Не могу отправить пустой пост')
-      return
-    }
-
-    createPost({ variables: { owner: myUser?.id, description, images } })
-  }
-
-  const handleRemoveImage = (image: File) =>
-    setValue(
-      'images',
-      Array.from(images).filter((el) => el !== image),
-    )
-
-  const handleKeydown: KeyboardEventHandler<HTMLTextAreaElement> = ({ key, shiftKey }) => {
-    if (key === 'Enter' && !shiftKey) handleSubmit(onSubmit)()
-  }
-
   return (
     <>
-      <div className={cl.makePost}>
-        <form className={cl.makePostForm} onSubmit={handleSubmit(onSubmit)}>
-          <img src={user?.avatar} className={cl.avatar} />
-          <div className={cl.textareaWrapper}>
-            <textarea
-              className={cl.textarea}
-              {...register('description', { onChange: resizeTextarea })}
-              placeholder='Что у вас нового?'
-              onKeyDown={handleKeydown}
-            />
-          </div>
+      <p className={cl.error}>{store.error}</p>
+      <div className={cl.wrapper}>
+        <div className={cl.wrapperForm}>
+          <img src={myUser?.avatar || ''} className={cl.avatar} />
+          <textarea
+            className={cl.textarea}
+            placeholder='Что у вас нового?'
+            value={store.description}
+            onKeyDown={(e) => store.handleKeydown(e, store, createPost, myUser?.id!)}
+            onChange={(e) => store.handleHeight(e, store)}
+          />
           <label className={cl.label}>
             <Icon iconId='add_photo' className={cl.addPhoto} />
-            <input {...register('images')} multiple type='file' hidden accept='image/*' />
+            <input
+              multiple
+              type='file'
+              hidden
+              accept='image/*'
+              onChange={(e) => store.setFiles(e.target.files!, store)}
+            />
           </label>
-          <button type='submit'>
-            <Icon iconId='send' />
-          </button>
-        </form>
-        {images && images.length ? <ImagesPreview images={images} onRemove={handleRemoveImage} /> : ''}
+          <Icon iconId='send' onClick={() => store.send(createPost, store, myUser?.id!)} />
+        </div>
+        {store.images?.length ? <MakePostImages store={store} /> : ''}
       </div>
     </>
-  )
-}
-
-function ImagesPreview(props: { images: any[]; onRemove: (image: File) => void }) {
-  if (!props.images) return <></>
-
-  return (
-    <div className={cl.imagesPreview}>
-      {Array.from(props.images).map((image) => (
-        <div className={cl.imagePreviewWrapper}>
-          <button className={cl.imagePreviewClose} onClick={() => props.onRemove(image)}>
-            <Icon iconId='close' />
-          </button>
-          <img className={cl.imagePreview} key={image.size} src={URL.createObjectURL(image)} />
-        </div>
-      ))}
-    </div>
   )
 }

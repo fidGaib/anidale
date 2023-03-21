@@ -1,9 +1,24 @@
+.wrapper {
+  background: var(--playground);
+  margin-top: 5px;
+  border-radius: var(--playground-border);
+  margin-bottom: 10px;
+  display: flex;
+  padding: 0px 10px;
+  flex-direction: column;
+  width: 100%;
+}
+.wrapperForm {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+}
 .avatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
+  margin-top: 5px;
 }
-
 textarea {
   background: 0;
   border: 0;
@@ -11,26 +26,27 @@ textarea {
   outline: 0;
   font-size: 14px;
   width: 70%;
-  height: 30px;
-  padding-top: 0px;
+  height: 45px;
   margin-left: 10px;
   font-size: calibri;
+  padding-top: 15px;
+  margin-bottom: 5px;
 }
-
-button {
-  all: unset;
-}
-
 svg {
   height: 25px;
   width: 25px;
   cursor: pointer;
+  margin-top: 10px;
 }
-
-.addPhoto {
-  margin-right: 10px;
+.label {
+  display: flex;
+  width: 50px;
+  margin-left: auto;
+  .addPhoto {
+    margin-right: 10px;
+    margin-left: auto;
+  }
 }
-
 .error {
   width: 100%;
   margin-top: 10px;
@@ -38,55 +54,4 @@ svg {
   color: var(--accent);
   font-family: calibri;
   margin-left: 10px;
-}
-
-.label {
-  display: flex;
-  align-items: center;
-  margin-right: auto;
-}
-
-.makePost {
-  background: var(--playground);
-  margin-top: 5px;
-  border-radius: var(--playground-border);
-  margin-bottom: 10px;
-  display: flex;
-  flex-direction: column;
-  padding: 10px;
-}
-
-.makePostForm {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 10px;
-  gap: 10px;
-}
-
-.textareaWrapper {
-  padding: 5px;
-  flex-grow: 1;
-}
-
-.imagePreviewWrapper {
-  position: relative;
-}
-
-.imagePreviewClose {
-  all: unset;
-  position: absolute;
-  top: 0;
-  right: 0;
-  background-color: #d3d3d3aa;
-}
-
-.imagePreview {
-  width: 100px;
-  aspect-ratio: 1 / 1;
-}
-
-.imagesPreview {
-  display: flex;
-  gap: 5px;
 }

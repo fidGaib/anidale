@@ -22,4 +22,8 @@ export interface PostStore {
   changeText: (description: string) => void
   setFiles: (file: FileList | File[], store: PostStore) => void
   validate: (file: File, store: PostStore) => Promise<boolean | void>
+  removeImage: (image: File, store: PostStore) => void
+  send: (fn: any, store: PostStore, owner: number) => void
+  handleHeight: (e: any, store: PostStore) => void
+  handleKeydown: (a: any, store: PostStore, createPost: any, owner: number) => void
 }

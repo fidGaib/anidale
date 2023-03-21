@@ -13,7 +13,7 @@ interface PorepsMenu {
 }
 export const RemovePost = ({ id, userId }: PorepsMenu) => {
   const someUser = useViewer()
-  const [remove, {}] = useMutation(REMOVE_POST)
+  const [remove] = useMutation(REMOVE_POST)
   const setRemoveId = usePostStore((state) => state.setRemoveId)
   const removeFromStore = usePostStore((state) => state.removePost)
   return (
@@ -28,11 +28,18 @@ export const RemovePost = ({ id, userId }: PorepsMenu) => {
           <li
             onClick={(e) => {
               e.preventDefault()
-              remove({ variables: { id } })
+              remove({
+                variables: { id },
+                update(cache) {
+                  const normalizeId: any = cache.identify({ id, __typename: 'Post' })
+                  cache.evict(normalizeId)
+                  cache.gc()
+                },
+              })
               setRemoveId(id)
               setTimeout(() => {
                 removeFromStore(id)
-              }, 1000)
+              }, 2000)
             }}
           >
             Удалить

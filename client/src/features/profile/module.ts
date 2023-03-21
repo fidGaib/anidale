@@ -67,4 +67,33 @@ export const usePostStore = create<PostStore>()((set) => ({
     else if (size > maxSize) return setError(`Размер изображения не должен привышать ${maxSize}мб`)
     else return true
   },
+  removeImage: (image, store) => {
+    let array = store.images.filter((item) => item !== image)
+    set((state) => ({
+      images: array,
+    }))
+  },
+  send: (schemaFn, store, owner) => {
+    if (!store.description.trim() && store.images.length === 0) return
+    if (store.description.trim().length > 255) return store.setError('Не более 255 символов')
+    schemaFn({ variables: { owner, description: store.description, images: store.images } }).then((res: any) => {
+      set((state) => ({
+        description: '',
+      }))
+      const post = res?.data?.createPost
+      // @ts-ignore
+      store.addPost([post])
+    })
+  },
+  handleHeight: (e, store) => {
+    store.changeText(e.target.value)
+    const el = e.target
+    if (el) {
+      el.style.height = '45px'
+      el.style.height = el.scrollHeight + 'px'
+    }
+  },
+  handleKeydown: ({ key, shiftKey }, store, createPost, owner) => {
+    if (key === 'Enter' && !shiftKey) return store.send(createPost, store, owner)
+  },
 }))
