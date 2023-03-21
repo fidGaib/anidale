@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.7.10",
+    "apollo-upload-client": "^17.0.0",
     "compose-function": "^3.0.3",
     "graphql": "^16.6.0",
     "react": "^18.2.0",
@@ -23,6 +24,7 @@
     "@graphql-codegen/cli": "^3.2.2",
     "@graphql-codegen/client-preset": "^2.1.1",
     "@trivago/prettier-plugin-sort-imports": "^4.1.1",
+    "@types/apollo-upload-client": "^17.0.2",
     "@types/compose-function": "^0.0.30",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
