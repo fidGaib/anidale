@@ -1,6 +1,7 @@
 import { SVGAttributes, forwardRef } from 'react'
 
 import AddPhotoIcon from './icons/add-photo'
+import Close from './icons/close'
 import CommIcon from './icons/comm'
 import FeedIcon from './icons/feed'
 import FriendsIcon from './icons/friends'
@@ -36,6 +37,7 @@ const icons = {
   like: (props: any, ref: any) => <LikeIcon {...props} />,
   menu_post: (props: any, ref: any) => <MenuNoticeIcon {...props} />,
   reload: (props: any, ref: any) => <ReloadIcon {...props} />,
+  close: (props: any, ref: any) => <Close {...props} />,
   //
 }
 interface PropsType extends SVGAttributes<SVGElement> {
