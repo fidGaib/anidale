@@ -17,11 +17,11 @@ export const MakePost = () => {
   const setFiles = usePostStore((state) => state.setFiles)
   const send = usePostStore((state) => state.send)
 
-  const [createPost, { error }] = useMutation(CREATE_POST)
+  const [createPost, { error, loading }] = useMutation(CREATE_POST)
   const myUser = useViewer()
   return (
     <>
-      <p className={cl.error}>{error_create || `${error ? error : ''}`}</p>
+      <p className={cl.error}>{error_create || `${error ? error.message : ''}`}</p>
       <div className={cl.wrapper}>
         <div className={cl.wrapperForm}>
           <img src={myUser?.avatar || ''} className={cl.avatar} />
@@ -38,7 +38,7 @@ export const MakePost = () => {
           </label>
           <Icon iconId='send' onClick={() => send(createPost, myUser?.id!)} />
         </div>
-        {images?.length ? <MakePostImages /> : ''}
+        {images?.length ? <MakePostImages id={loading ? cl.loading : ''} /> : ''}
       </div>
     </>
   )

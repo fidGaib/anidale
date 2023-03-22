@@ -3,11 +3,11 @@ import Icon from '@/shared/icons'
 
 import cl from './ui.module.less'
 
-export const MakePostImages = () => {
+export const MakePostImages = ({ id }: { id: string }) => {
   const images = usePostStore((state) => state.images)
   const removeImage = usePostStore((state) => state.removeImage)
   return (
-    <div className={cl.imagesPreview}>
+    <div className={cl.imagesPreview} id={id}>
       {images.map((image) => (
         <div key={image.size} className={cl.imagePreviewWrapper}>
           <Icon iconId='close' className={cl.imagePreviewClose} onClick={() => removeImage(image)} />

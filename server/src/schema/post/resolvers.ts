@@ -16,8 +16,11 @@ const PostResolvers: Resolvers = {
     async createPost(parent, { post }) {
       const { owner, description, images } = post
       const postData = await postController.create(owner, description, images)
-      console.log(postData)
-      return postData
+
+      return {
+        ...postData.post,
+        images: postData.images,
+      }
     },
     async updatePost(parent, { id, post }) {
       let description, images

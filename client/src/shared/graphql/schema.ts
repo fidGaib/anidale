@@ -85,11 +85,17 @@ export const POSTS = graphql(`
     }
   }
 `)
-export const CREATE_POST = graphql(`
+export const CREATE_POST = gql(`
   mutation CREATE_POST($owner: Int!, $description: String, $images: [File!]) {
     createPost(post: { owner: $owner, description: $description, images: $images }) {
       id
       description
+      images{
+        id
+        small
+        medium
+        type
+      }
       user {
         id
         avatar

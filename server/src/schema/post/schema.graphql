@@ -8,18 +8,19 @@ type Mutation {
   updatePost(id: Int!, post: UpdatePost): Post
 }
 input UpdatePost {
-  description: String
-  images: [FILE!]
-}
-input CreatePost {
+  owner: Int!
   description: String
   images: [FILE]
+}
+input CreatePost {
   owner: Int!
+  description: String
+  images: [FILE]
 }
 type Post {
   id: Int
   description: String
-  images: [PostImages!]
+  images: [PostImages]
   date: Date
   user: User
 }
