@@ -9,7 +9,7 @@ declare module 'jsonwebtoken' {
     }
 }
 
-class TokenServiceGraph {
+class TokenService {
   private accessSecret: string
   private refreshSecret: string
 
@@ -70,4 +70,4 @@ class TokenServiceGraph {
     }
   }
 }
-export default new TokenServiceGraph()
+export default new TokenService()
