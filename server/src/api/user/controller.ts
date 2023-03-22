@@ -7,7 +7,7 @@ import UserService from './service'
 
 const emailRegex =
   /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i
-class UserControllerGraph {
+class UserController {
   async registration(user: Registration, req: Request, res: Response) {
     const { email, pass, pass2 } = user
     if (!email.trim() || !pass.trim() || !pass2.trim()) {
@@ -90,4 +90,4 @@ class UserControllerGraph {
     return user
   }
 }
-export default new UserControllerGraph()
+export default new UserController()

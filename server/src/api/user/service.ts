@@ -8,8 +8,7 @@ import User from '@/db/models/user-model'
 import { UpdateUser } from '@/schema/resolvers-types'
 
 import avatar from '../dtos/avatar-random'
-
-import tokenServiceGraph from './token-service-graph'
+import tokenService from './token-service'
 
 class UserService {
   async registration(email: string, pass: string) {
@@ -35,8 +34,8 @@ class UserService {
       include: { feed: { include: { posts: true } }, friends: true },
     })
 
-    const tokens = await tokenServiceGraph.generateTokens(user)
-    await tokenServiceGraph.saveToken(user.id, tokens.refreshToken)
+    const tokens = await tokenService.generateTokens(user)
+    await tokenService.saveToken(user.id, tokens.refreshToken)
     return {
       ...tokens,
       user,
@@ -50,8 +49,8 @@ class UserService {
     if (!candidate) throw createGraphQLError('Пользователь не найден')
     const isPassEquals = await compare(pass + process.env.PASS_PEPPER, candidate.pass)
     if (!isPassEquals) throw createGraphQLError('Не верный пароль.')
-    const tokens = await tokenServiceGraph.generateTokens(candidate)
-    await tokenServiceGraph.saveToken(candidate.id, tokens.refreshToken)
+    const tokens = await tokenService.generateTokens(candidate)
+    await tokenService.saveToken(candidate.id, tokens.refreshToken)
     return {
       ...tokens,
       user: candidate,
@@ -111,13 +110,13 @@ class UserService {
     return true
   }
   async logout(refreshToken: string) {
-    const token = await tokenServiceGraph.removeToken(refreshToken)
+    const token = await tokenService.removeToken(refreshToken)
     return token
   }
   async refresh(refreshToken?: string) {
     if (!refreshToken) throw createGraphQLError('НЕ АВТОРИЗОВАН')
-    const userData = tokenServiceGraph.validateRefreshToken(refreshToken)
-    const tokenFromDb = await tokenServiceGraph.findToken(refreshToken)
+    const userData = tokenService.validateRefreshToken(refreshToken)
+    const tokenFromDb = await tokenService.findToken(refreshToken)
 
     if (!userData || !tokenFromDb) throw createGraphQLError('НЕ АВТОРИЗОВАН')
     const user = await User.findUnique({
@@ -129,9 +128,9 @@ class UserService {
       throw Error('User not found')
     }
 
-    const tokens = await tokenServiceGraph.generateTokens({ ...user })
+    const tokens = await tokenService.generateTokens({ ...user })
 
-    await tokenServiceGraph.saveToken(user.id, tokens.refreshToken)
+    await tokenService.saveToken(user.id, tokens.refreshToken)
 
     return {
       ...tokens,
