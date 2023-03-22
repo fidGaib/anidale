@@ -37,15 +37,15 @@ export const PostImages = ({ images }: Post) => {
         return (
           <>
             <img
-              key={`${image.small! + image.id}`}
+              key={`${image?.small}`}
               className={cl.small}
-              src={`http://localhost:5000/storage/${image.small}.webp`}
+              src={`http://localhost:5000/storage/${image?.small}.webp`}
               alt=''
             />
             <img
-              key={image.small}
+              key={image?.medium}
               className={cl.medium}
-              src={`http://localhost:5000/storage/${image.small}.webp`}
+              src={`http://localhost:5000/storage/${image?.medium}.webp`}
               alt=''
             />
           </>

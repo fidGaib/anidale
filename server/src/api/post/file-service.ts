@@ -52,11 +52,11 @@ class FileStorageService {
     // sharp compress
     const { compS, vertical, type, compM } = await this.compress(file)
     // high
-    /*const high = await this.saveFile(file)  До лучших времен :(*/
+    /*const high = await this.saveFile(file, false)  До лучших времен :(*/
     // medium
-    const medium = await this.save(compM)
+    const medium = await this.save(compM, 'webp')
     // small
-    const small = await this.save(compS)
+    const small = await this.save(compS, 'webp')
     // return files
     return { high: '', medium, small, vertical, type }
   }
@@ -66,19 +66,19 @@ class FileStorageService {
   }
 
   async saveFile(file: File): Promise<Hash> {
-    return await this.save(await this.fileToBuffer(file))
+    return await this.save(await this.fileToBuffer(file), file.type.split('/')[1])
   }
 
-  async save(buffer: Buffer): Promise<Hash> {
+  async save(buffer: Buffer, type: string): Promise<Hash> {
     const hash = await this.bufferHash(buffer)
     const someDir = hash.slice(0, 2)
-    const dirToSave = path.join(this.storagePath, hash.slice(0, 2))
+    const dirToSave = path.join(this.storagePath, someDir)
+    const nameFile = hash + '.' + type
     await fs.mkdir(dirToSave, { recursive: true })
 
-    if (!(await exists(path.join(dirToSave, hash)))) {
-      await fs.writeFile(path.join(dirToSave, hash), buffer)
+    if (!(await exists(path.join(dirToSave,nameFile)))) {
+      await fs.writeFile(path.join(dirToSave, nameFile), buffer)
     }
-
     return `${someDir}/${hash}`
   }
 

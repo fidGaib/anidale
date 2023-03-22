@@ -54,7 +54,7 @@ export const PROFILE = graphql(`
     }
   }
 `)
-export const POST_BY_USER = gql(`
+export const POST_BY_USER = graphql(`
   query POST_BY_USER($id: Int!, $limit: Int!, $page: Int!) {
     getPostsByUser(id: $id, limit: $limit, page: $page) {
       id
@@ -62,6 +62,7 @@ export const POST_BY_USER = gql(`
       images {
         id
         small
+        medium
         type
       }
       user {
@@ -77,6 +78,12 @@ export const POSTS = graphql(`
     getPosts(limit: $limit, page: $page) {
       id
       description
+      images {
+        id
+        small
+        medium
+        type
+      }
       user {
         id
         avatar
@@ -85,12 +92,12 @@ export const POSTS = graphql(`
     }
   }
 `)
-export const CREATE_POST = gql(`
+export const CREATE_POST = graphql(`
   mutation CREATE_POST($owner: Int!, $description: String, $images: [File!]) {
     createPost(post: { owner: $owner, description: $description, images: $images }) {
       id
       description
-      images{
+      images {
         id
         small
         medium
