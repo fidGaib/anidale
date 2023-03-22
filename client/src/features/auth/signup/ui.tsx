@@ -28,7 +28,8 @@ export const FormSignup = () => {
   }
 
   useEffect(() => {
-    if (data) {
+    if (data?.registration) {
+      // @ts-ignore
       ViewerVar(data.registration)
     }
   }, [data])

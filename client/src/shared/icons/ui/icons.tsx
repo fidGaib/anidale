@@ -31,13 +31,13 @@ const icons = {
   signin: (props: any, ref: any) => <LoginIcon {...props} />,
   signout: (props: any, ref: any) => <LogoutIcon {...props} />,
   registration: (props: any, ref: any) => <LoginIcon {...props} />,
-  comm: (props: any, ref: any) => <CommIcon {...props} />,
-  send: (props: any, ref: any) => <SendIcon {...props} />,
-  add_photo: (props: any, ref: any) => <AddPhotoIcon {...props} />,
-  like: (props: any, ref: any) => <LikeIcon {...props} />,
-  menu_post: (props: any, ref: any) => <MenuNoticeIcon {...props} />,
-  reload: (props: any, ref: any) => <ReloadIcon {...props} />,
-  close: (props: any, ref: any) => <Close {...props} />,
+  comm: (props: any, ref: any) => <CommIcon className={props.className} />,
+  send: (props: any, ref: any) => <SendIcon className={props.className} onClick={props.onClick} />,
+  add_photo: (props: any, ref: any) => <AddPhotoIcon className={props.className} />,
+  like: (props: any, ref: any) => <LikeIcon className={props.className} />,
+  menu_post: (props: any, ref: any) => <MenuNoticeIcon className={props.className} />,
+  reload: (props: any, ref: any) => <ReloadIcon className={props.className} />,
+  close: (props: any, ref: any) => <Close className={props.className} onClick={props.onClick} />,
   //
 }
 interface PropsType extends SVGAttributes<SVGElement> {

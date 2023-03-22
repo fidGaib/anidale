@@ -1,6 +1,4 @@
-import React from 'react'
-
-const FeedIcon = (props: any) => {
+const FeedIcon = ({ className }: any) => {
   return (
     <svg
       fill='#a52a2a'
@@ -12,7 +10,7 @@ const FeedIcon = (props: any) => {
       xmlSpace='preserve'
       stroke='#a52a2a'
       strokeWidth='0.00512'
-      {...props}
+      className={className}
     >
       <g id='SVGRepo_bgCarrier' strokeWidth='0' />
 

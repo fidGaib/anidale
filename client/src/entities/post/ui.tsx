@@ -33,12 +33,24 @@ export const PostActionWrapp = () => {
 export const PostImages = ({ images }: Post) => {
   return (
     <div className={cl.wrappImages}>
-      {images?.map((image) => (
-        <>
-          <img key={image.id} className={cl.small} src={`http://localhost:5000/storage/${image.small}.webp`} alt='' />
-          <img key={image.id} className={cl.medium} src={`http://localhost:5000/storage/${image.small}.webp`} alt='' />
-        </>
-      ))}
+      {images?.map((image) => {
+        return (
+          <>
+            <img
+              key={`${image.small! + image.id}`}
+              className={cl.small}
+              src={`http://localhost:5000/storage/${image.small}.webp`}
+              alt=''
+            />
+            <img
+              key={image.small}
+              className={cl.medium}
+              src={`http://localhost:5000/storage/${image.small}.webp`}
+              alt=''
+            />
+          </>
+        )
+      })}
     </div>
   )
 }

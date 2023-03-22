@@ -1,4 +1,4 @@
-const close: React.FC = (props) => {
+const close = (props: any) => {
   return (
     <svg
       {...props}
