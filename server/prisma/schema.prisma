@@ -41,11 +41,13 @@ model Post {
 }
 
 model PostImage {
-  id          Int      @id @default(autoincrement())
-  minimize    String
-  oversize    String
-  vertical    Boolean
-  date        DateTime @default(now())
+  id        Int      @id @default(autoincrement())
+  high      String
+  medium    String
+  small     String
+  type      String
+  vertical  Boolean
+  date      DateTime @default(now())
   post      Post   @relation(fields: [postId], references: [id])
   postId    Int
 }

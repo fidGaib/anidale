@@ -4,8 +4,8 @@ import { MakePostImages } from '@/entities/profile/ui'
 import { useViewer } from '@/entities/viewer'
 import { CREATE_POST } from '@/shared/graphql/schema'
 import Icon from '@/shared/icons'
+import { usePostStore } from '@/shared/store'
 
-import { usePostStore } from './module'
 import cl from './ui.module.less'
 
 export const MakePost = () => {
@@ -17,11 +17,11 @@ export const MakePost = () => {
   const setFiles = usePostStore((state) => state.setFiles)
   const send = usePostStore((state) => state.send)
 
-  const [createPost] = useMutation(CREATE_POST)
+  const [createPost, { error }] = useMutation(CREATE_POST)
   const myUser = useViewer()
   return (
     <>
-      <p className={cl.error}>{error_create}</p>
+      <p className={cl.error}>{error_create || `${error}`}</p>
       <div className={cl.wrapper}>
         <div className={cl.wrapperForm}>
           <img src={myUser?.avatar || ''} className={cl.avatar} />

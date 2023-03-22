@@ -6,7 +6,8 @@ class PostController {
   async create(owner: number, description?: string, images?: File[]) {
     if (!owner) throw createGraphQLError('Вы не авторизованы или произошла непредвиденная ошибка')
     if (!description?.trim() && !images?.length) throw createGraphQLError('У вас пустые поля')
-    return await PostService.create(owner, description || '', images)
+    const postData = await PostService.create(owner, description || '', images)
+    return postData
   }
   async getPosts(limit: number, page: number) {
     if (limit < 0) return []

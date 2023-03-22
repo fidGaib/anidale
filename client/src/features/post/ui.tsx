@@ -3,8 +3,8 @@ import { useMutation } from '@apollo/client'
 import { useViewer } from '@/entities/viewer'
 import { REMOVE_POST } from '@/shared/graphql/schema'
 import Icon from '@/shared/icons'
+import { usePostStore } from '@/shared/store'
 
-import { usePostStore } from '../profile/module'
 import cl from './ui.module.less'
 
 interface PorepsMenu {

@@ -1,10 +1,8 @@
-import { createGraphQLError } from 'graphql-yoga'
-
 import { storagePath } from '@/config'
 import { Post, PostImage } from '@/db/models/post-model'
 import User from '@/db/models/user-model'
 
-import FileStorageService from './file-service'
+import FileStorageService, { SaveImage } from './file-service'
 
 class PostService {
   async findAll(limit: number, page: number) {
@@ -14,7 +12,13 @@ class PostService {
       orderBy: { id: 'desc' },
       include: {
         images: true,
-        user: true,
+        user: {
+          select: {
+            id: true,
+            avatar: true,
+            login: true,
+          },
+        },
       },
     })
     return posts
@@ -27,7 +31,13 @@ class PostService {
       orderBy: { id: 'desc' },
       include: {
         images: true,
-        user: true,
+        user: {
+          select: {
+            id: true,
+            avatar: true,
+            login: true,
+          },
+        },
       },
     })
     return posts
@@ -42,28 +52,37 @@ class PostService {
         description,
         feedId: user.feedId,
       },
-      include: { user: true },
+      include: {
+        user: {
+          select: {
+            id: true,
+            avatar: true,
+            login: true,
+          },
+        },
+      },
     })
-
-    if (images) {
+    let postImages = <SaveImage[]>[]
+    if (images?.length) {
       const StorageService = new FileStorageService(storagePath)
-
-      const imagesInfo = await Promise.all(images.map((image) => StorageService.saveImage(image)))
+      postImages = await Promise.all(images.map((image) => StorageService.saveImage(image)))
       await PostImage.createMany({
-        data: imagesInfo.map((info) => ({
+        data: postImages.map((info) => ({
           postId: post.id,
           ...info,
         })),
       })
     }
-    return post
+    return { post, images: postImages }
   }
   async remove(id: number) {
-    await Post.delete({
+    const post = await Post.findUnique({
       where: {
         id,
       },
     })
+    await PostImage.deleteMany({where: {postId: id}})
+    await Post.delete({where: {id}})
     return true
   }
   async update(id: number, description?: string, images?: File[]) {
@@ -71,7 +90,7 @@ class PostService {
       description,
     }
     const post = await Post.update({ where: { id }, data: newPost, include: { user: true } })
-    return post
+    return { post, images }
   }
 }
 export default new PostService()

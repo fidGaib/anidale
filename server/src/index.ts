@@ -1,7 +1,10 @@
+import { config } from 'dotenv'
 import express from 'express'
 import type { Server } from 'http'
 
 import handlers from './handlers'
+
+config()
 
 const app = express()
 

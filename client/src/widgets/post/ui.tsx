@@ -1,10 +1,10 @@
 import { useQuery } from '@apollo/client'
 import { useEffect } from 'react'
 
-import { PostActionWrapp, PostDescription, PostOwner } from '@/entities/post'
-import { usePostStore } from '@/features/profile/module'
+import { PostActionWrapp, PostDescription, PostImages, PostOwner } from '@/entities/post'
 import { Post } from '@/features/profile/types'
 import { POSTS, POST_BY_USER } from '@/shared/graphql/schema'
+import { usePostStore } from '@/shared/store'
 
 import cl from './ui.module.less'
 
@@ -15,8 +15,8 @@ interface Props {
 }
 
 export const Posts = ({ id, limit, page }: Props) => {
+  // @ts-ignore
   const { data } = useQuery(id ? POST_BY_USER : POSTS, {
-    fetchPolicy: 'no-cache',
     variables: id ? { id, limit, page } : { limit, page },
   })
   const posts = usePostStore((state) => state.posts)
@@ -24,7 +24,9 @@ export const Posts = ({ id, limit, page }: Props) => {
   const removeId = usePostStore((state) => state.removeId)
   const clearPosts = usePostStore((state) => state.clearPosts)
   useEffect(() => {
+    // @ts-ignore
     if (data && id) addPosts(data.getPostsByUser)
+    // @ts-ignore
     if (data && !id) addPosts(data.getPosts)
     return () => clearPosts()
   }, [data])
@@ -35,6 +37,7 @@ export const Posts = ({ id, limit, page }: Props) => {
           <div key={post.id} className={cl.wrapper} id={removeId === post.id ? cl.delShow : ''}>
             <PostOwner post={post} />
             {post.description && <PostDescription description={post.description} />}
+            {post?.images?.length ? <PostImages images={post.images} /> : ''}
             <PostActionWrapp />
           </div>
         ))}

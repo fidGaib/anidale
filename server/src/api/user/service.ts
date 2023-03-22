@@ -8,7 +8,7 @@ import User from '@/db/models/user-model'
 import { UpdateUser } from '@/schema/resolvers-types'
 
 import avatar from '../dtos/avatar-random'
-import UserDto from '../dtos/user-dto'
+
 import tokenServiceGraph from './token-service-graph'
 
 class UserService {

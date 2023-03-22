@@ -1,9 +1,23 @@
+import { createGraphQLError } from 'graphql-yoga'
 import { createHash } from 'node:crypto'
 import fs from 'node:fs/promises'
 import path from 'path'
 import sharp from 'sharp'
 
 type Hash = string
+export interface SaveImage {
+  high: string
+  medium: string
+  small: string
+  vertical: boolean
+  type: string
+}
+interface CompressImage {
+  compM: Buffer
+  compS: Buffer
+  vertical: boolean
+  type: string
+}
 
 async function exists(path: string) {
   return fs
@@ -14,40 +28,58 @@ async function exists(path: string) {
 
 class FileStorageService {
   constructor(private storagePath: string) {}
-
-  async saveImage(file: File): Promise<{ minimize: string; oversize: string; vertical: boolean }> {
-    const oversize = await this.saveFile(file)
-
-    const sharpFile = sharp(await this.fileToBuffer(file))
-
-    const { width, height } = await sharpFile.metadata()
+  async validate(file: File): Promise<null> {
+    if (file.size > 5242880) {
+      throw createGraphQLError('размер файла больше 5мб')
+    }
+    if (file.type.split('/')[0] !== 'image') {
+      throw createGraphQLError('Можно загружать только арты')
+    }
+    return null
+  }
+  async compress(file: File): Promise<CompressImage> {
+    const comp = sharp(await this.fileToBuffer(file)).resize({ fit: 'cover' })
+    const compM = await comp.toFormat('webp').toBuffer()
+    const compS = await comp.toFormat('webp', { quality: 1, alphaQuality: 1 }).toBuffer()
+    // // get width and high
+    const { width, height } = await comp.metadata()
+    // // get vertical
     const vertical = Boolean(height && width && height > width)
-
-    const minimize = await this.save(await sharpFile.jpeg({ mozjpeg: true }).toBuffer())
-
-    return { oversize, minimize, vertical }
+    return { compM, compS, vertical, type: file.type.split('/')[1] }
+  }
+  async saveImage(file: File): Promise<SaveImage> {
+    await this.validate(file)
+    // sharp compress
+    const { compS, vertical, type, compM } = await this.compress(file)
+    // high
+    /*const high = await this.saveFile(file)  До лучших времен :(*/
+    // medium
+    const medium = await this.save(compM)
+    // small
+    const small = await this.save(compS)
+    // return files
+    return { high: '', medium, small, vertical, type }
   }
 
-  async fileToBuffer(file: File) {
+  async fileToBuffer(file: File): Promise<Buffer> {
     return Buffer.from(await file.arrayBuffer())
   }
 
-  async saveFile(file: File) {
+  async saveFile(file: File): Promise<Hash> {
     return await this.save(await this.fileToBuffer(file))
   }
 
   async save(buffer: Buffer): Promise<Hash> {
     const hash = await this.bufferHash(buffer)
-
+    const someDir = hash.slice(0, 2)
     const dirToSave = path.join(this.storagePath, hash.slice(0, 2))
-
     await fs.mkdir(dirToSave, { recursive: true })
 
     if (!(await exists(path.join(dirToSave, hash)))) {
       await fs.writeFile(path.join(dirToSave, hash), buffer)
     }
 
-    return hash
+    return `${someDir}/${hash}`
   }
 
   async load(hash: Hash) {

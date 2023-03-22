@@ -1,3 +1,5 @@
+import { gql } from '@apollo/client'
+
 import { graphql } from './gql/gql'
 
 export const GET_USERS = graphql(`
@@ -52,15 +54,20 @@ export const PROFILE = graphql(`
     }
   }
 `)
-export const POST_BY_USER = graphql(`
+export const POST_BY_USER = gql(`
   query POST_BY_USER($id: Int!, $limit: Int!, $page: Int!) {
     getPostsByUser(id: $id, limit: $limit, page: $page) {
       id
       description
+      images {
+        id
+        small
+        type
+      }
       user {
         id
-        login
         avatar
+        login
       }
     }
   }
