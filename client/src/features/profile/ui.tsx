@@ -21,7 +21,11 @@ export const MakePost = () => {
   const myUser = useViewer()
   return (
     <>
+<<<<<<< HEAD
       <p className={cl.error}>{error_create || `${error ? error : ''}`}</p>
+=======
+      <p className={cl.error}>{error_create || `${error}`}</p>
+>>>>>>> 5a3da1c4730f78d195df26612010bb99a416a5e1
       <div className={cl.wrapper}>
         <div className={cl.wrapperForm}>
           <img src={myUser?.avatar || ''} className={cl.avatar} />
