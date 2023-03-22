@@ -25,7 +25,7 @@ type User {
   createdAt: Date
   accessToken: String
   refreshToken: String
-  feed: Feed!
+  feed: Feed
 }
 
 type Feed {

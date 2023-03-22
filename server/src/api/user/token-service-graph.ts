@@ -58,7 +58,7 @@ class TokenServiceGraph {
       const userData = jwt.verify(token, this.accessSecret)
       return userData
     } catch (e) {
-      return null
+      return null 
     }
   }
   validateRefreshToken(token: string) {

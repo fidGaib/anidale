@@ -13,19 +13,19 @@ const PostResolvers: Resolvers = {
     },
   },
   Mutation: {
-    async createPost(parent, args) {
-      const { owner, description, images } = args.post
-      return await postController.create(owner, description, images)
+    async createPost(parent, { post }) {
+      const { owner, description, images } = post
+      const postData = await postController.create(owner, description, images)
+      console.log(postData)
+      return postData
     },
-    async updatePost(parent, args) {
-      const { id } = args
+    async updatePost(parent, { id, post }) {
       let description, images
-      if (args.post?.description) description = args.post.description
-      if (args.post?.images) images = args.post.images
+      if (post?.description) description = post.description
+      if (post?.images) images = post.images
       return await postController.update(id, description, images)
     },
-    async removePost(parent, args) {
-      const { id } = args
+    async removePost(parent, { id }) {
       return await postController.remove(id)
     },
   },

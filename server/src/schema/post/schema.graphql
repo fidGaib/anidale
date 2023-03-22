@@ -20,18 +20,16 @@ type Post {
   id: Int
   description: String
   images: [PostImages!]
-  countLikes: Int
-  countComm: Int
   date: Date
   user: User
 }
 type PostImages {
   id: Int
-  #   high: String
-  #   medium: String
-  #   small: String
-  oversize: String
-  minimize: String
+  high: String
+  medium: String
+  small: String
+  vertical: Boolean
+  type: String
   postId: Int
   date: Date
 }

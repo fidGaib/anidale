@@ -3,10 +3,18 @@ export interface User {
   login: string
   avatar: string
 }
+export interface PostImages {
+  id: number
+  high: string
+  medium: string
+  small: string
+  type: string
+}
 export interface Post {
   id: number
   description: string
   user: User
+  images: PostImages[]
 }
 export interface PostStore {
   posts: Post[]
