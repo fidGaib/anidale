@@ -1,4 +1,12 @@
 import { Link } from 'react-router-dom'
+// import required modules
+import { FreeMode, Navigation } from 'swiper'
+import 'swiper/css/free-mode'
+import 'swiper/css/navigation'
+// swiper
+import { Swiper, SwiperSlide } from 'swiper/react'
+// Import Swiper styles
+import 'swiper/swiper.min.css'
 
 import { RemovePost } from '@/features/post'
 import { Post } from '@/shared/graphql/gql/graphql'
@@ -9,9 +17,9 @@ import cl from './ui.module.less'
 export const PostOwner = ({ post }: { post: Post }) => {
   return (
     <Link to={`/profile/${post?.user?.id}`} className={cl.wrappOwner}>
-      <img src={post?.user?.avatar!} alt='' />
+      <img src={post?.user?.avatar || ''} alt='' />
       {post?.user?.login}
-      <RemovePost id={post?.id!} userId={post?.user?.id!} />
+      <RemovePost id={post?.id || 0} userId={post?.user?.id || 0} />
     </Link>
   )
 }
@@ -32,25 +40,28 @@ export const PostActionWrapp = () => {
 }
 export const PostImages = ({ images }: Post) => {
   return (
-    <div className={cl.wrappImages}>
-      {images?.map((image) => {
-        return (
+    <>
+      <Swiper
+        style={{
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          '--swiper-navigation-color': '#fff',
+          '--swiper-pagination-color': '#fff',
+        }}
+        spaceBetween={0}
+        navigation={true}
+        modules={[FreeMode, Navigation]}
+        className={cl.wrappImages}
+      >
+        {images?.map((image) => (
           <>
-            <img
-              key={`${image?.small}`}
-              className={cl.small}
-              src={`http://localhost:5000/storage/${image?.small}.webp`}
-              alt=''
-            />
-            <img
-              key={image?.medium}
-              className={cl.medium}
-              src={`http://localhost:5000/storage/${image?.medium}.webp`}
-              alt=''
-            />
+            <SwiperSlide key={image?.id} id={cl.childSwiper}>
+              <img className={cl.medium} src={`http://localhost:5000/storage/${image?.medium}.webp`} />
+              <img className={cl.small} src={`http://localhost:5000/storage/${image?.small}.webp`} />
+            </SwiperSlide>
           </>
-        )
-      })}
-    </div>
+        ))}
+      </Swiper>
+    </>
   )
 }

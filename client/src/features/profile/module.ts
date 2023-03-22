@@ -35,7 +35,7 @@ export const usePostStore = create<PostStore>()((set, get) => ({
   //set images
   setFiles(fileList) {
     get().setError('')
-    let files = Array.from(fileList)
+    const files = Array.from(fileList)
     if (files.length + get().images.length <= 9) {
       files.map(async (file) => {
         const a = await get().validate(file)
@@ -44,7 +44,7 @@ export const usePostStore = create<PostStore>()((set, get) => ({
         }
       })
     } else {
-      let delCount = files.length - (9 - get().images.length)
+      const delCount = files.length - (9 - get().images.length)
       for (let i = 0; i < delCount; i++) {
         files.pop()
       }
@@ -62,7 +62,7 @@ export const usePostStore = create<PostStore>()((set, get) => ({
     else return true
   },
   removeImage: (image) => {
-    let array = get().images.filter((item) => item !== image)
+    const array = get().images.filter((item) => item !== image)
     set((state) => ({
       images: array,
     }))
@@ -73,8 +73,11 @@ export const usePostStore = create<PostStore>()((set, get) => ({
     schemaFn({ variables: { owner, description: get().description, images: get().images } }).then((res: any) => {
       set((state) => ({
         description: '',
+        images: [],
+        error: '',
       }))
       const post = res?.data?.createPost
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       get().addPost([post])
     })
