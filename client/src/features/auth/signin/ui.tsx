@@ -23,7 +23,8 @@ export const FormSignin = () => {
   }
 
   useEffect(() => {
-    if (data) {
+    if (data?.login) {
+      // @ts-ignore
       ViewerVar(data.login)
     }
   }, [data])

@@ -1,6 +1,6 @@
 import { forwardRef } from 'react'
 
-const MenuHeaderIcon = forwardRef((props, ref?: any) => {
+const MenuHeaderIcon = forwardRef((props: any, ref?: any) => {
   return (
     <svg
       ref={ref}
@@ -9,7 +9,8 @@ const MenuHeaderIcon = forwardRef((props, ref?: any) => {
       fill='#a52a2a'
       stroke='#a52a2a'
       strokeWidth='0.01024'
-      {...props}
+      className={props.className}
+      onClick={props.onClick}
     >
       <g id='SVGRepo_bgCarrier' strokeWidth='0'></g>
       <g

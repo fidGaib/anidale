@@ -6,17 +6,20 @@ import MenuHeader from '@/features/header'
 import { REFRESH } from '@/shared/graphql/schema'
 import useOutsideClick from '@/shared/hooks/useOutsideClick'
 import Icon from '@/shared/icons'
+import { useUserStore } from '@/shared/store'
 
 import cl from './ui.module.less'
 
 export const Header = () => {
   const { data } = useQuery(REFRESH, { fetchPolicy: 'network-only' })
-
+  const validateUser = useUserStore((state) => state.validate)
   useEffect(() => {
-    if (data?.refresh.user) {
-      ViewerVar(data?.refresh.user)
+    if (data?.refresh?.user) {
+      validateUser()
+      // @ts-ignore
+      ViewerVar(data.refresh.user)
     } else ViewerVar(null)
-  }, [data?.refresh.user])
+  }, [data?.refresh?.user])
   const [showMenu, setShowMenu] = useState(false)
   const notCloseMenuRef = useRef(null)
   const refMenu = useRef(null)

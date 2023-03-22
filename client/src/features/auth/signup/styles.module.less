@@ -4,6 +4,11 @@
   display: flex;
   justify-content: center;
 }
+@media screen and (max-width: 800px) {
+  .container {
+    width: 100%;
+  }
+}
 .form {
   display: flex;
   flex-direction: column;
@@ -26,6 +31,7 @@
   font-size: var(--size-text-main);
   font-family: var(--font-text-main);
 }
+
 .form p {
   color: var(--accent);
   font-weight: bold;
