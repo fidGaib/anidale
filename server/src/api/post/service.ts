@@ -75,14 +75,33 @@ class PostService {
     }
     return { post, images: postImages }
   }
-  async remove(id: number) {
+  async remove(id: number):Promise<boolean> {
+    // file service
+    const StorageService = new FileStorageService(storagePath)
+    // find post
     const post = await Post.findUnique({
-      where: {
-        id,
-      },
+      where: {id},
+      include: {images: true}
     })
-    await PostImage.deleteMany({where: {postId: id}})
-    await Post.delete({where: {id}})
+    // some magick || iteration post images
+    post?.images.forEach(async (item) => {
+      // find  double image by medium
+      const res = await PostImage.findMany({
+        where: {
+          medium: item.medium
+        }
+      })
+      // delete image if not double || res.length === 1
+      if(res.length === 1)  await StorageService.removeFile(res[0])
+    })
+    await PostImage.deleteMany({
+      where: {postId: id}
+    })
+    await Post.delete({
+      where: {
+        id
+      }
+    })
     return true
   }
   async update(id: number, description?: string, images?: File[]) {

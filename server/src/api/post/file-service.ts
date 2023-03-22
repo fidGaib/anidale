@@ -76,7 +76,7 @@ class FileStorageService {
     const nameFile = hash + '.' + type
     await fs.mkdir(dirToSave, { recursive: true })
 
-    if (!(await exists(path.join(dirToSave,nameFile)))) {
+    if (!(await exists(path.join(dirToSave, nameFile)))) {
       await fs.writeFile(path.join(dirToSave, nameFile), buffer)
     }
     return `${someDir}/${hash}`
@@ -100,6 +100,15 @@ class FileStorageService {
     shasum.end()
 
     return shasum.read()
+  }
+  async removeFile(image: SaveImage): Promise<boolean> {
+    // const high = path.join(this.storagePath, image.high + '.' + image.type)
+    const medium = path.join(this.storagePath, image.medium + '.' + 'webp')
+    const small = path.join(this.storagePath, image.small + '.' + 'webp')
+    // fs.unlink(high)
+    await fs.unlink(medium)
+    await fs.unlink(small)
+    return true
   }
 }
 
