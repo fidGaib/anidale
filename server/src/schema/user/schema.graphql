@@ -18,7 +18,7 @@ type Refresh {
 type User {
   id: Int!
   email: String
-  login: String
+  login: String!
   avatar: String
   activationLink: String
   isActivated: Boolean
