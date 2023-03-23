@@ -17,6 +17,7 @@ module.exports = {
     ecmaVersion: 'latest',
     sourceType: 'module',
   },
+  ignorePatterns: ['src/shared/graphql/gql/*'],
   plugins: ['react', '@typescript-eslint'],
   rules: {},
 }

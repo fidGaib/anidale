@@ -1,4 +1,4 @@
-import { SVGAttributes, forwardRef } from 'react'
+import { ForwardedRef, ImgHTMLAttributes, SVGAttributes, forwardRef } from 'react'
 
 import AddPhotoIcon from './icons/add-photo'
 import Close from './icons/close'
@@ -19,30 +19,32 @@ import SendIcon from './icons/send'
 import SettingsIcon from './icons/settings'
 
 const icons = {
-  logo: (props: any, ref: any) => <Logo {...props} />,
-  menu_header: (props: any, ref: any) => <MenuHeaderIcon {...props} ref={ref} />,
+  logo: (props: ImgHTMLAttributes<HTMLImageElement>) => <Logo {...props} />,
+  menu_header: (props: SVGAttributes<SVGElement>, ref: ForwardedRef<SVGElement>) => (
+    <MenuHeaderIcon {...props} ref={ref} />
+  ),
   // menu header icons
-  profile: (props: any, ref: any) => <ProfileIcon {...props} />,
-  feed: (props: any, ref: any) => <FeedIcon {...props} />,
-  chat: (props: any, ref: any) => <MessageIcon {...props} />,
-  groups: (props: any, ref: any) => <GroupsIcon {...props} />,
-  friends: (props: any, ref: any) => <FriendsIcon {...props} />,
-  settings: (props: any, ref: any) => <SettingsIcon {...props} />,
-  signin: (props: any, ref: any) => <LoginIcon {...props} />,
-  signout: (props: any, ref: any) => <LogoutIcon {...props} />,
-  registration: (props: any, ref: any) => <LoginIcon {...props} />,
-  comm: (props: any, ref: any) => <CommIcon className={props.className} />,
-  send: (props: any, ref: any) => <SendIcon className={props.className} onClick={props.onClick} />,
-  add_photo: (props: any, ref: any) => <AddPhotoIcon className={props.className} />,
-  like: (props: any, ref: any) => <LikeIcon className={props.className} />,
-  menu_post: (props: any, ref: any) => <MenuNoticeIcon className={props.className} />,
-  reload: (props: any, ref: any) => <ReloadIcon className={props.className} />,
-  close: (props: any, ref: any) => <Close className={props.className} onClick={props.onClick} />,
+  profile: (props: SVGAttributes<SVGElement>) => <ProfileIcon {...props} />,
+  feed: (props: SVGAttributes<SVGElement>) => <FeedIcon {...props} />,
+  chat: (props: SVGAttributes<SVGElement>) => <MessageIcon {...props} />,
+  groups: (props: SVGAttributes<SVGElement>) => <GroupsIcon {...props} />,
+  friends: (props: SVGAttributes<SVGElement>) => <FriendsIcon {...props} />,
+  settings: (props: SVGAttributes<SVGElement>) => <SettingsIcon {...props} />,
+  signin: (props: SVGAttributes<SVGElement>) => <LoginIcon {...props} />,
+  signout: (props: SVGAttributes<SVGElement>) => <LogoutIcon {...props} />,
+  registration: (props: SVGAttributes<SVGElement>) => <LoginIcon {...props} />,
+  comm: (props: SVGAttributes<SVGElement>) => <CommIcon className={props.className} />,
+  send: (props: SVGAttributes<SVGElement>) => <SendIcon className={props.className} onClick={props.onClick} />,
+  add_photo: (props: SVGAttributes<SVGElement>) => <AddPhotoIcon className={props.className} />,
+  like: (props: SVGAttributes<SVGElement>) => <LikeIcon className={props.className} />,
+  menu_post: (props: SVGAttributes<SVGElement>) => <MenuNoticeIcon className={props.className} />,
+  reload: (props: SVGAttributes<SVGElement>) => <ReloadIcon className={props.className} />,
+  close: (props: SVGAttributes<SVGElement>) => <Close className={props.className} onClick={props.onClick} />,
   //
 }
 interface PropsType extends SVGAttributes<SVGElement> {
   iconId: keyof typeof icons
 }
-export const Icon = forwardRef<SVGElement, PropsType>((props, ref) => {
+export const Icon = forwardRef<SVGElement, PropsType>(function Icon(props, ref) {
   return icons[props.iconId](props, ref)
 })

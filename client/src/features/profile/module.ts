@@ -10,12 +10,12 @@ export const usePostStore = create<PostStore>()((set, get) => ({
   error: '',
   //set error
   setError(message) {
-    set((state) => ({ error: message }))
+    set(() => ({ error: message }))
   },
   //set text
   changeText(description) {
     if (description.length > 255) return
-    set((state) => ({ description }))
+    set(() => ({ description }))
   },
   //add
   addPost: (post) => set((state) => ({ posts: [...post, ...state.posts] })),
@@ -25,10 +25,10 @@ export const usePostStore = create<PostStore>()((set, get) => ({
       posts: state.posts.filter((post) => post.id !== id),
     })),
   //set removeId
-  setRemoveId: (id) => set((state) => ({ removeId: id })),
+  setRemoveId: (id) => set(() => ({ removeId: id })),
   // clear unmount
   clearPosts: () =>
-    set((state) => ({
+    set(() => ({
       posts: [],
       removeId: 0,
     })),
@@ -40,7 +40,7 @@ export const usePostStore = create<PostStore>()((set, get) => ({
       files.map(async (file) => {
         const a = await get().validate(file)
         if (a === true) {
-          set((state) => ({ images: [...get().images, file] }))
+          set(() => ({ images: [...get().images, file] }))
         }
       })
     } else {
@@ -63,7 +63,7 @@ export const usePostStore = create<PostStore>()((set, get) => ({
   },
   removeImage: (image) => {
     const array = get().images.filter((item) => item !== image)
-    set((state) => ({
+    set(() => ({
       images: array,
     }))
   },
@@ -71,7 +71,7 @@ export const usePostStore = create<PostStore>()((set, get) => ({
     if (!get().description.trim() && get().images.length === 0) return
     if (get().description.trim().length > 255) return get().setError('Не более 255 символов')
     schemaFn({ variables: { owner, description: get().description, images: get().images } }).then((res: any) => {
-      set((state) => ({
+      set(() => ({
         description: '',
         images: [],
         error: '',

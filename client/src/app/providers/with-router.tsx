@@ -14,12 +14,13 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
   link,
 })
-export const withRouter = (component: () => React.ReactNode) => () => {
-  return (
-    <ApolloProvider client={client}>
-      <BrowserRouter>
-        <Suspense fallback={<Loader />}>{component()}</Suspense>
-      </BrowserRouter>
-    </ApolloProvider>
-  )
-}
+export const withRouter = (component: () => React.ReactNode) =>
+  function WithRouter() {
+    return (
+      <ApolloProvider client={client}>
+        <BrowserRouter>
+          <Suspense fallback={<Loader />}>{component()}</Suspense>
+        </BrowserRouter>
+      </ApolloProvider>
+    )
+  }

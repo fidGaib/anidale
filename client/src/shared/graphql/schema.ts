@@ -1,5 +1,3 @@
-import { gql } from '@apollo/client'
-
 import { graphql } from './gql/gql'
 
 export const GET_USERS = graphql(`

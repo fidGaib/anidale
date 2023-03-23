@@ -1,4 +1,6 @@
-const FeedIcon = ({ className }: any) => {
+import { SVGAttributes } from 'react'
+
+const FeedIcon = (props: SVGAttributes<SVGElement>) => {
   return (
     <svg
       fill='#a52a2a'
@@ -10,7 +12,7 @@ const FeedIcon = ({ className }: any) => {
       xmlSpace='preserve'
       stroke='#a52a2a'
       strokeWidth='0.00512'
-      className={className}
+      {...props}
     >
       <g id='SVGRepo_bgCarrier' strokeWidth='0' />
 

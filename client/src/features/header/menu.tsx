@@ -6,7 +6,7 @@ import Icon from '@/shared/icons'
 
 import cl from './ui.module.less'
 
-export const MenuHeader = forwardRef((props, ref?: any) => {
+export const MenuHeader = forwardRef(function MenuHeader(props, ref?: any) {
   const viewer = useViewer()
   return (
     <ul className={cl.menu} ref={ref}>

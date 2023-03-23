@@ -1,4 +1,6 @@
-const ArtsIcon = (props: any) => {
+import { SVGAttributes } from 'react'
+
+const ArtsIcon = (props: SVGAttributes<SVGElement>) => {
   return (
     <svg fill='#a52a2a' width='64px' height='64px' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' {...props}>
       <g id='SVGRepo_bgCarrier' strokeWidth='0'></g>

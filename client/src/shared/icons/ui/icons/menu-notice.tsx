@@ -1,4 +1,6 @@
-const MenuNoticeIcon = (props: any) => {
+import { SVGAttributes } from 'react'
+
+const MenuNoticeIcon = (props: SVGAttributes<SVGElement>) => {
   return (
     <svg
       {...props}

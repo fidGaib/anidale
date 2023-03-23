@@ -1,4 +1,6 @@
-const LikeIcon = (props: any) => {
+import { SVGAttributes } from 'react'
+
+const LikeIcon = (props: SVGAttributes<SVGElement>) => {
   return (
     <svg fill='#c0c0c0' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' {...props}>
       <g id='SVGRepo_bgCarrier' strokeWidth='0'></g>

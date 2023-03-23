@@ -1,12 +1,8 @@
-const GroupsIcon = ({ className }: any) => {
+import { SVGAttributes } from 'react'
+
+const GroupsIcon = (props: SVGAttributes<SVGElement>) => {
   return (
-    <svg
-      fill='#a52a2a'
-      xmlns='http://www.w3.org/2000/svg'
-      viewBox='0 0 100 100'
-      xmlSpace='preserve'
-      className={className}
-    >
+    <svg fill='#a52a2a' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' xmlSpace='preserve' {...props}>
       <g id='SVGRepo_bgCarrier' strokeWidth='0'></g>
       <g id='SVGRepo_tracerCarrier' strokeLinecap='round' strokeLinejoin='round'></g>
       <g id='SVGRepo_iconCarrier'>

@@ -1,12 +1,14 @@
-const close = (props: any) => {
+import { SVGAttributes } from 'react'
+
+const Close = (props: SVGAttributes<SVGSVGElement>) => {
   return (
     <svg
-      {...props}
       viewBox='0 0 24 24'
       version='1.1'
       xmlns='http://www.w3.org/2000/svg'
       xmlnsXlink='http://www.w3.org/1999/xlink'
       fill='#000000'
+      {...props}
     >
       <g id='SVGRepo_bgCarrier' strokeWidth='0'></g>
       <g id='SVGRepo_tracerCarrier' strokeLinecap='round' strokeLinejoin='round'></g>
@@ -54,4 +56,4 @@ const close = (props: any) => {
   )
 }
 
-export default close
+export default Close

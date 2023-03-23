@@ -15,7 +15,6 @@ interface Props {
 }
 
 export const Posts = ({ id, limit, page }: Props) => {
-  // @ts-ignore
   const { data } = useQuery(id ? POST_BY_USER : POSTS, {
     variables: id ? { id, limit, page } : { limit, page },
   })
@@ -24,10 +23,8 @@ export const Posts = ({ id, limit, page }: Props) => {
   const removeId = usePostStore((state) => state.removeId)
   const clearPosts = usePostStore((state) => state.clearPosts)
   useEffect(() => {
-    // @ts-ignore
-    if (data && id) addPosts(data.getPostsByUser)
-    // @ts-ignore
-    if (data && !id) addPosts(data.getPosts)
+    if (!data) return
+    addPosts(id ? data.getPostsByUser : data.getPosts)
     return () => clearPosts()
   }, [data])
   return (

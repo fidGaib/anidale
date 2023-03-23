@@ -12,10 +12,13 @@ import cl from './ui.module.less'
 export const Header = () => {
   const { data } = useQuery(REFRESH)
   useEffect(() => {
-    if (data?.refresh?.user) {
-      // @ts-ignore
-      ViewerVar(data.refresh.user)
-    } else ViewerVar(null)
+    const user = data?.refresh?.user
+    if (!user) {
+      ViewerVar(null)
+      return
+    }
+
+    ViewerVar(user)
   }, [data?.refresh?.user])
   const [showMenu, setShowMenu] = useState(false)
   const notCloseMenuRef = useRef(null)
@@ -26,6 +29,7 @@ export const Header = () => {
   const handleClicklInsideClose = () => {
     setShowMenu(false)
   }
+
   useOutsideClick(refMenu, handleClicklInsideClose, notCloseMenuRef)
   return (
     <header className={cl.wrapper}>
