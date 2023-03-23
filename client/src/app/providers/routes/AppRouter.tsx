@@ -3,7 +3,7 @@ import { Route, Routes } from 'react-router-dom'
 
 import { useAuth } from '@/entities/viewer'
 
-import { privateRouters, publicRouters } from './routes'
+import { privateRoutes, publicRoutes } from './routes'
 
 const Signin = lazy(() => import('@/pages/auth/signin'))
 const Feed = lazy(() => import('@/pages/feed'))
@@ -14,14 +14,14 @@ const AppRouter = () => {
     <>
       {isAuth ? (
         <Routes>
-          {privateRouters.map((route) => (
+          {privateRoutes.map((route) => (
             <Route key={route.path} element={<route.element />} path={route.path} />
           ))}
           <Route element={<Feed />} path={'/*'} />
         </Routes>
       ) : (
         <Routes>
-          {publicRouters.map((route) => (
+          {publicRoutes.map((route) => (
             <Route key={route.path} element={<route.element />} path={route.path} />
           ))}
           <Route element={<Signin />} path={'/*'} />

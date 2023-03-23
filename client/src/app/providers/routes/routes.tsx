@@ -7,15 +7,15 @@ const Signin = lazy(() => import('@/pages/auth/signin/'))
 const Signout = lazy(() => import('@/pages/auth/signout'))
 const Registration = lazy(() => import('@/pages/auth/signup/'))
 
-// private routers
-export const privateRouters = [
+// private routes
+export const privateRoutes = [
   { path: '/feed', element: Feed },
   { path: '/profile/:id', element: Profile },
   { path: '/signout', element: Signout },
   { path: '/friends', element: Friends },
 ]
-// public routers
-export const publicRouters = [
+// public routes
+export const publicRoutes = [
   { path: '/feed', element: Feed },
   { path: '/signin', element: Signin },
   { path: '/signup', element: Registration },
