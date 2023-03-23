@@ -1,25 +1,12 @@
-import { useQuery } from '@apollo/client'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 
-import { ViewerVar } from '@/entities/viewer'
 import MenuHeader from '@/features/header'
-import { REFRESH } from '@/shared/graphql/schema'
 import useOutsideClick from '@/shared/hooks/useOutsideClick'
 import Icon from '@/shared/icons'
 
 import cl from './ui.module.less'
 
 export const Header = () => {
-  const { data } = useQuery(REFRESH)
-  useEffect(() => {
-    const user = data?.refresh?.user
-    if (!user) {
-      ViewerVar(null)
-      return
-    }
-
-    ViewerVar(user)
-  }, [data?.refresh?.user])
   const [showMenu, setShowMenu] = useState(false)
   const notCloseMenuRef = useRef(null)
   const refMenu = useRef(null)
