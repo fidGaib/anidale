@@ -1,0 +1,13 @@
+{
+	"scripts": {
+		"i-all": "npm i && cd server && npm i && cd ../client && npm i && cd ..",
+		"dev": "concurrently \"npm:dev-*\" \"npm:codegen-*\"",
+		"dev-server": "cd server && npm run dev",
+		"dev-client": "cd client && npm run dev",
+		"codegen-server": "cd server && npm run codegen",
+		"codegen-client": "cd client && npm run codegen"
+	},
+	"devDependencies": {
+		"concurrently": "^7.6.0"
+	}
+}
