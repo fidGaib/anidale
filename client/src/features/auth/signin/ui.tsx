@@ -22,11 +22,9 @@ export const FormSignin = () => {
     await LOGIN({ variables, fetchPolicy: 'network-only' })
   }
 
-  useEffect(() => {
-    if (data?.login) {
-      ViewerVar(data.login)
-    }
-  }, [data])
+  if (data?.login) {
+    ViewerVar(data.login)
+  }
 
   return (
     <div className={cl.container}>
