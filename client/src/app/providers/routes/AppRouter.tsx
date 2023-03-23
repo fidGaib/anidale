@@ -1,6 +1,7 @@
 import { lazy } from 'react'
 import { Route, Routes } from 'react-router-dom'
 
+import NotFound from '@/pages/not-found'
 import { useAuthentication } from '@/processes/auth'
 
 import { privateRoutes, publicRoutes } from './routes'
@@ -16,23 +17,24 @@ const AppRouter = () => {
   }
 
   return (
-    <>
+    <Routes>
       {isAuth ? (
-        <Routes>
+        <>
           {privateRoutes.map((route) => (
             <Route key={route.path} element={<route.element />} path={route.path} />
           ))}
-          <Route element={<Feed />} path={'/*'} />
-        </Routes>
+          <Route element={<Feed />} path='/' />
+        </>
       ) : (
-        <Routes>
+        <>
           {publicRoutes.map((route) => (
             <Route key={route.path} element={<route.element />} path={route.path} />
           ))}
-          <Route element={<Signin />} path={'/*'} />
-        </Routes>
+          <Route element={<Signin />} path='/' />
+        </>
       )}
-    </>
+      <Route element={<NotFound />} path='*' />
+    </Routes>
   )
 }
 export default AppRouter
