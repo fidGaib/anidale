@@ -15,8 +15,6 @@ const AppRouter = () => {
     return <></>
   }
 
-  console.log('UPDATE STATE', { isAuth, isAuthenticating })
-
   return (
     <>
       {isAuth ? (
