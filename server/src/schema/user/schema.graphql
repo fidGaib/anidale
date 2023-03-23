@@ -19,7 +19,7 @@ type User {
   id: Int!
   email: String
   login: String!
-  avatar: String
+  avatar: String!
   activationLink: String
   isActivated: Boolean
   createdAt: Date
