@@ -1,33 +1,40 @@
 import { lazy } from 'react'
 import { Route, Routes } from 'react-router-dom'
 
-import { useAuth } from '@/entities/viewer'
+import NotFound from '@/pages/not-found'
+import { useAuthentication } from '@/processes/auth'
 
-import { privateRouters, publicRouters } from './routes'
+import { privateRoutes, publicRoutes } from './routes'
 
 const Signin = lazy(() => import('@/pages/auth/signin'))
 const Feed = lazy(() => import('@/pages/feed'))
 
 const AppRouter = () => {
-  const isAuth = useAuth()
+  const { isAuth, isAuthenticating } = useAuthentication()
+
+  if (isAuthenticating) {
+    return <></>
+  }
+
   return (
-    <>
+    <Routes>
       {isAuth ? (
-        <Routes>
-          {privateRouters.map((route) => (
+        <>
+          {privateRoutes.map((route) => (
             <Route key={route.path} element={<route.element />} path={route.path} />
           ))}
-          <Route element={<Feed />} path={'/*'} />
-        </Routes>
+          <Route element={<Feed />} path='/' />
+        </>
       ) : (
-        <Routes>
-          {publicRouters.map((route) => (
+        <>
+          {publicRoutes.map((route) => (
             <Route key={route.path} element={<route.element />} path={route.path} />
           ))}
-          <Route element={<Signin />} path={'/*'} />
-        </Routes>
+          <Route element={<Signin />} path='/' />
+        </>
       )}
-    </>
+      <Route element={<NotFound />} path='*' />
+    </Routes>
   )
 }
 export default AppRouter

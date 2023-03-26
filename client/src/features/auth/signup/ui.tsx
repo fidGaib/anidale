@@ -27,11 +27,9 @@ export const FormSignup = () => {
     REG({ variables: { email, pass, pass2 }, fetchPolicy: 'network-only' })
   }
 
-  useEffect(() => {
-    if (data?.registration) {
-      ViewerVar(data.registration)
-    }
-  }, [data])
+  if (data?.registration) {
+    ViewerVar(data.registration)
+  }
 
   return (
     <div className={cl.container}>

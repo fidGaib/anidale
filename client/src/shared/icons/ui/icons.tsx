@@ -46,5 +46,6 @@ interface PropsType extends SVGAttributes<SVGElement | any> {
   iconId: keyof typeof icons
 }
 export const Icon = forwardRef<SVGElement, PropsType>(function Icon(props, ref) {
-  return icons[props.iconId](props, ref)
+  const { iconId, ...rest } = props
+  return icons[iconId](rest, ref)
 })

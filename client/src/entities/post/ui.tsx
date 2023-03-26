@@ -54,12 +54,10 @@ export const PostImages = ({ images }: Post) => {
         className={cl.wrappImages}
       >
         {images?.map((image) => (
-          <>
-            <SwiperSlide key={image?.id} id={cl.childSwiper}>
-              <img className={cl.medium} src={`http://localhost:5000/storage/${image?.medium}.webp`} />
-              <img className={cl.small} src={`http://localhost:5000/storage/${image?.small}.webp`} />
-            </SwiperSlide>
-          </>
+          <SwiperSlide key={image?.id} id={cl.childSwiper}>
+            <img className={cl.medium} src={`http://localhost:5000/storage/${image?.medium}.webp`} />
+            <img className={cl.small} src={`http://localhost:5000/storage/${image?.small}.webp`} />
+          </SwiperSlide>
         ))}
       </Swiper>
     </>

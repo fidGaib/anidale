@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "vite-node -w src/index.ts",
     "start": "vite-node src/index.ts",
-    "generate": "graphql-codegen",
+    "codegen": "graphql-codegen -w",
     "lint": "eslint src/ generate-env.ts codegen.ts",
     "lint:fix": "eslint --fix src/ generate-env.ts codegen.ts"
   },
