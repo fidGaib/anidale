@@ -15,7 +15,7 @@ interface Props {
 }
 
 export const Posts = ({ id, limit, page }: Props) => {
-  const { data } = useQuery(id ? POST_BY_USER : POSTS, {
+  const { data } = useQuery<any>(id ? POST_BY_USER : POSTS, {
     variables: id ? { id, limit, page } : { limit, page },
   })
   const posts = usePostStore((state) => state.posts)

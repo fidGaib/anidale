@@ -20,7 +20,7 @@ import SettingsIcon from './icons/settings'
 
 const icons = {
   logo: (props: ImgHTMLAttributes<HTMLImageElement>) => <Logo {...props} />,
-  menu_header: (props: SVGAttributes<SVGElement>, ref: ForwardedRef<SVGElement>) => (
+  menu_header: (props: SVGAttributes<SVGElement>, ref: ForwardedRef<SVGElement | any>) => (
     <MenuHeaderIcon {...props} ref={ref} />
   ),
   // menu header icons
@@ -42,7 +42,7 @@ const icons = {
   close: (props: SVGAttributes<SVGElement>) => <Close className={props.className} onClick={props.onClick} />,
   //
 }
-interface PropsType extends SVGAttributes<SVGElement> {
+interface PropsType extends SVGAttributes<SVGElement | any> {
   iconId: keyof typeof icons
 }
 export const Icon = forwardRef<SVGElement, PropsType>(function Icon(props, ref) {
