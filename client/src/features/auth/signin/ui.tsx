@@ -1,7 +1,6 @@
 import { useMutation } from '@apollo/client'
-import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 
 import { ViewerVar } from '@/entities/viewer'
 import { SIGNIN } from '@/shared/graphql/schema'
@@ -24,6 +23,7 @@ export const FormSignin = () => {
 
   if (data?.login) {
     ViewerVar(data.login)
+    return <Navigate to={`/profile/${data.login.id}`} />
   }
 
   return (

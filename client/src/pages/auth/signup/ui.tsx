@@ -4,6 +4,7 @@ import Content from '@/shared/content'
 import cl from './ui.module.less'
 
 export const Registration = () => {
+  document.title = 'AniDale - Добро пожаловать!'
   return (
     <Content>
       <div className={cl.wrapLogin}>

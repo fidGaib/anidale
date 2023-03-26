@@ -10,14 +10,14 @@ const useAuthentication = () => {
   const [isAuthenticating, setAuthenticating] = useState(true)
 
   useEffect(() => {
-    if (loading) return
+    if(loading) return
     const user = data?.refresh?.user
     ViewerVar(user ?? null)
 
     setAuthenticating(false)
-  }, [data])
+  }, [data, loading])
 
-  return { isAuthenticating, isAuth }
+  return { isAuthenticating, isAuth, loading }
 }
 
 export { useAuthentication }
