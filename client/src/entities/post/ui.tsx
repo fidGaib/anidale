@@ -8,7 +8,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 // Import Swiper styles
 import 'swiper/swiper.min.css'
 
-import { RemovePost } from '@/features/post'
+import { PostDropdownMenu } from '@/features/post'
 import { Post } from '@/shared/graphql/gql/graphql'
 import Icon from '@/shared/icons'
 
@@ -19,7 +19,7 @@ export const PostOwner = ({ post }: { post: Post }) => {
     <Link to={`/profile/${post?.user?.id}`} className={cl.wrappOwner}>
       <img src={post?.user?.avatar || ''} alt='' />
       {post?.user?.login}
-      <RemovePost id={post?.id || 0} userId={post?.user?.id || 0} />
+      <PostDropdownMenu id={post?.id || 0} userId={post?.user?.id || 0} />
     </Link>
   )
 }

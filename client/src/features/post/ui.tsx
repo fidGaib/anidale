@@ -11,7 +11,7 @@ interface PorepsMenu {
   id: number
   userId: number
 }
-export const RemovePost = ({ id, userId }: PorepsMenu) => {
+export const PostDropdownMenu = ({ id, userId }: PorepsMenu) => {
   const someUser = useViewer()
   const [remove] = useMutation(REMOVE_POST)
   const setRemoveId = usePostStore((state) => state.setRemoveId)
