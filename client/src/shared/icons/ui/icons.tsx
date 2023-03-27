@@ -15,6 +15,7 @@ import MenuHeaderIcon from './icons/menu-header'
 import MenuNoticeIcon from './icons/menu-notice'
 import MessageIcon from './icons/message'
 import MusicIcon from './icons/music'
+import NotificationIcon from './icons/notification'
 import ProfileIcon from './icons/profile'
 import ReloadIcon from './icons/reload'
 import SendIcon from './icons/send'
@@ -26,7 +27,6 @@ const icons = {
   menu_header: (props: SVGAttributes<SVGElement>, ref: ForwardedRef<SVGElement | any>) => (
     <MenuHeaderIcon {...props} ref={ref} />
   ),
-  // menu header icons
   profile: (props: SVGAttributes<SVGElement>) => <ProfileIcon {...props} />,
   feed: (props: SVGAttributes<SVGElement>) => <FeedIcon {...props} />,
   chat: (props: SVGAttributes<SVGElement>) => <MessageIcon {...props} />,
@@ -46,7 +46,7 @@ const icons = {
   art: (props: SVGAttributes<SVGElement>) => <ArtsIcon className={props.className} onClick={props.onClick} />,
   music: (props: SVGAttributes<SVGElement>) => <MusicIcon className={props.className} onClick={props.onClick} />,
   video: (props: SVGAttributes<SVGElement>) => <VideoIcon className={props.className} onClick={props.onClick} />,
-  //
+  notification: (props: SVGAttributes<SVGElement>) => <NotificationIcon className={props.className} onClick={props.onClick} />,
 }
 interface PropsType extends SVGAttributes<SVGElement | any> {
   iconId: keyof typeof icons

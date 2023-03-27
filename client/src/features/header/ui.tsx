@@ -60,3 +60,33 @@ export const MenuHeader = () => {
     </>
   )
 }
+export const NotificationHeader = () => {
+  const viewer = useViewer()
+  return (
+    <>
+      <button className={cl.notification}>
+        <Icon iconId='notification' className={cl.notificationSvg} />
+      </button>
+      <div className={cl.notificationWrapper}>
+        {/* item */}
+        <div className={cl.item}>
+          <img src={viewer?.avatar} alt='' />
+          <div className={cl.body}>
+            <div className={cl.title}>{viewer?.login}</div>
+            <div className={cl.description}>Lorem ipsum dolor sit amet.</div>
+          </div>
+        </div>
+        {/* /item */}
+        {/* item */}
+        <div className={cl.item}>
+          <img src={viewer?.avatar} alt='' />
+          <div className={cl.body}>
+            <div className={cl.title}>{viewer?.login}</div>
+            <div className={cl.description}>Lorem ipsum dolor sit amet.</div>
+          </div>
+        </div>
+        {/* /item */}
+      </div>
+    </>
+  )
+}
