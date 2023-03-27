@@ -45,3 +45,25 @@ export const MakePost = () => {
     </>
   )
 }
+export const MeshBlock = () => {
+  return (
+    <div className={cl.meshBlock}>
+      <div className={cl.mesh}>
+        <Icon iconId='feed' className={cl.meshIcon} />
+        <p>записи</p>
+      </div>
+      <div className={cl.mesh}>
+        <Icon iconId='art' className={cl.meshIcon} />
+        <p>арты</p>
+      </div>
+      <div className={cl.mesh}>
+        <Icon iconId='music' className={cl.meshIcon} />
+        <p>музыка</p>
+      </div>
+      <div className={cl.mesh}>
+        <Icon iconId='video' className={cl.meshIcon} />
+        <p>видео</p>
+      </div>
+    </div>
+  )
+}

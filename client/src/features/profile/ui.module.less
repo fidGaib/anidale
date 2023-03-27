@@ -72,3 +72,33 @@ svg {
   font-family: calibri;
   margin-left: 10px;
 }
+// meshBlock
+.meshBlock {
+  width: 100%;
+  justify-content: center;
+  display: flex;
+  margin-bottom: 10px;
+  .mesh {
+    display: flex;
+    align-items: center;
+    box-shadow: 0px 0px 4px 1px rgb(235, 235, 235);
+    padding: 5px 10px;
+    border-radius: 8px;
+    margin: 0 5px;
+    background: #fff;
+    cursor: pointer;
+    .meshIcon {
+      width: 20px;
+      height: 20px;
+      padding: 0;
+      margin: 0;
+    }
+    p {
+      color: var(--color-text-main);
+      font-family: var(--font-text-main);
+      font-size: var(--size-text-main);
+      padding-left: 5px;
+      font-weight: 500;
+    }
+  }
+}

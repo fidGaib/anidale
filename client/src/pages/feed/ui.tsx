@@ -1,3 +1,4 @@
+import { MeshBlock } from '@/features/profile'
 import Content from '@/shared/content'
 import { Posts } from '@/widgets/post'
 
@@ -8,6 +9,7 @@ export const Feed = () => {
 
   return (
     <Content id={cl.content}>
+      <MeshBlock />
       <Posts limit={10} page={0} />
     </Content>
   )

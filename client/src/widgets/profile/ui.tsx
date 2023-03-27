@@ -1,3 +1,5 @@
+import { MeshBlock } from '@/features/profile'
+
 import cl from './ui.module.less'
 
 interface Props {
@@ -13,6 +15,7 @@ export const ArtWork = ({ avatar, login }: Props) => {
         <img className={cl.avatar} src={avatar || defaultAvatar} alt='' />
         <div className={cl.nickname}>{login || 'not found :('}</div>
       </div>
+      <MeshBlock />
     </div>
   )
 }

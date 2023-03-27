@@ -1,6 +1,7 @@
 import { ForwardedRef, ImgHTMLAttributes, SVGAttributes, forwardRef } from 'react'
 
 import AddPhotoIcon from './icons/add-photo'
+import ArtsIcon from './icons/art'
 import Close from './icons/close'
 import CommIcon from './icons/comm'
 import FeedIcon from './icons/feed'
@@ -13,10 +14,12 @@ import LogoutIcon from './icons/logout'
 import MenuHeaderIcon from './icons/menu-header'
 import MenuNoticeIcon from './icons/menu-notice'
 import MessageIcon from './icons/message'
+import MusicIcon from './icons/music'
 import ProfileIcon from './icons/profile'
 import ReloadIcon from './icons/reload'
 import SendIcon from './icons/send'
 import SettingsIcon from './icons/settings'
+import VideoIcon from './icons/video'
 
 const icons = {
   logo: (props: ImgHTMLAttributes<HTMLImageElement>) => <Logo {...props} />,
@@ -40,6 +43,9 @@ const icons = {
   menu_post: (props: SVGAttributes<SVGElement>) => <MenuNoticeIcon className={props.className} />,
   reload: (props: SVGAttributes<SVGElement>) => <ReloadIcon className={props.className} />,
   close: (props: SVGAttributes<SVGElement>) => <Close className={props.className} onClick={props.onClick} />,
+  art: (props: SVGAttributes<SVGElement>) => <ArtsIcon className={props.className} onClick={props.onClick} />,
+  music: (props: SVGAttributes<SVGElement>) => <MusicIcon className={props.className} onClick={props.onClick} />,
+  video: (props: SVGAttributes<SVGElement>) => <VideoIcon className={props.className} onClick={props.onClick} />,
   //
 }
 interface PropsType extends SVGAttributes<SVGElement | any> {
