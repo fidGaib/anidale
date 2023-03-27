@@ -1,5 +1,6 @@
 import { HTMLAttributes } from 'react'
 
+import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import Icon from '@/shared/icons'
 
 import cl from './ui.module.less'
@@ -16,7 +17,7 @@ export const MakePostImages: React.FC<Props> = ({ className, images, removeImage
       {images.map((image) => (
         <div key={image.size} className={cl.imagePreviewWrapper}>
           <Icon iconId='close' className={cl.imagePreviewClose} onClick={() => removeImage(image)} />
-          <img className={cl.imagePreview} src={URL.createObjectURL(image)} />
+          <ImageLoading className={cl.imagePreview} src={URL.createObjectURL(image)} />
         </div>
       ))}
     </div>

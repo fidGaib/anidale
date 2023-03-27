@@ -1,4 +1,5 @@
 import { MeshBlock } from '@/features/profile'
+import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 
 import cl from './ui.module.less'
 
@@ -12,7 +13,7 @@ export const ArtWork = ({ avatar, login }: Props) => {
   return (
     <div className={cl.wrapper}>
       <div className={cl.artwork}>
-        <img className={cl.avatar} src={avatar || defaultAvatar} alt='' />
+        <ImageLoading className={cl.avatar} src={avatar || defaultAvatar} alt='anidale' />
         <div className={cl.nickname}>{login || 'not found :('}</div>
       </div>
       <MeshBlock />

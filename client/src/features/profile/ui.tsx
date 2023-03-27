@@ -3,6 +3,7 @@ import { useMutation } from '@apollo/client'
 import { MakePostImages } from '@/entities/profile/ui'
 import { useViewer } from '@/entities/viewer'
 import { CREATE_POST } from '@/shared/graphql/schema'
+import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import Icon from '@/shared/icons'
 import { usePostStore } from '@/shared/store'
 
@@ -26,7 +27,7 @@ export const MakePost = () => {
       <p className={cl.error}>{error_create || `${error ? error.message : ''}`}</p>
       <div className={cl.wrapper}>
         <div className={cl.wrapperForm}>
-          <img src={myUser?.avatar || ''} className={cl.avatar} />
+          <ImageLoading src={myUser?.avatar || ''} className={cl.avatar} />
           <textarea
             className={cl.textarea}
             placeholder='Что у вас нового?'

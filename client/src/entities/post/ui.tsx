@@ -9,6 +9,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/swiper.min.css'
 
 import { Post } from '@/shared/graphql/gql/graphql'
+import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import Icon from '@/shared/icons'
 
 import cl from './ui.module.less'
@@ -16,7 +17,7 @@ import cl from './ui.module.less'
 export const PostOwner = ({ post }: { post: Post }) => {
   return (
     <Link to={`/profile/${post?.user?.id}`} className={cl.wrappOwner}>
-      <img src={post?.user?.avatar || ''} alt='' />
+      <ImageLoading src={post?.user?.avatar || ''} alt='anidale' />
       {post?.user?.login}
     </Link>
   )
@@ -53,8 +54,8 @@ export const PostImages = ({ images }: Post) => {
       >
         {images?.map((image) => (
           <SwiperSlide key={image?.id} id={cl.childSwiper}>
-            <img className={cl.medium} src={`http://localhost:5000/storage/${image?.medium}.webp`} />
-            <img className={cl.small} src={`http://localhost:5000/storage/${image?.small}.webp`} />
+            <ImageLoading className={cl.small} src={`http://localhost:5000/storage/${image?.small}.webp`} />
+            <ImageLoading className={cl.medium} src={`http://localhost:5000/storage/${image?.medium}.webp`} />
           </SwiperSlide>
         ))}
       </Swiper>

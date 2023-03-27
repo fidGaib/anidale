@@ -1,9 +1,10 @@
-import cl from './ui.module.css'
+import ImageLoading from '../hooks/onLoadImage/onLoadImage'
+import cl from './ui.module.less'
 
 export const Loader = () => {
   return (
     <div className={cl.loader}>
-      <img src='http://localhost:5000/storage/files-site/images/loading.gif' />
+      <ImageLoading src='http://localhost:5173/src/assets/images/loading.gif' alt='anidale' />
     </div>
   )
 }
