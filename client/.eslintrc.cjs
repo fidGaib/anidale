@@ -1,6 +1,8 @@
 /* eslint-env node */
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { defineConfig } = require('eslint-define-config')
 
-module.exports = {
+module.exports = defineConfig({
   env: {
     browser: true,
     es2021: true,
@@ -19,5 +21,7 @@ module.exports = {
   },
   ignorePatterns: ['src/shared/graphql/gql/*'],
   plugins: ['react', '@typescript-eslint'],
-  rules: {},
-}
+  rules: {
+    'react/prop-types': 'off',
+  },
+})
