@@ -9,10 +9,10 @@ import Dropdown from '@/shared/ui/dropdown'
 import cl from './ui.module.less'
 
 interface PorepsMenu {
-  id: number
+  postId: number
   userId: number
 }
-export const PostDropdownMenu = ({ id, userId }: PorepsMenu) => {
+export const PostDropdownMenu = ({ postId, userId }: PorepsMenu) => {
   const someUser = useViewer()
   const [remove] = useMutation(REMOVE_POST)
   const setRemoveId = usePostStore((state) => state.setRemoveId)
@@ -32,16 +32,16 @@ export const PostDropdownMenu = ({ id, userId }: PorepsMenu) => {
             onClick={(e) => {
               e.preventDefault()
               remove({
-                variables: { id },
+                variables: { id: postId },
                 update(cache) {
-                  const normalizeId: any = cache.identify({ id, __typename: 'Post' })
+                  const normalizeId: any = cache.identify({ id: postId, __typename: 'Post' })
                   cache.evict(normalizeId)
                   cache.gc()
                 },
               })
-              setRemoveId(id)
+              setRemoveId(postId)
               setTimeout(() => {
-                removeFromStore(id)
+                removeFromStore(postId)
               }, 1000)
             }}
           >

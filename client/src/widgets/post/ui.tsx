@@ -35,7 +35,7 @@ export const Posts = ({ id, limit, page }: Props) => {
           <div key={post.id} className={cl.wrapper} id={removeId === post.id ? cl.delShow : ''}>
             <div className='row align-center'>
               <PostOwner post={post} />
-              <PostDropdownMenu id={post.id} userId={post.user.id} />
+              <PostDropdownMenu postId={post.id} userId={post.user.id} />
             </div>
             {post.description && <PostDescription description={post.description} />}
             {post?.images?.length ? <PostImages images={post.images} /> : ''}
