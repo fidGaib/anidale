@@ -4,7 +4,7 @@ import { Link, Navigate } from 'react-router-dom'
 
 import { ViewerVar } from '@/entities/viewer'
 import { REGISTRATION } from '@/shared/graphql/schema'
-import Input from '@/shared/ui/input/intex'
+import Input from '@/shared/ui/input'
 
 import cl from './styles.module.less'
 
