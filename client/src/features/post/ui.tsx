@@ -17,7 +17,7 @@ export const PostDropdownMenu = ({ id, userId }: PorepsMenu) => {
   const setRemoveId = usePostStore((state) => state.setRemoveId)
   const removeFromStore = usePostStore((state) => state.removePost)
   return (
-    <>
+    <div className={cl.dropdownWrapper}>
       <Icon iconId='menu_post' className={cl.menuPost} />
       {someUser?.id === userId ? (
         <ul className={cl.menuBody}>
@@ -52,6 +52,6 @@ export const PostDropdownMenu = ({ id, userId }: PorepsMenu) => {
           <li>Пожаловаться</li>
         </ul>
       )}
-    </>
+    </div>
   )
 }

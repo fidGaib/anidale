@@ -5,13 +5,14 @@
 .menuBody {
   position: absolute;
   z-index: 2;
-  right: 10px;
-  top: 47px;
+  top: 40px;
   background: var(--playground);
   border-radius: var(--playground-border);
   border: 1px solid #cccccc;
   display: none;
   li {
+    width: 100%;
+    white-space: nowrap;
     font-weight: normal;
     list-style: none;
     padding: 10px;
@@ -28,4 +29,7 @@
 }
 .menuBody:hover {
   display: block;
+}
+.dropdownWrapper {
+  position: relative;
 }

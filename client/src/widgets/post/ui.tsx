@@ -2,6 +2,7 @@ import { useQuery } from '@apollo/client'
 import { useEffect } from 'react'
 
 import { PostActionWrapp, PostDescription, PostImages, PostOwner } from '@/entities/post'
+import { PostDropdownMenu } from '@/features/post'
 import { Post } from '@/features/profile/types'
 import { POSTS, POST_BY_USER } from '@/shared/graphql/schema'
 import { usePostStore } from '@/shared/store'
@@ -32,7 +33,10 @@ export const Posts = ({ id, limit, page }: Props) => {
       {posts &&
         posts?.map((post: Post) => (
           <div key={post.id} className={cl.wrapper} id={removeId === post.id ? cl.delShow : ''}>
-            <PostOwner post={post} />
+            <div className='row align-center'>
+              <PostOwner post={post} />
+              <PostDropdownMenu id={post.id} userId={post.user.id} />
+            </div>
             {post.description && <PostDescription description={post.description} />}
             {post?.images?.length ? <PostImages images={post.images} /> : ''}
             <PostActionWrapp />
