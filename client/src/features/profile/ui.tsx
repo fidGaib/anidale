@@ -12,6 +12,7 @@ export const MakePost = () => {
   const error_create = usePostStore((state) => state.error)
   const description = usePostStore((state) => state.description)
   const images = usePostStore((state) => state.images)
+  const removeImage = usePostStore((state) => state.removeImage)
   const handleKeydown = usePostStore((state) => state.handleKeydown)
   const handleHeight = usePostStore((state) => state.handleHeight)
   const setFiles = usePostStore((state) => state.setFiles)
@@ -39,7 +40,7 @@ export const MakePost = () => {
           </label>
           <Icon iconId='send' onClick={() => send(createPost, myUser.id)} />
         </div>
-        {images?.length ? <MakePostImages id={loading ? cl.loading : ''} /> : ''}
+        {images?.length ? <MakePostImages {...{ images, removeImage }} className={loading ? cl.loading : ''} /> : ''}
       </div>
     </>
   )
