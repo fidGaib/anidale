@@ -2,34 +2,3 @@
   margin-left: auto;
   width: 30px;
 }
-.menuBody {
-  position: absolute;
-  z-index: 2;
-  top: 40px;
-  background: var(--playground);
-  border-radius: var(--playground-border);
-  border: 1px solid #cccccc;
-  display: none;
-  li {
-    width: 100%;
-    white-space: nowrap;
-    font-weight: normal;
-    list-style: none;
-    padding: 10px;
-    font-size: 14px;
-    transition: all 0.3s;
-    border-radius: 5px;
-  }
-  li:hover {
-    background: #cccccc;
-  }
-}
-.menuPost:hover + .menuBody {
-  display: block;
-}
-.menuBody:hover {
-  display: block;
-}
-.dropdownWrapper {
-  position: relative;
-}

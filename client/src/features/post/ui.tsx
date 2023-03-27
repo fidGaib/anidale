@@ -4,6 +4,7 @@ import { useViewer } from '@/entities/viewer'
 import { REMOVE_POST } from '@/shared/graphql/schema'
 import Icon from '@/shared/icons'
 import { usePostStore } from '@/shared/store'
+import Dropdown from '@/shared/ui/dropdown'
 
 import cl from './ui.module.less'
 
@@ -17,10 +18,12 @@ export const PostDropdownMenu = ({ id, userId }: PorepsMenu) => {
   const setRemoveId = usePostStore((state) => state.setRemoveId)
   const removeFromStore = usePostStore((state) => state.removePost)
   return (
-    <div className={cl.dropdownWrapper}>
-      <Icon iconId='menu_post' className={cl.menuPost} />
+    <Dropdown>
+      <Dropdown.Header>
+        <Icon iconId='menu_post' className={cl.menuPost} />
+      </Dropdown.Header>
       {someUser?.id === userId ? (
-        <ul className={cl.menuBody}>
+        <Dropdown.Body>
           <li>Сохранить в закладках</li>
           <li>Редактировать</li>
           <li>Скопировать ссылку</li>
@@ -44,14 +47,14 @@ export const PostDropdownMenu = ({ id, userId }: PorepsMenu) => {
           >
             Удалить
           </li>
-        </ul>
+        </Dropdown.Body>
       ) : (
-        <ul className={cl.menuBody}>
+        <Dropdown.Body>
           <li>Сохранить в закладках</li>
           <li>Скопировать ссылку</li>
           <li>Пожаловаться</li>
-        </ul>
+        </Dropdown.Body>
       )}
-    </div>
+    </Dropdown>
   )
 }
