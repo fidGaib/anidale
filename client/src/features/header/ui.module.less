@@ -9,6 +9,11 @@
   width: 150px;
   border-radius: var(--playground-border);
   background: var(--playground);
+  display: none;
+
+  &:hover {
+    display: block;
+  }
 }
 .menu li {
   display: flex;
@@ -17,6 +22,9 @@
   padding: 3px 10px;
   border-radius: 5px;
   list-style: none;
+  &:hover {
+    background: rgba(211, 211, 211, 0.612);
+  }
 }
 .menu li a {
   text-transform: lowercase;
@@ -34,7 +42,19 @@
   width: 20px;
   height: 20px;
   transform: scale(0.9);
+  margin-top: -3px;
 }
-.menu li:hover {
-  background: rgba(211, 211, 211, 0.612);
+
+.focusBtn {
+  margin-left: auto;
+  border: 0;
+  outline: 0;
+  background: 0;
+  &:focus + .menu {
+    display: block;
+  }
+}
+.headerMenuSvg {
+  width: 27px;
+  height: 27px;
 }
