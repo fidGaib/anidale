@@ -12,9 +12,9 @@ const Dropdown: React.FC<HTMLAttributes<HTMLElement>> = ({ className, children, 
 
 const DropdownHeader: React.FC<HTMLAttributes<HTMLElement>> = ({ className, children, ...rest }) => {
   return (
-    <div className={`${cl.dropdownHeader} ${className}`} {...rest}>
+    <button className={`${cl.dropdownHeader} ${className}`} {...rest}>
       {children}
-    </div>
+    </button>
   )
 }
 

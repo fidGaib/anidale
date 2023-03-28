@@ -19,11 +19,9 @@ export const PostDropdownMenu = ({ postId, userId }: PorepsMenu) => {
   const removeFromStore = usePostStore((state) => state.removePost)
   return (
     <Dropdown>
-      <button>
-        <Dropdown.Header>
-          <Icon iconId='menu_post' className={cl.menuPost} />
-        </Dropdown.Header>
-      </button>
+      <Dropdown.Header>
+        <Icon iconId='menu_post' className={cl.menuPost} />
+      </Dropdown.Header>
       {someUser?.id === userId ? (
         <Dropdown.Body>
           <li>Сохранить в закладках</li>
