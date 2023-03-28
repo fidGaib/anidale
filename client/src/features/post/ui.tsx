@@ -27,7 +27,7 @@ export const PostDropdownMenu = ({ postId, userId }: PorepsMenu) => {
           <li>Сохранить в закладках</li>
           <li>Редактировать</li>
           <li>Скопировать ссылку</li>
-          <li>Ахривировать запись</li>
+          <li>Архивировать запись</li>
           <li
             onClick={(e) => {
               e.preventDefault()
