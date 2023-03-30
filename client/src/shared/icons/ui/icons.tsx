@@ -18,6 +18,8 @@ import MusicIcon from './icons/music'
 import NotificationIcon from './icons/notification'
 import ProfileIcon from './icons/profile'
 import ReloadIcon from './icons/reload'
+import RemoveUserIcon from './icons/remove-user'
+import SearchIcon from './icons/search'
 import SendIcon from './icons/send'
 import SettingsIcon from './icons/settings'
 import VideoIcon from './icons/video'
@@ -46,7 +48,13 @@ const icons = {
   art: (props: SVGAttributes<SVGElement>) => <ArtsIcon className={props.className} onClick={props.onClick} />,
   music: (props: SVGAttributes<SVGElement>) => <MusicIcon className={props.className} onClick={props.onClick} />,
   video: (props: SVGAttributes<SVGElement>) => <VideoIcon className={props.className} onClick={props.onClick} />,
-  notification: (props: SVGAttributes<SVGElement>) => <NotificationIcon className={props.className} onClick={props.onClick} />,
+  notification: (props: SVGAttributes<SVGElement>) => (
+    <NotificationIcon className={props.className} onClick={props.onClick} />
+  ),
+  unsubscribe_user: (props: SVGAttributes<SVGElement>) => (
+    <RemoveUserIcon className={props.className} onClick={props.onClick} />
+  ),
+  search: (props: SVGAttributes<SVGElement>) => <SearchIcon className={props.className} onClick={props.onClick} />,
 }
 interface PropsType extends SVGAttributes<SVGElement | any> {
   iconId: keyof typeof icons

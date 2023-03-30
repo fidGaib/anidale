@@ -6,4 +6,5 @@ interface UserType {
   id: number
   login: string
   avatar: string
+  email: string
 }
