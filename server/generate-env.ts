@@ -15,7 +15,7 @@ async function generateEnv() {
 # server
 PORT=5000
 # db link
-DB_LINK='postgres://postgres:root@localhost:5432/anidale'
+DB_LINK='postgresql://anin:JPubBNxK568hsKdTZy4JqA@broke-chicken-10698.8nj.cockroachlabs.cloud:26257/defaultdb?sslmode=verify-full'
 # tokens
 JWT_ACCESS_SECRET='${randomBytes(64).toString('base64')}'
 JWT_REFRESH_SECRET='${randomBytes(64).toString('base64')}'
