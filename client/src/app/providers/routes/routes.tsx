@@ -1,3 +1,4 @@
+import Music from '@/pages/music'
 import { lazy } from 'react'
 
 const Feed = lazy(() => import('@/pages/feed'))
@@ -15,6 +16,7 @@ export const privateRoutes = [
   { path: '/signout', element: Signout },
   { path: '/friends', element: Friends },
   { path: '/settings', element: Settings },
+  { path: '/music', element: Music },
 ]
 // public routes
 export const publicRoutes = [

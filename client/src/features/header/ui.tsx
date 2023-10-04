@@ -36,6 +36,10 @@ export const MenuHeader = () => {
               <Link to={'/groups'}>Сообщества</Link>
             </li>
             <li>
+              <Icon iconId='music' className={cl.menuSvg} />
+              <Link to={'/music'}>Музыка</Link>
+            </li>
+            <li>
               <Icon iconId='settings' className={cl.menuSvg} />
               <Link to={'/settings'}>Настройки</Link>
             </li>

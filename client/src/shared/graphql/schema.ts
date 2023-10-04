@@ -32,6 +32,7 @@ export const REGISTRATION = graphql(`
       id
       login
       avatar
+      email
     }
   }
 `)
@@ -41,6 +42,14 @@ export const SIGNIN = graphql(`
       id
       login
       avatar
+      email 
+    }
+  }
+`)
+export const UPDATE_LOGIN = graphql(`
+  mutation UPDATE_LOGIN( $id: Int!, $login: String!) {
+    update( id: $id, user: { login: $login } ) {
+      login
     }
   }
 `)

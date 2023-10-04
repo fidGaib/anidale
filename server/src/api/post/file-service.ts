@@ -105,7 +105,7 @@ class FileStorageService {
     // const high = path.join(this.storagePath, image.high + '.' + image.type)
     const medium = path.join(this.storagePath, image.medium + '.' + 'webp')
     const small = path.join(this.storagePath, image.small + '.' + 'webp')
-    // fs.unlink(high)
+    // fs.unlink(high) 
     await fs.unlink(medium)
     await fs.unlink(small)
     return true

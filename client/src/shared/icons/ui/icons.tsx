@@ -23,6 +23,9 @@ import SearchIcon from './icons/search'
 import SendIcon from './icons/send'
 import SettingsIcon from './icons/settings'
 import VideoIcon from './icons/video'
+import Play from './icons/play'
+import Pause from './icons/pause'
+import ChangeAvatarIcon from './icons/change-avatar'
 
 const icons = {
   logo: (props: ImgHTMLAttributes<HTMLImageElement>) => <Logo {...props} />,
@@ -55,6 +58,9 @@ const icons = {
     <RemoveUserIcon className={props.className} onClick={props.onClick} />
   ),
   search: (props: SVGAttributes<SVGElement>) => <SearchIcon className={props.className} onClick={props.onClick} />,
+  play: (props: SVGAttributes<SVGElement>) => <Play className={props.className} onClick={props.onClick}/>,
+  pause: (props: SVGAttributes<SVGElement>) => <Pause className={props.className} onClick={props.onClick}/>,
+  changeAvatar: (props: SVGAttributes<SVGElement>) => <ChangeAvatarIcon className={props.className} onClick={props.onClick}/>,
 }
 interface PropsType extends SVGAttributes<SVGElement | any> {
   iconId: keyof typeof icons

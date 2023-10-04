@@ -1,24 +1,7 @@
 #content {
   display: flex;
 }
-.listSettings {
-  width: 20%;
-  display: flex;
-  flex-direction: column;
-  padding-right: 10px;
-  li {
-    list-style: none;
-    font-family: var(--font-text-main);
-    font-size: var(--size-text-main);
-    color: var(--color-text-main);
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    &:hover {
-      background: var(--bodyColor);
-    }
-  }
-}
+
 .wrapper {
   width: 80%;
   padding: 10px 0;
@@ -31,9 +14,26 @@
     width: 100%;
     margin-bottom: 10px;
   }
+  .upload {
+    width: 100%;
+    position: relative;
+    height: 150px;
+    width: 150px;
+    margin: 0 auto;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+    .changeAvatar {
+      margin-top: 50px;
+      margin-left: 10px;
+      height: 50px;
+    }
+  }
   .avatar {
     width: 100%;
     display: flex;
+    margin-top: -150px;
     margin-bottom: 10px;
     justify-content: center;
     img {
@@ -43,14 +43,10 @@
     }
   }
   input {
-    background: var(--bodyColor);
-    padding: 5px 10px;
-    border-radius: 5px;
-    height: 30px;
     margin-right: 10px;
     margin-bottom: 5px;
+    width: auto;
   }
-
   .save {
     margin: 0;
     margin-top: 10px;
@@ -76,4 +72,7 @@
     height: 300px;
     cursor: pointer;
   }
+}
+form {
+width: 100%;
 }

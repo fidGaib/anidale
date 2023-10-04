@@ -28,6 +28,7 @@ model User {
   friendTo    User[]   @relation(name: "Friendship")
   feed        Feed     @relation(fields: [feedId], references: [id])
   feedId      Int      @unique
+  backgroundImage String?
 }
 
 model Post {

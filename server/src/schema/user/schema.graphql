@@ -17,7 +17,7 @@ type Refresh {
 }
 type User {
   id: Int!
-  email: String
+  email: String!
   login: String!
   avatar: String!
   activationLink: String
@@ -26,6 +26,7 @@ type User {
   accessToken: String
   refreshToken: String
   feed: Feed
+  backgroundImage: String
 }
 
 type Feed {

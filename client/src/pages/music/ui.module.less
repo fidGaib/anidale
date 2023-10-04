@@ -1,0 +1,76 @@
+.head_music{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    height: 30px;
+}
+.head_music p{
+    margin-left: 20px;
+    font-weight: bold;
+    color: var(--color-text-main);
+    font-family: var(--font-text-main);
+    font-size: var(--size-text-main);
+    cursor: pointer;
+    &:hover {
+      color: var(  --accent);
+    }
+}
+.add_music_icon{
+    margin-top: 5px;
+    height: 25px;
+    width: 25px;
+    margin-left: auto;
+    margin-right: 20px;
+}
+.one_child {
+    width: 100%;
+    display: flex;
+    margin-top: 5px;
+    cursor: pointer;
+    padding: 5px;
+    align-items: center;
+    border-radius: var(--playground-border);
+    &:hover{
+        background: rgba(128, 128, 128, 0.442);
+        transition:  .5s;
+        .play_icon {
+         display: block;
+        }
+        .pause_icon {
+            display: block;
+        }
+    }
+}
+.one_child img{
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+}
+.info_music{
+    padding: 5px;
+    margin-left: 15px;
+}
+.info_music .title{
+    font-weight: bold;
+    color: var(--color-text-main);
+    font-family: var(--font-text-main);
+    font-size: var(--size-text-main);
+}
+.info_music .owner{
+    color: gray;
+    font-family: var(--font-text-main);
+    font-size: var(--size-text-main);
+}
+.play_icon {
+    display: none;
+    width: 20px;
+    margin-left: -28px;
+    opacity: .9;
+}
+.pause_icon {
+    display: none;
+    width: 30px;
+    height: 30px;
+    margin-left: -35px;
+    opacity: .9;
+}
