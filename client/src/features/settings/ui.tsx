@@ -1,7 +1,8 @@
-import { useState } from 'react'
+
+import { useSettingsStore } from './module'
 import cl from './ui.module.less'
 export const SettingsMenu = () => {
-    const [layout, setLayout] = useState(1)
+  const setLayout = useSettingsStore((state) => state.setLayout)
     return (
       <ul className={cl.listSettings}>
         <li onClick={() => setLayout(1)}>Профиль</li>
