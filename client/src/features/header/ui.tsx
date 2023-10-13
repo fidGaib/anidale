@@ -13,7 +13,7 @@ export const MenuHeader = () => {
         <Icon iconId={'menu_header'} className={cl.headerMenuSvg} />
       </button>
       <ul className={cl.menu}>
-        {viewer ? (
+        {viewer.id !== 0 ? (
           <>
             <li>
               <Icon iconId='profile' className={cl.menuSvg} />
@@ -66,6 +66,7 @@ export const MenuHeader = () => {
 }
 export const NotificationHeader = () => {
   const viewer = useViewer()
+  if (viewer.id === 0) return <div style={{ marginLeft: 'auto' }}></div>
   return (
     <>
       <button className={cl.notification}>
@@ -74,18 +75,18 @@ export const NotificationHeader = () => {
       <div className={cl.notificationWrapper}>
         {/* item */}
         <div className={cl.item}>
-          <img src={viewer?.avatar} alt='' />
+          <img src={viewer.avatar} alt='' />
           <div className={cl.body}>
-            <div className={cl.title}>{viewer?.login}</div>
+            <div className={cl.title}>{viewer.login}</div>
             <div className={cl.description}>Lorem ipsum dolor sit amet.</div>
           </div>
         </div>
         {/* /item */}
         {/* item */}
         <div className={cl.item}>
-          <img src={viewer?.avatar} alt='' />
+          <img src={viewer.avatar} alt='' />
           <div className={cl.body}>
-            <div className={cl.title}>{viewer?.login}</div>
+            <div className={cl.title}>{viewer.login}</div>
             <div className={cl.description}>Lorem ipsum dolor sit amet.</div>
           </div>
         </div>

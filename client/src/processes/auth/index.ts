@@ -1,19 +1,30 @@
-import { useQuery } from '@apollo/client'
+import { makeVar, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 
-import { ViewerVar, useAuth } from '@/entities/viewer'
+import { useAuth } from '@/entities/viewer'
 import { REFRESH } from '@/shared/graphql/schema'
 
+interface UserType {
+  id: number
+  login: string
+  avatar: string
+  email: string
+}
+export const ViewerVar = makeVar<UserType>({
+  id: 0,
+  login: '',
+  avatar: '',
+  email: '',
+})
 const useAuthentication = () => {
-  const { data, loading } = useQuery(REFRESH)
+  const { data, loading } = useQuery(REFRESH, { fetchPolicy: 'network-only' })
   const isAuth = useAuth()
   const [isAuthenticating, setAuthenticating] = useState(true)
 
   useEffect(() => {
-    if(loading) return
+    if (loading) return
     const user = data?.refresh?.user
-    ViewerVar(user ?? null)
-
+    if (user) ViewerVar(user)
     setAuthenticating(false)
   }, [data, loading])
 

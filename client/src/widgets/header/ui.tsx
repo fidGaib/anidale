@@ -16,7 +16,7 @@ export const Header = () => {
       </Link>
       <NotificationHeader />
       <MenuHeader />
-      {viewer ? (
+      {viewer.id !== 0 ? (
         <Link to={`/profile/${viewer?.id}`} className={cl.userAvatar}>
           <ImageLoading src={viewer?.avatar} alt={viewer?.login} />
         </Link>

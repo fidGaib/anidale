@@ -2,7 +2,7 @@ import { useMutation } from '@apollo/client'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { Link, Navigate } from 'react-router-dom'
 
-import { ViewerVar } from '@/entities/viewer'
+import { ViewerVar } from '@/processes/auth'
 import { REGISTRATION } from '@/shared/graphql/schema'
 import Input from '@/shared/ui/input'
 
