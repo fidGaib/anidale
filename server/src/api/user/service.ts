@@ -43,8 +43,7 @@ class UserService {
   }
   async login(email: string, pass: string) {
     const candidate = await User.findUnique({
-      where: { email },
-      include: { feed: { include: { posts: true } }, friends: true },
+      where: { email }
     })
     if (!candidate) throw createGraphQLError('Пользователь не найден')
     const isPassEquals = await compare(pass + process.env.PASS_PEPPER, candidate.pass)
@@ -110,8 +109,7 @@ class UserService {
     return true
   }
   async logout(refreshToken: string) {
-    const token = await tokenService.removeToken(refreshToken)
-    return token
+    return await tokenService.removeToken(refreshToken)
   }
   async refresh(refreshToken?: string) {
     if (!refreshToken) throw createGraphQLError('НЕ АВТОРИЗОВАН')

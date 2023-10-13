@@ -5,7 +5,6 @@ import { useViewer } from '@/entities/viewer'
 import { MakePost } from '@/features/profile'
 import Content from '@/shared/content'
 import { PROFILE } from '@/shared/graphql/schema'
-import Loader from '@/shared/loader'
 import { Posts } from '@/widgets/post'
 import { ArtWork } from '@/widgets/profile'
 
@@ -17,7 +16,7 @@ export const Profile = () => {
   const params = useParams()
   const id = parseInt(params.id || '')
   const { data } = useQuery(PROFILE, { variables: { id } })
-  if (!data?.getUser) return <Loader />
+  if (!data?.getUser) return <></>
   return (
     <Content className={cl.content}>
       <ArtWork login={data.getUser.login || ''} avatar={data.getUser.avatar || ''} />

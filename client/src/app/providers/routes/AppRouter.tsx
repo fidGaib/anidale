@@ -12,28 +12,26 @@ const Feed = lazy(() => import('@/pages/feed'))
 
 const AppRouter = () => {
   const { isAuth, isAuthenticating, loading } = useAuthentication()
-  if (isAuthenticating || loading) {
-    return <Loader />
-  } else
-    return (
-      <Routes>
-        {isAuth ? (
-          <>
-            {privateRoutes.map((route) => (
-              <Route key={route.path} element={<route.element />} path={route.path} />
-            ))}
-            <Route element={<Feed />} path='/' />
-          </>
-        ) : (
-          <>
-            {publicRoutes.map((route) => (
-              <Route key={route.path} element={<route.element />} path={route.path} />
-            ))}
-            <Route element={<Signin />} path='/' />
-          </>
-        )}
-        <Route element={<NotFound />} path='*' />
-      </Routes>
-    )
+  if (isAuthenticating || loading) return <Loader />
+  return (
+    <Routes>
+      {isAuth ? (
+        <>
+          {privateRoutes.map((route) => (
+            <Route key={route.path} element={<route.element />} path={route.path} />
+          ))}
+          <Route element={<Feed />} path='/' />
+        </>
+      ) : (
+        <>
+          {publicRoutes.map((route) => (
+            <Route key={route.path} element={<route.element />} path={route.path} />
+          ))}
+          <Route element={<Signin />} path='/' />
+        </>
+      )}
+      <Route element={<NotFound />} path='*' />
+    </Routes>
+  )
 }
 export default AppRouter

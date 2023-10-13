@@ -67,10 +67,10 @@ export const usePostStore = create<PostStore>()((set, get) => ({
       images: array,
     }))
   },
-  send: (schemaFn, owner) => {
+  send: async (schemaFn, owner) => {
     if (!get().description.trim() && get().images.length === 0) return
     if (get().description.trim().length > 255) return get().setError('Не более 255 символов')
-    schemaFn({ variables: { owner, description: get().description, images: get().images } }).then((res: any) => {
+    await schemaFn({ variables: { owner, description: get().description, images: get().images } }).then((res: any) => {
       set(() => ({
         description: '',
         images: [],

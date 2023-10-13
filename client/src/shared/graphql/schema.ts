@@ -17,6 +17,7 @@ export const REFRESH = graphql(`
         id
         login
         avatar
+        email 
       }
     }
   }
@@ -46,10 +47,13 @@ export const SIGNIN = graphql(`
     }
   }
 `)
-export const UPDATE_LOGIN = graphql(`
-  mutation UPDATE_LOGIN( $id: Int!, $login: String!) {
-    update( id: $id, user: { login: $login } ) {
+export const UPDATE_USER= graphql(`
+  mutation UPDATE_LOGIN( $id: Int!, $login: String, $email: String, $pass: String, $old_pass: String, $avatar: String) {
+    update( id: $id, user: { login: $login, email: $email, avatar: $avatar }, pass: $pass, old_pass: $old_pass ) {
+      id
       login
+      avatar
+      email 
     }
   }
 `)

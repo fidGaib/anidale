@@ -19,7 +19,7 @@ export const withRouter = (component: () => React.ReactNode) =>
     return (
       <ApolloProvider client={client}>
         <BrowserRouter>
-          <Suspense fallback={<Loader />}>{component()}</Suspense>
+          <Suspense fallback={<Loader/>}>{component()}</Suspense>
         </BrowserRouter>
       </ApolloProvider>
     )

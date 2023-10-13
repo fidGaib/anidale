@@ -13,6 +13,7 @@ import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import Icon from '@/shared/icons'
 
 import cl from './ui.module.less'
+import { useState } from 'react'
 
 export const PostOwner = ({ post }: { post: Post }) => {
   return (
@@ -38,6 +39,7 @@ export const PostActionWrapp = () => {
   )
 }
 export const PostImages = ({ images }: Post) => {
+  const [showModal, setModal] = useState(false)
   return (
     <>
       <Swiper
@@ -55,7 +57,7 @@ export const PostImages = ({ images }: Post) => {
         {images?.map((image) => (
           <SwiperSlide key={image?.id} id={cl.childSwiper}>
             <ImageLoading className={cl.small} src={`http://localhost:5000/storage/${image?.small}.webp`} />
-            <ImageLoading className={cl.medium} src={`http://localhost:5000/storage/${image?.medium}.webp`} />
+            <ImageLoading onClick={()=>setModal(true)} className={cl.medium} src={`http://localhost:5000/storage/${image?.medium}.webp`} />
           </SwiperSlide>
         ))}
       </Swiper>
