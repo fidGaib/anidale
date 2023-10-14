@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '@/entities/viewer'
 import { REFRESH } from '@/shared/graphql/schema'
 
-interface UserType {
+export interface UserType {
   id: number
   login: string
   avatar: string

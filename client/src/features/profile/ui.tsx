@@ -4,6 +4,7 @@ import { MakePostImages } from '@/entities/profile/ui'
 import { useViewer } from '@/entities/viewer'
 import { CREATE_POST } from '@/shared/graphql/schema'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
+import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
 import Icon from '@/shared/icons'
 import { usePostStore } from '@/shared/store'
 
@@ -21,13 +22,12 @@ export const MakePost = () => {
 
   const [createPost, { error, loading }] = useMutation(CREATE_POST)
   const myUser = useViewer()
-  if (!myUser) return <></>
   return (
     <>
       <p className={cl.error}>{error_create || `${error ? error.message : ''}`}</p>
       <div className={cl.wrapper}>
         <div className={cl.wrapperForm}>
-          <ImageLoading src={myUser?.avatar || ''} className={cl.avatar} />
+          <ImageLoading src={useSrcAvatar(myUser.avatar)} className={cl.avatar} />
           <textarea
             className={cl.textarea}
             placeholder='Что у вас нового?'

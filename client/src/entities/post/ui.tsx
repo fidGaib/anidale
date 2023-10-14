@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 // import required modules
 import { FreeMode, Navigation } from 'swiper'
@@ -10,15 +11,16 @@ import 'swiper/swiper.min.css'
 
 import { Post } from '@/shared/graphql/gql/graphql'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
+import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
 import Icon from '@/shared/icons'
+import { defaultAvatar } from '@/widgets/profile'
 
 import cl from './ui.module.less'
-import { useState } from 'react'
 
 export const PostOwner = ({ post }: { post: Post }) => {
   return (
     <Link to={`/profile/${post?.user?.id}`} className={cl.wrappOwner}>
-      <ImageLoading src={post?.user?.avatar || ''} alt='anidale' />
+      <ImageLoading src={useSrcAvatar(post?.user?.avatar || defaultAvatar)} alt='anidale' />
       {post?.user?.login}
     </Link>
   )
@@ -57,7 +59,11 @@ export const PostImages = ({ images }: Post) => {
         {images?.map((image) => (
           <SwiperSlide key={image?.id} id={cl.childSwiper}>
             <ImageLoading className={cl.small} src={`http://localhost:5000/storage/${image?.small}.webp`} />
-            <ImageLoading onClick={()=>setModal(true)} className={cl.medium} src={`http://localhost:5000/storage/${image?.medium}.webp`} />
+            <ImageLoading
+              onClick={() => setModal(true)}
+              className={cl.medium}
+              src={`http://localhost:5000/storage/${image?.medium}.webp`}
+            />
           </SwiperSlide>
         ))}
       </Swiper>

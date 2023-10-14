@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom'
 import { useViewer } from '@/entities/viewer'
 import { MenuHeader, NotificationHeader } from '@/features/header'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
+import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
 import Icon from '@/shared/icons'
 
+import { defaultAvatar } from '../profile'
 import cl from './ui.module.less'
 
 export const Header = () => {
@@ -18,7 +20,7 @@ export const Header = () => {
       <MenuHeader />
       {viewer.id !== 0 ? (
         <Link to={`/profile/${viewer?.id}`} className={cl.userAvatar}>
-          <ImageLoading src={viewer?.avatar} alt={viewer?.login} />
+          <ImageLoading src={useSrcAvatar(viewer.avatar)} alt={viewer?.login} />
         </Link>
       ) : (
         ''

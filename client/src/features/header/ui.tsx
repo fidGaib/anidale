@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 
 import { useViewer } from '@/entities/viewer'
+import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
 import Icon from '@/shared/icons'
 
 import cl from './ui.module.less'
@@ -75,7 +76,7 @@ export const NotificationHeader = () => {
       <div className={cl.notificationWrapper}>
         {/* item */}
         <div className={cl.item}>
-          <img src={viewer.avatar} alt='' />
+          <img src={useSrcAvatar(viewer.avatar)} alt='' />
           <div className={cl.body}>
             <div className={cl.title}>{viewer.login}</div>
             <div className={cl.description}>Lorem ipsum dolor sit amet.</div>
@@ -84,7 +85,7 @@ export const NotificationHeader = () => {
         {/* /item */}
         {/* item */}
         <div className={cl.item}>
-          <img src={viewer.avatar} alt='' />
+          <img src={useSrcAvatar(viewer.avatar)} alt='' />
           <div className={cl.body}>
             <div className={cl.title}>{viewer.login}</div>
             <div className={cl.description}>Lorem ipsum dolor sit amet.</div>
