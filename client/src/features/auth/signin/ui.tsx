@@ -4,6 +4,7 @@ import { Link, Navigate } from 'react-router-dom'
 
 import { ViewerVar } from '@/processes/auth'
 import { SIGNIN } from '@/shared/graphql/schema'
+import { ButtonUI } from '@/shared/ui/button/ui'
 import Input from '@/shared/ui/input'
 
 import cl from './styles.module.less'
@@ -32,7 +33,7 @@ export const FormSignin = () => {
         {error && <p>{error.message}</p>}
         <Input {...register('email')} type='email' placeholder='E-mail...' required />
         <Input {...register('pass')} type='password' placeholder='Пароль...' required />
-        <button className={cl.sign}>Войти</button>
+        <ButtonUI>Войти</ButtonUI>
         <p className={cl.redirect}>
           Нет аккаунта? - <Link to={'/signup'}>Регистрация</Link>
         </p>

@@ -1,7 +1,8 @@
 import CardUser from '@/entities/friends/ui'
 import { useViewer } from '@/entities/viewer'
 import Content from '@/shared/content'
-import Icon from '@/shared/icons'
+import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
+import Input from '@/shared/ui/input'
 
 import cl from './ui.module.less'
 
@@ -19,8 +20,8 @@ export const Friends = () => {
         </div>
       </div>
       <div className={cl.wrappSeacrh}>
-        <Icon iconId='search' />
-        <input type='text' placeholder='Найти...' className={cl.search} />
+        <ImageLoading src='/icons/search.svg' className={cl.svg} />
+        <Input type='text' placeholder='Найти...' id={cl.search} />
       </div>
       <CardUser />
     </Content>

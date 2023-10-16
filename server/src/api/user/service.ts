@@ -90,7 +90,7 @@ class UserService {
       avatar = await Promise.all(user.avatar.map((image) => StorageService.saveImage(image)))
       const userData = await User.update({
         where: { id },
-        data: {avatar: avatar[0].medium},
+        data: {avatar: avatar[0].small},
       });
       return userData
     } else {

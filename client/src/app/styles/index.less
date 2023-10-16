@@ -7,40 +7,26 @@
   margin: 0;
   box-sizing: border-box;
 }
-html,
-body,
+html {
+  width: 100vw;
+  max-width: 100%;
+  min-height: 100vh;
+  scroll-behavior: smooth;
+}
+body {
+  width: 100%;
+  min-height: 100%;
+}
 #root {
   width: 100%;
-  min-height: 100vh;
+  min-height: 100%;
 }
 img {
   object-fit: cover;
   object-position: center;
 }
-html {
-  scroll-behavior: smooth;
-}
 body {
   background-color: var(--bodyColor);
-  background-image: var(--bodyImage);
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-attachment: fixed;
-}
-input {
-  border: 0;
-  outline: 0;
-  background: 0;
-  font-size: var(--size-text-main);
-  font-family: var(--font-text-main);
 }
 button {
-  border: 0;
-  outline: 0;
-  background: 0;
-  font-size: var(--size-text-main);
-  font-family: var(--font-text-main);
-  cursor: pointer;
-  padding: 0;
 }

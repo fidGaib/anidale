@@ -6,7 +6,8 @@ import { useSettingsStore } from '@/features/settings/module'
 import { ViewerVar } from '@/processes/auth'
 import { UPDATE_USER } from '@/shared/graphql/schema'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
-import Icon from '@/shared/icons'
+import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
+import { ButtonUI } from '@/shared/ui/button/ui'
 import Input from '@/shared/ui/input'
 
 import cl from './ui.module.less'
@@ -25,28 +26,22 @@ export const EditLoginAvatar = () => {
       {/* AVATAR  */}
       <h2>Профиль</h2>
       <label htmlFor='upl' className={cl.upload}>
-        <Icon className={cl.changeAvatar} iconId='changeAvatar' />
+        <ImageLoading className={cl.changeAvatar} src='/icons/add_photo.svg' />
       </label>
       <ImageLoading
         className={cl.avatar}
-        src={
-          image.length
-            ? URL.createObjectURL(image[0])
-            : user.avatar.split('/').length === 2
-            ? `http://localhost:5000/storage/${user.avatar}.webp`
-            : user.avatar
-        }
+        src={image.length ? URL.createObjectURL(image[0]) : useSrcAvatar(user.avatar)}
       />
       <Input id={'upl'} type='file' accept='image/*' onChange={(e) => setFiles(e.target.files!)} hidden required />
       <h2 className={cl.save}>
         <p className={cl.error}>{error?.message || loading ? 'Сохранение...' : ''}</p>
-        <button
+        <ButtonUI
           onClick={() => {
             send(UPDATE, user.id)
           }}
         >
           Сохранить
-        </button>
+        </ButtonUI>
       </h2>
       {/* // LOGIN */}
       <h2>Информация</h2>
@@ -59,7 +54,7 @@ export const EditLoginAvatar = () => {
         required
       />
       <h2 className={cl.save}>
-        <button
+        <ButtonUI
           onClick={() => {
             sendLogin(UPDATE, user).finally(() => {
               if (data?.update) ViewerVar(data.update)
@@ -67,7 +62,7 @@ export const EditLoginAvatar = () => {
           }}
         >
           Сохранить
-        </button>
+        </ButtonUI>
       </h2>
     </div>
   )
@@ -75,15 +70,12 @@ export const EditLoginAvatar = () => {
 // EMAIL && PASSWORD
 export const EditPassEmail = () => {
   const user = useViewer()
-  const [newEmail, setNewEmail] = useState(user?.email ? user.email : '')
+  const [newEmail, setNewEmail] = useState(user.email)
   const [NEWEMAIL, { data, error, loading }] = useMutation(UPDATE_USER)
   const sendNewEmail = async () => {
-    if (user?.email === newEmail) return
-    console.log(user?.email)
-    if (user?.id && user.email) {
-      await NEWEMAIL({ variables: { id: user?.id, email: newEmail }, fetchPolicy: 'network-only' })
-      if (data?.update) ViewerVar(data.update)
-    }
+    if (user.email === newEmail) return
+    await NEWEMAIL({ variables: { id: user.id, email: newEmail }, fetchPolicy: 'network-only' })
+    if (data?.update) ViewerVar(data.update)
   }
   return (
     <div className={cl.wrapper}>
@@ -91,16 +83,14 @@ export const EditPassEmail = () => {
       <p className={cl.error}>{error?.message || loading ? 'Сохранение...' : ''}</p>
       <Input type='email' placeholder='E-mail...' value={newEmail} onChange={(e) => setNewEmail(e.target.value)} />
       <h2 className={cl.save}>
-        <button onClick={sendNewEmail} className={cl.BtnSecure}>
-          Получить подтверждение на почту
-        </button>
+        <ButtonUI onClick={sendNewEmail}>Получить подтверждение на почту</ButtonUI>
       </h2>
       <h2>Пароль</h2>
       <Input type='password' placeholder='Старый пароль...' value={''} />
       <Input type='password' placeholder='Новый пароль...' value={''} />
       <Input type='password' placeholder='Подтвердите пароль...' value={''} />
       <h2 className={cl.save}>
-        <button className={cl.BtnSecure}>Сохранить</button>
+        <ButtonUI>Сохранить</ButtonUI>
       </h2>
     </div>
   )
@@ -110,7 +100,7 @@ export const CustomizeSettings = () => {
   return (
     <div className={cl.wrapper}>
       <h2>Задний фон</h2>
-      <ImageLoading className={cl.backround} src={user?.avatar} />
+      <ImageLoading className={cl.backround} src={useSrcAvatar(user.avatar)} />
       <h2>Цвет виджетов</h2>
       <input type='color' />
       <h2>Закругление виджетов</h2>
@@ -120,7 +110,7 @@ export const CustomizeSettings = () => {
       <h2>Акцент</h2>
       <input type='color' />
       <h2 className={cl.save}>
-        <button className={cl.BtnSecure}>Сохранить</button>
+        <ButtonUI>Сохранить</ButtonUI>
       </h2>
     </div>
   )

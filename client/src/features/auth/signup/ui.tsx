@@ -4,6 +4,7 @@ import { Link, Navigate } from 'react-router-dom'
 
 import { ViewerVar } from '@/processes/auth'
 import { REGISTRATION } from '@/shared/graphql/schema'
+import { ButtonUI } from '@/shared/ui/button/ui'
 import Input from '@/shared/ui/input'
 
 import cl from './styles.module.less'
@@ -43,7 +44,7 @@ export const FormSignup = () => {
           placeholder='Подтвердите пароль...'
         />
         {errors.pass2 ? <p>Пароли не совпадают</p> : ''}
-        <button className={cl.sign}>Регистрация</button>
+        <ButtonUI>Регистрация</ButtonUI>
         <p className={cl.redirect}>
           Есть аккаунт? - <Link to={'/signin'}>Войти</Link>
         </p>

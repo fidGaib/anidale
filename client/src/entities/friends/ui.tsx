@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom'
 import { GET_USERS } from '@/shared/graphql/schema'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
-import Icon from '@/shared/icons'
 
 import cl from './ui.module.less'
 
@@ -24,9 +23,9 @@ const CardUser = () => {
             <div className={cl.login}>{login}</div>
           </Link>
           <Link className={cl.toChat} to={`/chat?chat_id=${Math.round(Math.random() * 99999999)}&from=${id}&to=${id}`}>
-            <Icon iconId='chat' />
+            <ImageLoading src='/icons/chat.svg' alt='anidale chat icon' className={cl.svg} />
           </Link>
-          <Icon iconId='unsubscribe_user' />
+          <ImageLoading src='/icons/close.svg' alt='anidale close icon' className={cl.svg} />
         </div>
       ))}
     </>

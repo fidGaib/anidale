@@ -2,7 +2,6 @@ import { useMutation } from '@apollo/client'
 
 import { useViewer } from '@/entities/viewer'
 import { REMOVE_POST } from '@/shared/graphql/schema'
-import Icon from '@/shared/icons'
 import { usePostStore } from '@/shared/store'
 import Dropdown from '@/shared/ui/dropdown'
 
@@ -19,9 +18,7 @@ export const PostDropdownMenu = ({ postId, userId }: PorepsMenu) => {
   const removeFromStore = usePostStore((state) => state.removePost)
   return (
     <Dropdown>
-      <Dropdown.Header>
-        <Icon iconId='menu_post' className={cl.menuPost} />
-      </Dropdown.Header>
+      <Dropdown.Header>{/* <Icon iconId='menu_post' className={cl.menuPost} /> */}</Dropdown.Header>
       {someUser?.id === userId ? (
         <Dropdown.Body>
           <li>Сохранить в закладках</li>

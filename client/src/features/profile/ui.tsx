@@ -1,16 +1,18 @@
 import { useMutation } from '@apollo/client'
+import { useParams } from 'react-router-dom'
 
 import { MakePostImages } from '@/entities/profile/ui'
 import { useViewer } from '@/entities/viewer'
 import { CREATE_POST } from '@/shared/graphql/schema'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
-import Icon from '@/shared/icons'
 import { usePostStore } from '@/shared/store'
 
 import cl from './ui.module.less'
 
 export const MakePost = () => {
+  const params = useParams()
+  const id = parseInt(params.id || '')
   const error_create = usePostStore((state) => state.error)
   const description = usePostStore((state) => state.description)
   const images = usePostStore((state) => state.images)
@@ -22,6 +24,7 @@ export const MakePost = () => {
 
   const [createPost, { error, loading }] = useMutation(CREATE_POST)
   const myUser = useViewer()
+  if (myUser.id !== id) return <></>
   return (
     <>
       <p className={cl.error}>{error_create || `${error ? error.message : ''}`}</p>
@@ -36,10 +39,10 @@ export const MakePost = () => {
             onChange={(e) => handleHeight(e)}
           />
           <label className={cl.label}>
-            <Icon iconId='add_photo' className={cl.addPhoto} />
+            <ImageLoading className={cl.svg} src='/icons/add_photo.svg' />
             <input multiple type='file' hidden accept='image/*' onChange={(e) => setFiles(e.target.files!)} />
           </label>
-          <Icon iconId='send' onClick={() => send(createPost, myUser.id)} />
+          <ImageLoading className={cl.svg} src='/icons/send.svg' onClick={() => send(createPost, myUser.id)} />
         </div>
         {images?.length ? <MakePostImages {...{ images, removeImage }} className={loading ? cl.loading : ''} /> : ''}
       </div>
@@ -50,19 +53,19 @@ export const MeshBlock = () => {
   return (
     <div className={cl.meshBlock}>
       <div className={cl.mesh}>
-        <Icon iconId='feed' className={cl.meshIcon} />
+        <ImageLoading src='/icons/feed.svg' className={cl.meshIcon} />
         <p>записи</p>
       </div>
       <div className={cl.mesh}>
-        <Icon iconId='art' className={cl.meshIcon} />
+        <ImageLoading src='/icons/arts.svg' className={cl.meshIcon} />
         <p>арты</p>
       </div>
       <div className={cl.mesh}>
-        <Icon iconId='music' className={cl.meshIcon} />
+        <ImageLoading src='/icons/music.svg' className={cl.meshIcon} />
         <p>музыка</p>
       </div>
       <div className={cl.mesh}>
-        <Icon iconId='video' className={cl.meshIcon} />
+        <ImageLoading src='/icons/arts.svg' className={cl.meshIcon} />
         <p>видео</p>
       </div>
     </div>

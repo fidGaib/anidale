@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
 // import required modules
 import { FreeMode, Navigation } from 'swiper'
@@ -12,38 +11,36 @@ import 'swiper/swiper.min.css'
 import { Post } from '@/shared/graphql/gql/graphql'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
-import Icon from '@/shared/icons'
-import { defaultAvatar } from '@/widgets/profile'
 
 import cl from './ui.module.less'
 
 export const PostOwner = ({ post }: { post: Post }) => {
   return (
     <Link to={`/profile/${post?.user?.id}`} className={cl.wrappOwner}>
-      <ImageLoading src={useSrcAvatar(post?.user?.avatar || defaultAvatar)} alt='anidale' />
+      <ImageLoading src={useSrcAvatar(post?.user?.avatar || '')} alt='anidale' />
       {post?.user?.login}
     </Link>
   )
 }
 export const PostDescription = ({ description }: Post) => {
-  return <>{description && <div className={cl.text}>{description}</div>}</>
+  return <>{description ? <div className={cl.text}>{description}</div> : <></>}</>
 }
 export const PostActionWrapp = () => {
   return (
     <div className={cl.wrappActions}>
       <div className={cl.icon}>
-        <Icon iconId='like' />
+        <ImageLoading src='../../../public/icons/like.svg' alt='anidale like icon' />
       </div>
       <div className={cl.icon}>
-        <Icon iconId='comm' />
+        <ImageLoading src='../../../public/icons/comm.svg' alt='anidale comments icon' />
       </div>
     </div>
   )
 }
 export const PostImages = ({ images }: Post) => {
-  const [showModal, setModal] = useState(false)
-  return (
-    <>
+  if (!images?.length) return <></>
+  else
+    return (
       <Swiper
         style={{
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -56,17 +53,12 @@ export const PostImages = ({ images }: Post) => {
         modules={[FreeMode, Navigation]}
         className={cl.wrappImages}
       >
-        {images?.map((image) => (
-          <SwiperSlide key={image?.id} id={cl.childSwiper}>
-            <ImageLoading className={cl.small} src={`http://localhost:5000/storage/${image?.small}.webp`} />
-            <ImageLoading
-              onClick={() => setModal(true)}
-              className={cl.medium}
-              src={`http://localhost:5000/storage/${image?.medium}.webp`}
-            />
+        {images.map((image) => (
+          <SwiperSlide key={image!.id} id={cl.childSwiper}>
+            <ImageLoading className={cl.small} src={`http://localhost:5000/storage/${image!.small}.webp`} />
+            <ImageLoading className={cl.medium} src={`http://localhost:5000/storage/${image!.medium}.webp`} />
           </SwiperSlide>
         ))}
       </Swiper>
-    </>
-  )
+    )
 }
