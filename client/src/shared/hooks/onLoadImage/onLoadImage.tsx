@@ -1,7 +1,5 @@
 import { useRef, useState } from 'react'
 
-import { defaultAvatar } from '@/widgets/profile'
-
 import useOnScreen from '../useOnScreen'
 import cl from './style.module.less'
 
@@ -15,7 +13,7 @@ const ImageLoading = (props: any) => {
   const isVisible = useOnScreen(imgRef)
   return (
     <div ref={imgRef} id={loading ? cl.loading : ''} {...props}>
-      {isVisible || !loading ? <img src={props.src} onLoad={onLoad} alt={'anidale'} /> : <img src={defaultAvatar} />}
+      {isVisible || !loading ? <img src={props.src} onLoad={onLoad} alt={'anidale'} /> : <img src={''} />}
     </div>
   )
 }

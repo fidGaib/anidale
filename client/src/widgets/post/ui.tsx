@@ -18,6 +18,7 @@ export const Posts = () => {
   const page = 0
   const { data, loading } = useQuery<any>(id ? POST_BY_USER : POSTS, {
     variables: id ? { id, limit, page } : { limit, page },
+    fetchPolicy: 'cache-and-network',
   })
   const posts = usePostStore((state) => state.posts)
   const addPosts = usePostStore((state) => state.addPost)

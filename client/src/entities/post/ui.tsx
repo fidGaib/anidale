@@ -29,10 +29,10 @@ export const PostActionWrapp = () => {
   return (
     <div className={cl.wrappActions}>
       <div className={cl.icon}>
-        <ImageLoading src='../../../public/icons/like.svg' alt='anidale like icon' />
+        <ImageLoading src='/icons/like.svg' alt='anidale like icon' />
       </div>
       <div className={cl.icon}>
-        <ImageLoading src='../../../public/icons/comm.svg' alt='anidale comments icon' />
+        <ImageLoading src='/icons/comm.svg' alt='anidale comments icon' />
       </div>
     </div>
   )

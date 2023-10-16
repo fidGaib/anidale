@@ -17,7 +17,7 @@ export const ViewerVar = makeVar<UserType>({
   email: '',
 })
 const useAuthentication = () => {
-  const { data, loading } = useQuery(REFRESH, { fetchPolicy: 'network-only' })
+  const { data, loading } = useQuery(REFRESH, { fetchPolicy: 'cache-and-network' })
   const isAuth = useAuth()
   const [isAuthenticating, setAuthenticating] = useState(true)
 

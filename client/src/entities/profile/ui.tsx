@@ -15,7 +15,6 @@ export const MakePostImages: React.FC<Props> = ({ className, images, removeImage
     <div className={`${cl.imagesPreview} ${className}`} {...rest}>
       {images.map((image) => (
         <div key={image.size} className={cl.imagePreviewWrapper}>
-          {/* <Icon iconId='close' className={cl.imagePreviewClose} onClick={() => removeImage(image)} /> */}
           <ImageLoading
             className={cl.imagePreviewClose}
             src={'/icons/close.svg'}

@@ -13,6 +13,7 @@
   "dependencies": {
     "@apollo/client": "^3.7.10",
     "apollo-upload-client": "^17.0.0",
+    "caniuse-lite": "^1.0.30001549",
     "compose-function": "^3.0.3",
     "graphql": "^16.6.0",
     "react": "^18.2.0",

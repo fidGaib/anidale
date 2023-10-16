@@ -56,7 +56,7 @@ export const MenuHeader = () => {
               <Link to={'/feed'}>Лента</Link>
             </li>
             <li>
-              {/* <Icon iconId='signin' className={cl.menuSvg} /> */}
+              <ImageLoading className={cl.menuSvg} src='/icons/sigin.svg' alt='anidale sigin icon' />
               <Link to={'/signin'}>Войти</Link>
             </li>
           </>

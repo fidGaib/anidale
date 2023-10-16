@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 
-const useOnScreen = (ref) => {
+const useOnScreen = (ref: any) => {
   const [isIntersecting, setIntersecting] = useState(false)
   const observer = useMemo(() => new IntersectionObserver(([entry]) => setIntersecting(entry.isIntersecting)), [ref])
   useEffect(() => {
