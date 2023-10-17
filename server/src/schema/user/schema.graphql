@@ -33,7 +33,6 @@ type Feed {
   id: Int
   posts: [Post!]!
 }
-
 input UpdateUser {
   email: String
   pass: String

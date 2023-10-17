@@ -1,11 +1,26 @@
 import { graphql } from './gql/gql'
 
+graphql(`
+  fragment PartUser on User {
+    id
+    login
+    avatar
+  }
+  fragment PartPost on Post {
+    id
+    description
+    images {
+      id
+      small
+      medium
+      type
+    }
+  }
+`)
 export const GET_USERS = graphql(`
   query GET_USERS {
     getUsers {
-      id
-      login
-      avatar
+      ...PartUser
     }
   }
 `)
@@ -14,9 +29,7 @@ export const REFRESH = graphql(`
     refresh {
       accessToken
       user {
-        id
-        login
-        avatar
+        ...PartUser
         email
       }
     }
@@ -30,9 +43,7 @@ export const LOGOUT = graphql(`
 export const REGISTRATION = graphql(`
   mutation REG($email: String!, $pass: String!, $pass2: String!) {
     registration(user: { email: $email, pass: $pass, pass2: $pass2 }) {
-      id
-      login
-      avatar
+      ...PartUser
       email
     }
   }
@@ -40,9 +51,7 @@ export const REGISTRATION = graphql(`
 export const SIGNIN = graphql(`
   mutation LOGIN($email: String!, $pass: String!) {
     login(user: { email: $email, pass: $pass }) {
-      id
-      login
-      avatar
+      ...PartUser
       email
     }
   }
@@ -50,9 +59,7 @@ export const SIGNIN = graphql(`
 export const UPDATE_USER = graphql(`
   mutation UPDATE_LOGIN($id: Int!, $login: String, $email: String, $pass: String, $old_pass: String, $avatar: [File!]) {
     update(id: $id, user: { login: $login, email: $email, avatar: $avatar }, pass: $pass, old_pass: $old_pass) {
-      id
-      login
-      avatar
+      ...PartUser
       email
     }
   }
@@ -60,27 +67,16 @@ export const UPDATE_USER = graphql(`
 export const PROFILE = graphql(`
   query PROFILE($id: Int!) {
     getUser(id: $id) {
-      id
-      login
-      avatar
+      ...PartUser
     }
   }
 `)
 export const POST_BY_USER = graphql(`
   query POST_BY_USER($id: Int!, $limit: Int!, $page: Int!) {
     getPostsByUser(id: $id, limit: $limit, page: $page) {
-      id
-      description
-      images {
-        id
-        small
-        medium
-        type
-      }
+      ...PartPost
       user {
-        id
-        avatar
-        login
+        ...PartUser
       }
     }
   }
@@ -88,18 +84,9 @@ export const POST_BY_USER = graphql(`
 export const POSTS = graphql(`
   query POSTS($limit: Int!, $page: Int!) {
     getPosts(limit: $limit, page: $page) {
-      id
-      description
-      images {
-        id
-        small
-        medium
-        type
-      }
+      ...PartPost
       user {
-        id
-        avatar
-        login
+        ...PartUser
       }
     }
   }
@@ -107,18 +94,9 @@ export const POSTS = graphql(`
 export const CREATE_POST = graphql(`
   mutation CREATE_POST($owner: Int!, $description: String, $images: [File!]) {
     createPost(post: { owner: $owner, description: $description, images: $images }) {
-      id
-      description
-      images {
-        id
-        small
-        medium
-        type
-      }
+      ...PartPost
       user {
-        id
-        avatar
-        login
+        ...PartUser
       }
     }
   }
