@@ -21,16 +21,23 @@ class TokenService {
     this.refreshSecret = process.env.JWT_REFRESH_SECRET
   }
 
-  async generateTokens(payload: UserDto) {
-    const accessToken = jwt.sign(payload, this.accessSecret, { expiresIn: '15m' })
-    const refreshToken = jwt.sign(payload, this.refreshSecret, { expiresIn: '14d' })
+  async generateTokens({avatar, email,id,login}: UserDto) {
+    const dto = {avatar, email,id,login}
+    const accessToken = jwt.sign(dto, this.accessSecret, { expiresIn: '15m' })
+    const refreshToken = jwt.sign(dto, this.refreshSecret, { expiresIn: '14d' })
     return {
       accessToken,
       refreshToken,
     }
   }
   async findToken(refreshToken: string) {
-      const tokenData = await Token.findMany({ where: { refreshToken }, include: { user: true } })
+      const tokenData = await Token.findMany({ where: { refreshToken }, include: { user: {select:{
+          pass: true,
+          id: true,
+          avatar: true,
+          email: true,
+          login: true
+      }} } })
       return tokenData[0]
   }
   async saveToken(userId: number, refreshToken: string) {
@@ -55,7 +62,7 @@ class TokenService {
   }
   validateAccessToken(token: string) {
     try {
-      const userData = jwt.verify(token, this.accessSecret)
+      const userData = <jwt.UserIDJwtPayload>jwt.verify(token, this.accessSecret)
       return userData
     } catch (e) {
       return null 

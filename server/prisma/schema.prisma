@@ -12,7 +12,6 @@ generator client {
 
 model User {
   id          Int      @id @default(sequence())
-  // id          Int      @id @default(autoincrement())
   email       String   @unique
   pass        String
   login       String
@@ -33,7 +32,6 @@ model User {
 
 model Post {
   id          Int      @id @default(sequence())
-  // id          Int      @id @default(autoincrement())
   description String
   date        DateTime @default(now())
   images      PostImage[]
@@ -45,7 +43,6 @@ model Post {
 
 model PostImage {
   id          Int      @id @default(sequence())
-  // id        Int      @id @default(autoincrement())
   high      String
   medium    String
   small     String
@@ -58,7 +55,6 @@ model PostImage {
 
 model Feed {
   id          Int      @id @default(sequence())
-  // id          Int      @id @default(autoincrement())
   posts     Post[]
   updatedAt   DateTime @updatedAt
   user        User?
@@ -67,7 +63,6 @@ model Feed {
 
 model Token {
   id          Int      @id @default(sequence())
-  // id          Int      @id @default(autoincrement())
   user        User     @relation(fields: [userId], references: [id])
   userId      Int
   refreshToken String
@@ -75,14 +70,12 @@ model Token {
 
 model Chat {
   id          Int      @id @default(sequence())
-  // id          Int      @id @default(autoincrement())
   users       User[]
   messages    Message[] 
 }
 
 model Message {
   id          Int      @id @default(sequence())
-  // id          Int      @id @default(autoincrement())
   chat        Chat     @relation(fields: [chatId], references: [id])
   chatId      Int
   sender      User     @relation(fields: [senderId], references: [id])

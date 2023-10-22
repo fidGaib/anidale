@@ -1,90 +1,88 @@
-import UserService from "./service";
-import { Login, Registration, UpdateUser } from "@/schema/resolvers-types";
-import { Request, Response } from "express";
-import { createGraphQLError } from "graphql-yoga";
+import { Request, Response } from 'express'
+import { createGraphQLError } from 'graphql-yoga'
+
+import { Login, Registration, UpdateUser } from '@/schema/resolvers-types'
+
+import UserService from './service'
 
 const emailRegex =
-  /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i;
+  /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i
 class UserController {
-  async registration(user: Registration, req: Request, res: Response) {
-    const { email, pass, pass2 } = user;
-    if (!email.trim() || !pass.trim() || !pass2.trim()) {
-      throw createGraphQLError("У вас пустые поля");
+  async registration({ email, pass, pass2 }: Registration, req: Request, res: Response) {
+    const EmailTrim = email.trim()
+    const PassTrim = pass.trim()
+    const Pass2Trim = pass2.trim()
+    if (!EmailTrim || !PassTrim || !Pass2Trim) {
+      throw createGraphQLError('У вас пустые поля')
     } else if (!email.match(emailRegex)) {
-      throw createGraphQLError("Некорректный E-mail");
+      throw createGraphQLError('Некорректный E-mail')
     } else if (pass !== pass2) {
-      throw createGraphQLError("Пароли не совпадают");
+      throw createGraphQLError('Пароли не совпадают')
     }
-    const userData = await UserService.registration(email.trim(), pass.trim());
+    const { refreshToken, accessToken, user } = await UserService.registration(EmailTrim, Pass2Trim)
 
-    res.cookie("refreshToken", userData.refreshToken, {
-      maxAge: 14 * 24 * 60 * 60 * 1000,
-      httpOnly: true,
-    });
-    res.cookie("accessToken", userData.accessToken, {
-      maxAge: 15 * 60 * 1000,
-      httpOnly: true,
-    });
+    this.setCookie(res, refreshToken, accessToken)
     return {
-      accessToken: userData.accessToken,
-      refreshToken: userData.refreshToken,
-      ...userData.user,
-    };
-  }
-  async login(user: Login, req: Request, res: Response) {
-    const { email, pass } = user;
-    if (!email.trim() || !pass.trim()) {
-      throw createGraphQLError("У вас пустые поля");
-    } else if (!email.match(emailRegex)) {
-      throw createGraphQLError("Некорректный E-mail");
+      accessToken,
+      refreshToken,
+      ...user,
     }
-    const userData = await UserService.login(email.trim(), pass.trim());
-    res.cookie("refreshToken", userData.refreshToken, {
-      maxAge: 14 * 24 * 60 * 60 * 1000,
-      httpOnly: true,
-    });
-    res.cookie("accessToken", userData.accessToken, {
-      maxAge: 15 * 60 * 1000,
-      httpOnly: true,
-    });
+  }
+  async login({ email, pass }: Login, req: Request, res: Response) {
+    const EmailTrim = email.trim()
+    const PassTrim = pass.trim()
+    if (!EmailTrim || !PassTrim) {
+      throw createGraphQLError('У вас пустые поля')
+    } else if (!email.match(emailRegex)) {
+      throw createGraphQLError('Некорректный E-mail')
+    }
+    const { refreshToken, accessToken, user } = await UserService.login(EmailTrim, PassTrim)
+    this.setCookie(res, refreshToken, accessToken)
     return {
-      accessToken: userData.accessToken,
-      refreshToken: userData.refreshToken,
-      ...userData.user,
-    };
+      accessToken,
+      refreshToken,
+      ...user,
+    }
   }
   async fetchOne(id: number) {
-    return await UserService.getUser(id);
+    return await UserService.getUser(id)
   }
   async fetchMany() {
-    return await UserService.getUsers();
+    return await UserService.getUsers()
   }
   async updateUser(id: number, user?: UpdateUser) {
-    if (!user) throw Error("User not found");
+    if (!user) throw Error('User not found')
     if (user.email && !user.email.match(emailRegex)) {
-      throw createGraphQLError("Некорректный E-mail");
+      throw createGraphQLError('Некорректный E-mail')
     }
 
-    return await UserService.update(id, user);
+    return await UserService.update(id, user)
   }
   async remove(id: number) {
-    return await UserService.remove(id);
+    return await UserService.remove(id)
   }
-  async logout(req: Request) {
-    return await UserService.logout(req.cookies.refreshToken);
+  async logout({ cookies: { refreshToken } }: Request) {
+    return await UserService.logout(refreshToken)
   }
-  async refresh(req: Request, res: Response) {
-    const { refreshToken } = req.cookies;
-    const user = await UserService.refresh(refreshToken);
-    res.cookie("refreshToken", user.refreshToken, {
+  async refresh({ cookies: { refreshToken, accessToken } }: Request, res: Response) {
+    if (accessToken) {
+      const user = await UserService.refresh(refreshToken, accessToken)
+      return user
+    } else {
+      const user = await UserService.refresh(refreshToken, accessToken)
+      this.setCookie(res, user.refreshToken, user.accessToken)
+      return user
+    }
+  }
+  async setCookie(res: Response, refreshToken: string, accessToken: string) {
+    res.cookie('refreshToken', refreshToken, {
       maxAge: 14 * 24 * 60 * 60 * 1000,
       httpOnly: true,
-    });
-    res.cookie("accessToken", user.accessToken, {
+    })
+    res.cookie('accessToken', accessToken, {
       maxAge: 15 * 60 * 1000,
       httpOnly: true,
-    });
-    return user;
+    })
   }
 }
-export default new UserController();
+export default new UserController()

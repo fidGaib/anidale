@@ -31,7 +31,13 @@ class UserService {
         avatar: avatar[avatar_random],
         feedId: feed.id,
       },
-      include: { feed: { include: { posts: true } }, friends: true },
+      select: {
+        pass: true,
+        id: true,
+        avatar: true,
+        email: true,
+        login: true
+      }
     });
 
     const tokens = await tokenService.generateTokens(user);
@@ -44,6 +50,13 @@ class UserService {
   async login(email: string, pass: string) {
     const candidate = await User.findUnique({
       where: { email },
+      select: {
+        pass: true,
+        id: true,
+        avatar: true,
+        email: true,
+        login: true
+      }
     });
     if (!candidate) throw createGraphQLError("Пользователь не найден");
     const isPassEquals = await compare(
@@ -129,29 +142,36 @@ class UserService {
   async logout(refreshToken: string) {
     return await tokenService.removeToken(refreshToken);
   }
-  async refresh(refreshToken?: string) {
-    if (!refreshToken) throw createGraphQLError("НЕ АВТОРИЗОВАН");
-    const userData = tokenService.validateRefreshToken(refreshToken);
-    const tokenFromDb = await tokenService.findToken(refreshToken);
-
-    if (!userData || !tokenFromDb) throw createGraphQLError("НЕ АВТОРИЗОВАН");
-    const user = await User.findUnique({
-      where: { id: userData.id },
-      include: { feed: { include: { posts: true } }, friends: true },
-    });
-
-    if (!user) {
-      throw Error("User not found");
+  async refresh(refreshToken?: string, accessToken?: string) {
+    if(accessToken) {
+      const user = tokenService.validateAccessToken(accessToken);
+      return {
+        user
+      };
     }
-
-    const tokens = await tokenService.generateTokens({ ...user });
-
-    await tokenService.saveToken(user.id, tokens.refreshToken);
-
-    return {
-      ...tokens,
-      user,
-    };
+    else {
+      if (!refreshToken) throw createGraphQLError("НЕ АВТОРИЗОВАН");
+      const userData = tokenService.validateRefreshToken(refreshToken);
+      const tokenFromDb = await tokenService.findToken(refreshToken);
+  
+      if (!userData || !tokenFromDb) throw createGraphQLError("НЕ АВТОРИЗОВАН");
+      const user = await User.findUnique({
+        where: { id: userData.id },
+      });
+  
+      if (!user) {
+        throw Error("User not found");
+      }
+  
+      const tokens = await tokenService.generateTokens({ ...user });
+  
+      await tokenService.saveToken(user.id, tokens.refreshToken);
+  
+      return {
+        ...tokens,
+        user,
+      };
+    }
   }
 }
 export default new UserService();

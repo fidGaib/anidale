@@ -27,7 +27,6 @@ export const GET_USERS = graphql(`
 export const REFRESH = graphql(`
   query REFRESH {
     refresh {
-      accessToken
       user {
         ...PartUser
         email
