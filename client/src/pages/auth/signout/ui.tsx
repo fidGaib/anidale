@@ -1,16 +1,21 @@
 import { useQuery } from '@apollo/client'
-import { Navigate } from 'react-router-dom'
 
 import { ViewerVar } from '@/processes/auth'
-import { LOGOUT } from '@/shared/graphql/schema'
+import { SIGNOUT } from '@/shared/graphql/schema'
+import { useEffect } from 'react'
 
 export const Signout = () => {
-  useQuery(LOGOUT, { fetchPolicy: 'no-cache' })
-  ViewerVar({
-    id: 0,
-    login: '',
-    avatar: '',
-    email: '',
-  })
-  return <Navigate to='/signin' replace />
+  const {data, loading} = useQuery(SIGNOUT, { fetchPolicy: 'no-cache' })
+  useEffect(() => {
+    if (data?.logout) {
+      ViewerVar({
+        id: 0,
+        login: '',
+        avatar: '',
+        email: '',
+      })
+      window.location.href = '/';
+    }
+  }, [data?.logout, loading])
+  return <></>
 }

@@ -14,8 +14,9 @@ const UserResolvers: Resolvers = {
       return await UserController.refresh(req, res)
     },
     async logout(parent, args, ctx) {
-      const { req } = ctx
-      return await UserController.logout(req)
+      const { req, res } = ctx
+      console.log("sss")
+      return await UserController.logout(req, res)
     },
   },
   Mutation: {

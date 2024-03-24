@@ -34,9 +34,9 @@ export const REFRESH = graphql(`
     }
   }
 `)
-export const LOGOUT = graphql(`
-  query LOGOUT {
-    logout
+export const SIGNOUT = graphql(`
+  query SIGNOUT {
+    logout 
   }
 `)
 export const REGISTRATION = graphql(`

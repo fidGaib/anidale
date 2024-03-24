@@ -1,6 +1,6 @@
 import { MeshBlock } from '@/features/profile'
 import Content from '@/shared/content'
-import { Plug } from '@/shared/ui/plug'
+// import { Plug } from '@/shared/ui/plug'
 import { Posts } from '@/widgets/post'
 
 import cl from './ui.module.less'
@@ -11,7 +11,7 @@ export const Feed = () => {
   return (
     <Content id={cl.content}>
       <MeshBlock />
-      <Posts limit={10} page={0} />
+      <Posts/>
     </Content>
   )
 }

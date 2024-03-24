@@ -61,7 +61,8 @@ class UserController {
   async remove(id: number) {
     return await UserService.remove(id)
   }
-  async logout({ cookies: { refreshToken } }: Request) {
+  async logout({ cookies: { refreshToken } }: Request, res: Response) {
+    
     return await UserService.logout(refreshToken)
   }
   async refresh({ cookies: { refreshToken, accessToken } }: Request, res: Response) {

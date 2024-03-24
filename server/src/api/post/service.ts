@@ -89,8 +89,17 @@ class PostService {
       const res = await PostImage.findMany({
         where: {
           medium: item.medium
+        },
+        select: {
+          small: true,
+          medium: true,
+          high: true,
+          vertical: true,
+          type: true
         }
       })
+      const user = await User.findMany({ where: { avatar: item.small }, select: { id: true }})
+      if (user.length > 0) return
       // delete image if not double || res.length === 1
       if(res.length === 1)  await StorageService.removeFile(res[0])
     })

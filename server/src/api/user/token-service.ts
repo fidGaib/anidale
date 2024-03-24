@@ -62,6 +62,7 @@ class TokenService {
   }
   validateAccessToken(token: string) {
     try {
+
       const userData = <jwt.UserIDJwtPayload>jwt.verify(token, this.accessSecret)
       return userData
     } catch (e) {

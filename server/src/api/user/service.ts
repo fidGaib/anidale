@@ -9,6 +9,7 @@ import { compare, hash } from "bcrypt";
 import { createGraphQLError } from "graphql-yoga";
 import { v4 } from "uuid";
 import FileStorageService, { SaveImage } from "../post/file-service";
+import { Response } from "express";
 
 class UserService {
   async registration(email: string, pass: string) {
@@ -144,6 +145,9 @@ class UserService {
   }
   async refresh(refreshToken?: string, accessToken?: string) {
     if(accessToken) {
+      if (!refreshToken) throw createGraphQLError("НЕ АВТОРИЗОВАН");
+      const tokenFromDb = await tokenService.findToken(refreshToken);
+      if (!tokenFromDb) throw createGraphQLError("НЕ АВТОРИЗОВАН");
       const user = tokenService.validateAccessToken(accessToken);
       return {
         user

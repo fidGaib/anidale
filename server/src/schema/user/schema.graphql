@@ -8,7 +8,7 @@ type Mutation {
   registration(user: Registration!): User
   login(user: Login!): User
   update(id: Int!, user: UpdateUser, pass: String, old_pass: String): User
-  remove(id: Int!): Boolean
+  remove(id: Int!): Boolean 
 }
 type Refresh {
   refreshToken: String
