@@ -15,7 +15,6 @@ const UserResolvers: Resolvers = {
     },
     async logout(parent, args, ctx) {
       const { req, res } = ctx
-      console.log("sss")
       return await UserController.logout(req, res)
     },
   },

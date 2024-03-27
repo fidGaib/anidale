@@ -50,23 +50,61 @@ export const MakePost = () => {
   )
 }
 export const MeshBlock = () => {
+  // const {data} = useQuery(POST_BY_USER, {variables: {id: 1, limit: 10, page: 0}, fetchPolicy: 'network-only'})
+  // const images = data?.getPostsByUser[0].images
+  // console.log(images[0].small + images[0].type)
   return (
-    <div className={cl.meshBlock}>
-      <div className={cl.mesh}>
-        <ImageLoading src='/icons/feed.svg' className={cl.meshIcon} />
-        <p>записи</p>
+    <div>
+      <div className={cl.meshBlock}>
+        <div className={cl.mesh}>
+          <ImageLoading src='/icons/arts.svg' className={cl.meshIcon} />
+          <p>арты</p>
+        </div>
+        <div className={cl.mesh}>
+          <ImageLoading src='/icons/music.svg' className={cl.meshIcon} />
+          <p>музыка</p>
+        </div>
+        <div className={cl.mesh}>
+          <ImageLoading src='/icons/arts.svg' className={cl.meshIcon} />
+          <p>видео</p>
+        </div>
       </div>
-      <div className={cl.mesh}>
-        <ImageLoading src='/icons/arts.svg' className={cl.meshIcon} />
-        <p>арты</p>
+      {/* <MusicOne/>
+      <MusicOne/>
+      <MusicOne/>
+      <MusicOne/>
+      <MusicOne/> */}
+      <div className={cl.meshContent}>
+        <ImageLoading src='http://localhost:5000/storage/84/84c9a2388b4ae9da9c5b99b05b687978.webp'/>
+        <ImageLoading src='http://localhost:5000/storage/7f/7f4bbd4380f60d658a28a3e6c47d550d.webp'/>
+        <ImageLoading src='http://localhost:5000/storage/7f/7f4bbd4380f60d658a28a3e6c47d550d.webp'/>
+        <ImageLoading src='https://assets.faceit-cdn.net/avatars/cdf4e907-bfc3-4c5b-86be-15663126d4de_1605010404640.jpg'/>
+        <ImageLoading src='https://pushinka.top/uploads/posts/2023-04/1680492408_pushinka-top-p-top-anime-avi-dlya-ks-krasivo-9.jpg'/>
+        <ImageLoading src='http://localhost:5000/storage/7f/7f4bbd4380f60d658a28a3e6c47d550d.webp'/>
+        <ImageLoading src='https://sun1-85.userapi.com/s/v1/ig2/dSMwJSDis-Ihq2TYoxBCUFPtOX0xDaanZLckoYbYK5df9R7z9MVrPCitFgELrKLDLrBLlWu3wpce7XWp6I67qXLP.jpg?size=200x200&quality=96&crop=0,0,400,400&ava=1'/>
+        <ImageLoading src='http://localhost:5000/storage/7f/7f4bbd4380f60d658a28a3e6c47d550d.webp'/>
+        <p>Показать ещё</p>
       </div>
-      <div className={cl.mesh}>
-        <ImageLoading src='/icons/music.svg' className={cl.meshIcon} />
-        <p>музыка</p>
-      </div>
-      <div className={cl.mesh}>
-        <ImageLoading src='/icons/arts.svg' className={cl.meshIcon} />
-        <p>видео</p>
+    </div>
+  )
+}
+
+export const MeshBlockFeed = () => {
+  return (
+    <div>
+      <div className={cl.meshBlock}>
+        <div className={cl.mesh}>
+          <ImageLoading src='/icons/arts.svg' className={cl.meshIcon} />
+          <p>арты</p>
+        </div>
+        <div className={cl.mesh}>
+          <ImageLoading src='/icons/music.svg' className={cl.meshIcon} />
+          <p>музыка</p>
+        </div>
+        <div className={cl.mesh}>
+          <ImageLoading src='/icons/arts.svg' className={cl.meshIcon} />
+          <p>видео</p>
+        </div>
       </div>
     </div>
   )

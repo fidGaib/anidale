@@ -1,0 +1,54 @@
+#history {
+  display: flex;
+  flex-wrap: wrap;
+  width: 66px;
+  img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    cursor: pointer;
+    margin: 3px;
+    transition: all .5s;
+    border: 3px solid var(--accent);
+    &:hover {
+      opacity: .8;
+    }
+  }
+  .add_history {
+    margin-top: 3px;
+    margin-left: -63px;
+    transition: all .5s;
+    border-radius: 50%;
+    &:hover {
+      background: #fff;
+      opacity: .4;
+    }
+    img {
+      border: 0px;
+      scale: .5;
+      margin: 0px;
+      cursor: pointer;
+    }
+  }
+  p{
+    font-weight: bold;
+    color: var(--accent);
+    font-family: var(--font-text-main);
+    text-align: center;
+    margin: 0 auto;
+    cursor: pointer;
+    background: #fff;
+    padding: 1px 15px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 4px 1px rgb(211, 211, 211);
+  }
+}
+.historyProfile {
+    position: absolute;
+    margin-left: 21.3%;
+    margin-top: 10px;
+  }
+.historyFeed {
+  position: absolute;
+  margin-top: 40px;
+}

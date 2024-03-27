@@ -4,13 +4,18 @@ import { Posts } from '@/widgets/post'
 import { ArtWork } from '@/widgets/profile'
 
 import cl from './ui.module.less'
+import {HistoryProfile } from '@/entities/history'
 
 export const Profile = () => {
   return (
+    
+    <>
+    <HistoryProfile/>
     <Content className={cl.content}>
       <ArtWork />
       <MakePost />
       <Posts />
     </Content>
+    </>
   )
 }
