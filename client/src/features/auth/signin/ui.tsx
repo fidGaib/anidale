@@ -24,7 +24,7 @@ export const FormSignin = () => {
 
   if (data?.login) {
     ViewerVar(data.login)
-    return <Navigate to={`/profile/${data.login.id}`} />
+    window.location.href = `/profile/${data.login.id}`
   }
 
   return (

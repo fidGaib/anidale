@@ -5,6 +5,7 @@ import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
 
 import cl from './ui.module.less'
+import { useEffect, useState } from 'react'
 
 export const MenuHeader = () => {
   const viewer = useViewer()
@@ -73,33 +74,30 @@ export const MenuHeader = () => {
   )
 }
 export const NotificationHeader = () => {
-  const viewer = useViewer()
-  if (viewer.id === 0) return <div style={{ marginLeft: 'auto' }}></div>
+  const [show, setShow] = useState(false)
+  const user = useViewer()
+  useEffect(() => {
+    if( user.id ) setShow(true)
+  }, [user.id])
   return (
     <>
-      <button className={cl.notification}>
-        <ImageLoading className={cl.notificationSvg} src='/icons/notification.svg' alt='anidale notification icon' />
-      </button>
-      <div className={cl.notificationWrapper}>
-        {/* item */}
-        <div className={cl.item}>
-          <img src={useSrcAvatar(viewer.avatar)} alt='' />
-          <div className={cl.body}>
-            <div className={cl.title}>{viewer.login}</div>
-            <div className={cl.description}>Lorem ipsum dolor sit amet.</div>
+    {
+      !show ? <div style={{ marginLeft: 'auto' }}></div> :
+        <>
+          <button className={cl.notification}>
+            <ImageLoading className={cl.notificationSvg} src='/icons/notification.svg' alt='anidale notification icon' />
+          </button>
+          <div className={cl.notificationWrapper}>
+            <div className={cl.item}>
+              <img src={useSrcAvatar(user.avatar)} alt='' />
+              <div className={cl.body}>
+                <p className={cl.title}>{user.login}</p>
+                <p className={cl.description}>Привет! Как твои дела?)</p>
+              </div>
+            </div>
           </div>
-        </div>
-        {/* /item */}
-        {/* item */}
-        <div className={cl.item}>
-          <img src={useSrcAvatar(viewer.avatar)} alt='' />
-          <div className={cl.body}>
-            <div className={cl.title}>{viewer.login}</div>
-            <div className={cl.description}>Lorem ipsum dolor sit amet.</div>
-          </div>
-        </div>
-        {/* /item */}
-      </div>
+        </>
+    }
     </>
   )
 }

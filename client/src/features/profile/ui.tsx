@@ -50,9 +50,6 @@ export const MakePost = () => {
   )
 }
 export const MeshBlock = () => {
-  // const {data} = useQuery(POST_BY_USER, {variables: {id: 1, limit: 10, page: 0}, fetchPolicy: 'network-only'})
-  // const images = data?.getPostsByUser[0].images
-  // console.log(images[0].small + images[0].type)
   return (
     <div>
       <div className={cl.meshBlock}>
@@ -69,14 +66,9 @@ export const MeshBlock = () => {
           <p>видео</p>
         </div>
       </div>
-      {/* <MusicOne/>
-      <MusicOne/>
-      <MusicOne/>
-      <MusicOne/>
-      <MusicOne/> */}
       <div className={cl.meshContent}>
-        <ImageLoading src='http://localhost:5000/storage/84/84c9a2388b4ae9da9c5b99b05b687978.webp'/>
         <ImageLoading src='http://localhost:5000/storage/7f/7f4bbd4380f60d658a28a3e6c47d550d.webp'/>
+        <ImageLoading src='https://assets.faceit-cdn.net/avatars/cdf4e907-bfc3-4c5b-86be-15663126d4de_1605010404640.jpg'/>
         <ImageLoading src='http://localhost:5000/storage/7f/7f4bbd4380f60d658a28a3e6c47d550d.webp'/>
         <ImageLoading src='https://assets.faceit-cdn.net/avatars/cdf4e907-bfc3-4c5b-86be-15663126d4de_1605010404640.jpg'/>
         <ImageLoading src='https://pushinka.top/uploads/posts/2023-04/1680492408_pushinka-top-p-top-anime-avi-dlya-ks-krasivo-9.jpg'/>

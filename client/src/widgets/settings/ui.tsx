@@ -81,14 +81,14 @@ export const EditPassEmail = () => {
     <div className={cl.wrapper}>
       <h2>Email</h2>
       <p className={cl.error}>{error?.message || loading ? 'Сохранение...' : ''}</p>
-      <Input type='email' placeholder='E-mail...' value={newEmail} onChange={(e) => setNewEmail(e.target.value)} />
+      <Input type='email' placeholder='E-mail...' defaultValue={newEmail} value={newEmail} onChange={(e) => setNewEmail(e.target.value)} />
       <h2 className={cl.save}>
         <ButtonUI onClick={sendNewEmail}>Получить подтверждение на почту</ButtonUI>
       </h2>
       <h2>Пароль</h2>
-      <Input type='password' placeholder='Старый пароль...' value={''} />
-      <Input type='password' placeholder='Новый пароль...' value={''} />
-      <Input type='password' placeholder='Подтвердите пароль...' value={''} />
+      <Input type='password' placeholder='Старый пароль...' defaultValue={''} />
+      <Input type='password' placeholder='Новый пароль...' defaultValue={''} />
+      <Input type='password' placeholder='Подтвердите пароль...' defaultValue={''} />
       <h2 className={cl.save}>
         <ButtonUI>Сохранить</ButtonUI>
       </h2>
@@ -104,7 +104,7 @@ export const CustomizeSettings = () => {
       <h2>Цвет виджетов</h2>
       <input type='color' />
       <h2>Закругление виджетов</h2>
-      <input type='number' value={10} />
+      <input type='number' defaultValue={10} />
       <h2>Цвет основного текста</h2>
       <input type='color' />
       <h2>Акцент</h2>

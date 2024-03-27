@@ -60,7 +60,7 @@ export const Music = () => {
             type="range"
             min="0"
             max={duration / 1000}
-            default="0"
+            defaultValue="0"
             value={seconds}
             className={cl.timeline}
             onChange={(e) => {
