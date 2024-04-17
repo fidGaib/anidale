@@ -2,7 +2,6 @@ import { useMutation } from '@apollo/client'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { Link, Navigate } from 'react-router-dom'
 
-import { ViewerVar } from '@/processes/auth'
 import { REGISTRATION } from '@/shared/graphql/schema'
 import { ButtonUI } from '@/shared/ui/button/ui'
 import Input from '@/shared/ui/input'
@@ -28,7 +27,6 @@ export const FormSignup = () => {
   }
 
   if (data?.registration) {
-    ViewerVar(data.registration)
     return <Navigate to={`/profile/${data.registration.id}`} />
   }
 

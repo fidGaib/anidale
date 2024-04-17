@@ -65,25 +65,21 @@ class UserController {
     
     return await UserService.logout(refreshToken)
   }
-  async refresh({ cookies: { refreshToken, accessToken } }: Request, res: Response) {
-    if (accessToken) {
-      const user = await UserService.refresh(refreshToken, accessToken)
-      return user
-    } else {
-      const user = await UserService.refresh(refreshToken, accessToken)
-      this.setCookie(res, user.refreshToken, user.accessToken)
-      return user
+  async refresh (res: Response, refreshToken: string, accessToken: string) {
+    const data = await UserService.refresh(refreshToken, accessToken)
+    return {
+      ...data
     }
   }
-  async setCookie(res: Response, refreshToken: string, accessToken: string) {
-    res.cookie('refreshToken', refreshToken, {
-      maxAge: 14 * 24 * 60 * 60 * 1000,
-      httpOnly: true,
-    })
-    res.cookie('accessToken', accessToken, {
-      maxAge: 15 * 60 * 1000,
-      httpOnly: true,
-    })
+  async setCookie(res: Response, refreshToken?: string, accessToken?: string) {
+      res.cookie('refreshToken', refreshToken, {
+        maxAge: 14 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+      })
+      res.cookie('accessToken', accessToken, {
+        maxAge: 15 * 60 * 1000,
+        httpOnly: true,
+      })
   }
 }
 export default new UserController()

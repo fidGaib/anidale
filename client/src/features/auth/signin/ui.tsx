@@ -2,7 +2,6 @@ import { useMutation } from '@apollo/client'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { Link, Navigate } from 'react-router-dom'
 
-import { ViewerVar } from '@/processes/auth'
 import { SIGNIN } from '@/shared/graphql/schema'
 import { ButtonUI } from '@/shared/ui/button/ui'
 import Input from '@/shared/ui/input'
@@ -23,7 +22,6 @@ export const FormSignin = () => {
   }
 
   if (data?.login) {
-    ViewerVar(data.login)
     window.location.href = `/profile/${data.login.id}`
   }
 

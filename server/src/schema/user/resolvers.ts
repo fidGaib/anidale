@@ -6,32 +6,32 @@ const UserResolvers: Resolvers = {
     async getUsers() {
       return await UserController.fetchMany()
     },
-    async getUser(parent, args) {
+    async getUser(_, args) {
       return await UserController.fetchOne(args.id)
     },
-    async refresh(parent, args, ctx) {
-      const { req, res } = ctx
-      return await UserController.refresh(req, res)
-    },
-    async logout(parent, args, ctx) {
+    async logout(_, __, ctx) {
       const { req, res } = ctx
       return await UserController.logout(req, res)
     },
+    async refresh (_, __, ctx) {
+      const {req, res} = ctx
+      return await UserController.refresh(res, req.cookies.refreshToken, req.cookies.accessToken)
+    },
   },
   Mutation: {
-    async registration(parent, args, ctx) {
+    async registration(_, args, ctx) {
       const { req, res } = ctx
       return await UserController.registration(args.user, req, res)
     },
-    async login(parent, args, ctx) {
+    async login(_, args, ctx) {
       const { req, res } = ctx
       return await UserController.login(args.user, req, res)
     },
-    async update(parent, args) {
+    async update(_, args) {
       const { id, user } = args
       return await UserController.updateUser(id, user)
     },
-    async remove(parent, args) {
+    async remove(_, args) {
       const { id } = args
       return await UserController.remove(id)
     },

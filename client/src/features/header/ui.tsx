@@ -1,25 +1,25 @@
 import { Link } from 'react-router-dom'
 
-import { useViewer } from '@/entities/viewer'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
-import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
 
 import cl from './ui.module.less'
-import { useEffect, useState } from 'react'
+import { useReactiveVar } from '@apollo/client'
+import { VarAuthData } from '@/app/providers/routes/AppRouter'
+import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
 
 export const MenuHeader = () => {
-  const viewer = useViewer()
+  const AuthData = useReactiveVar(VarAuthData)
   return (
     <>
       <button className={cl.focusBtn}>
         <ImageLoading className={cl.headerMenuSvg} src='/icons/menu.svg' alt='anidale menu icon' />
       </button>
       <ul className={cl.menu}>
-        {viewer.id !== 0 ? (
+        {AuthData.id > 0  ? (
           <>
             <li>
               <ImageLoading className={cl.menuSvg} src='/icons/profile.svg' alt='anidale profile icon' />
-              <Link to={`/profile/${viewer.id}`}>Профиль</Link>
+              <Link to={`/profile/${AuthData.id}`}>Профиль</Link>
             </li>
             <li>
               <ImageLoading className={cl.menuSvg} src='/icons/feed.svg' alt='anidale feed icon' />
@@ -63,9 +63,9 @@ export const MenuHeader = () => {
           </>
         )}
       </ul>
-      {viewer.id !== 0 ? (
-        <Link to={`/profile/${viewer?.id}`} className={cl.userAvatar}>
-          <ImageLoading src={useSrcAvatar(viewer.avatar)} alt={viewer.login} />
+      {AuthData.id > 0  ? (
+        <Link to={`/profile/${AuthData.id}`} className={cl.userAvatar}>
+          <ImageLoading src={useSrcAvatar(AuthData.avatar)}/>
         </Link>
       ) : (
         <></>
@@ -74,24 +74,20 @@ export const MenuHeader = () => {
   )
 }
 export const NotificationHeader = () => {
-  const [show, setShow] = useState(false)
-  const user = useViewer()
-  useEffect(() => {
-    if( user.id ) setShow(true)
-  }, [user.id])
+  const AuthData = useReactiveVar(VarAuthData)
   return (
     <>
     {
-      !show ? <div style={{ marginLeft: 'auto' }}></div> :
+      AuthData.id === 0 ? <div style={{ marginLeft: 'auto' }}></div> :
         <>
           <button className={cl.notification}>
             <ImageLoading className={cl.notificationSvg} src='/icons/notification.svg' alt='anidale notification icon' />
           </button>
           <div className={cl.notificationWrapper}>
             <div className={cl.item}>
-              <img src={useSrcAvatar(user.avatar)} alt='' />
+              <img src={useSrcAvatar(AuthData.avatar)} alt='' />
               <div className={cl.body}>
-                <p className={cl.title}>{user.login}</p>
+                <p className={cl.title}>{AuthData.login}</p>
                 <p className={cl.description}>Привет! Как твои дела?)</p>
               </div>
             </div>

@@ -24,7 +24,7 @@ export const Music = () => {
     sec: "",
   }); 
   const [seconds, setSeconds] = useState(); // текущая позиция звука в секундах
-  const sec = duration / 1000;
+  const sec = duration!! / 1000;
   const min = Math.floor(sec / 60);
   const secRemain = Math.floor(sec % 60);
   const time = {
@@ -38,8 +38,8 @@ export const Music = () => {
         const min = Math.floor(sound.seek([]) / 60);
         const sec = Math.floor(sound.seek([]) % 60);
         setCurrTime({
-          min,
-          sec,
+          min: min.toString(),
+          sec: sec.toString(),
         });
       }
     }, 1000);
@@ -59,7 +59,7 @@ export const Music = () => {
           <input
             type="range"
             min="0"
-            max={duration / 1000}
+            max={duration!! / 1000}
             defaultValue="0"
             value={seconds}
             className={cl.timeline}

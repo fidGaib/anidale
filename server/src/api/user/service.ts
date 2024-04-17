@@ -4,12 +4,17 @@ import tokenService from "./token-service";
 import Feed from "@/db/models/feed-model";
 import Token from "@/db/models/token-model";
 import User from "@/db/models/user-model";
-import { UpdateUser } from "@/schema/resolvers-types";
 import { compare, hash } from "bcrypt";
 import { createGraphQLError } from "graphql-yoga";
 import { v4 } from "uuid";
 import FileStorageService, { SaveImage } from "../post/file-service";
-import { Response } from "express";
+type UpdateUser = {
+  avatar?: File[]
+  email?: string
+  isActivated?: boolean
+  login?: string
+  pass?: string
+};
 
 class UserService {
   async registration(email: string, pass: string) {
@@ -86,35 +91,33 @@ class UserService {
     });
   }
   async update(id: number, user: UpdateUser) {
+    // Find User
     const candidate = await User.findUnique({ where: { id } });
     if (!candidate) throw createGraphQLError("Пользователь не найден");
+    // Update E-mail
     if (candidate.email !== user.email?.trim() && user.email?.trim()) {
       const email = await User.findUnique({
         where: { email: user.email?.trim() },
       });
       if (email) throw createGraphQLError("E-mail занят");
     }
-    if (user.pass) {
+    // Update Password
+    else if (user.pass) {
       const hashPass = await hash(user.pass + process.env.PASS_PEPPER, 10);
       user.pass = hashPass;
     }
-    let avatar = <SaveImage[]>[]
-    if (user.avatar?.length) {
+    // Update Avatar
+    else if (user.avatar?.length) {
+      let avatar = <SaveImage[]>[]
       const StorageService = new FileStorageService(storagePath)
-      avatar = await Promise.all(user.avatar.map((image) => StorageService.saveImage(image)))
+      avatar = await Promise.all(user.avatar.map((image: File) => StorageService.saveImage(image)))
       const userData = await User.update({
         where: { id },
         data: {avatar: avatar[0].small},
       });
       return userData
-    } else {
-      const userData = await User.update({
-        where: { id },
-        data: user,
-      });
-
-      return userData;
-    }
+    } 
+    else throw createGraphQLError("Произошла не предвиденная ошибка");
   }
   async remove(id: number) {
     const user = await User.findUnique({
@@ -143,38 +146,15 @@ class UserService {
   async logout(refreshToken: string) {
     return await tokenService.removeToken(refreshToken);
   }
-  async refresh(refreshToken?: string, accessToken?: string) {
-    if(accessToken) {
-      if (!refreshToken) throw createGraphQLError("НЕ АВТОРИЗОВАН");
-      const tokenFromDb = await tokenService.findToken(refreshToken);
-      if (!tokenFromDb) throw createGraphQLError("НЕ АВТОРИЗОВАН");
-      const user = tokenService.validateAccessToken(accessToken);
-      return {
-        user
-      };
-    }
-    else {
-      if (!refreshToken) throw createGraphQLError("НЕ АВТОРИЗОВАН");
-      const userData = tokenService.validateRefreshToken(refreshToken);
-      const tokenFromDb = await tokenService.findToken(refreshToken);
-  
-      if (!userData || !tokenFromDb) throw createGraphQLError("НЕ АВТОРИЗОВАН");
-      const user = await User.findUnique({
-        where: { id: userData.id },
-      });
-  
-      if (!user) {
-        throw Error("User not found");
-      }
-  
-      const tokens = await tokenService.generateTokens({ ...user });
-  
-      await tokenService.saveToken(user.id, tokens.refreshToken);
-  
-      return {
-        ...tokens,
-        user,
-      };
+  async refresh(refreshToken: string, accessToken: string) {
+    if(!refreshToken) throw createGraphQLError("Вы не авторизованы")
+    const tokenFromDB = await Token.findMany({ where: { refreshToken } })
+    const userFromDB = await User.findUnique({ where:{ id: tokenFromDB[0].userId } })
+    if(!tokenFromDB || !userFromDB) throw createGraphQLError("Вы не авторизованы")
+    return {
+      id: userFromDB.id,
+      avatar: userFromDB.avatar,
+      login: userFromDB.login
     }
   }
 }

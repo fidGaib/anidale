@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client'
+import { useQuery, useReactiveVar } from '@apollo/client'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Link } from 'react-router-dom'
@@ -10,6 +10,7 @@ import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
 import ButtonUI from '@/shared/ui/button'
 
 import cl from './ui.module.less'
+import { VarAuthData } from '@/app/providers/routes/AppRouter'
 
 export const ArtWork = () => {
   const params = useParams()
@@ -22,6 +23,7 @@ export const ArtWork = () => {
   }
   document.title = `${user.login} - Профиль`
 
+  const AuthData = useReactiveVar(VarAuthData)
   return (
     <div className={cl.wrapper}>
       <div className={cl.artwork}>
@@ -38,12 +40,14 @@ export const ArtWork = () => {
         />
         <div className={cl.nickname}>{user.login || 'not found :('}</div>
       </div>
-      <div className={cl.wrappSubscribe}>
+      {
+        AuthData.id !== id ? <div className={cl.wrappSubscribe}>
         <Link to={'/chat'}>
           <ButtonUI>Написать</ButtonUI>
         </Link>
         <ButtonUI>Подписаться</ButtonUI>
-      </div>
+      </div> : <></>
+      }
       <MeshBlock />
     </div>
   )

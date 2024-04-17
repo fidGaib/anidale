@@ -6,6 +6,8 @@ import Token from '@/db/models/token-model'
 declare module 'jsonwebtoken' {
     export interface UserIDJwtPayload extends jwt.JwtPayload {
         id: number
+        accsessToken: string
+        refreshToken: string
     }
 }
 
@@ -21,10 +23,9 @@ class TokenService {
     this.refreshSecret = process.env.JWT_REFRESH_SECRET
   }
 
-  async generateTokens({avatar, email,id,login}: UserDto) {
-    const dto = {avatar, email,id,login}
-    const accessToken = jwt.sign(dto, this.accessSecret, { expiresIn: '15m' })
-    const refreshToken = jwt.sign(dto, this.refreshSecret, { expiresIn: '14d' })
+  async generateTokens({avatar, id,login}: UserDto) {
+    const accessToken = jwt.sign({avatar, id,login}, this.accessSecret, { expiresIn: '15m' })
+    const refreshToken = jwt.sign({avatar, id,login}, this.refreshSecret, { expiresIn: '14d' })
     return {
       accessToken,
       refreshToken,
@@ -32,7 +33,6 @@ class TokenService {
   }
   async findToken(refreshToken: string) {
       const tokenData = await Token.findMany({ where: { refreshToken }, include: { user: {select:{
-          pass: true,
           id: true,
           avatar: true,
           email: true,

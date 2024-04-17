@@ -37,7 +37,7 @@ export const Posts = () => {
         {posts &&
           posts?.map((post: Post) => (
             <div key={post.id} className={cl.wrapper} id={removeId === post.id ? cl.delShow : ''}>
-              <div className='row align-center'>
+              <div className={cl.owner}>
                 <PostOwner post={post} />
                 <PostDropdownMenu postId={post.id} userId={post.user.id} />
               </div>
