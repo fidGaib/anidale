@@ -17,9 +17,11 @@
     "compose-function": "^3.0.3",
     "graphql": "^16.6.0",
     "react": "^18.2.0",
+    "react-avatar-editor": "^13.0.2",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.43.7",
     "react-router-dom": "^6.9.0",
+    "styled-components": "^6.1.13",
     "swiper": "^9.1.1",
     "use-sound": "^4.0.1",
     "zustand": "^4.3.6"

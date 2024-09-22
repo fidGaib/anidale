@@ -117,6 +117,13 @@ class UserService {
       });
       return userData
     } 
+    else if(user?.login) {
+      const userData = await User.update({
+        where: { id },
+        data: {login: user.login}
+      });
+      return userData
+    }
     else throw createGraphQLError("Произошла не предвиденная ошибка");
   }
   async remove(id: number) {

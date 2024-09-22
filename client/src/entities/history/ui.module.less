@@ -1,56 +1,44 @@
-#history {
+.WrapOnHistorys {
+  position: absolute;
+  margin-left: 22%;
   display: flex;
-  flex-wrap: wrap;
-  width: 66px;
+  flex-direction: column;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
   img {
     width: 60px;
     height: 60px;
     border-radius: 50%;
     cursor: pointer;
-    margin: 3px;
-    transition: all .5s;
-    border: 3px solid var(--accent);
-    &:hover {
-      opacity: .8;
-    }
+    border: 4px solid #a52a2a;
+    margin-bottom: 5px;
   }
-  .add_history {
-    margin-top: 3px;
-    margin-left: -63px;
-    transition: all .5s;
-    border-radius: 50%;
-    &:hover {
-      background: #fff;
-      opacity: .4;
-    }
-    img {
-      border: 0px;
-      scale: .5;
-      margin: 0px;
-      cursor: pointer;
-    }
+  .history_add {
+    width: 60px;
+    height: 60px;
+    margin-top: -65px;
+    padding: 10px;
+    transition: 0.3s;
+    border: 4px solid #a52a2a;
   }
-  p{
-    font-weight: bold;
-    color: var(--accent);
-    font-family: var(--font-text-main);
-    text-align: center;
-    margin: 0 auto;
-    cursor: pointer;
+  .history_add:hover {
+    opacity: 0.5;
+    background: rgba(235, 235, 235);
+  }
+  p {
+    font-family: calibri;
     background: #fff;
-    padding: 1px 15px;
-    border-radius: 8px;
-    // box-shadow: 0px 0px 4px 1px rgb(211, 211, 211);
-    backdrop-filter: blur(10px);
-    background: var(--playground);
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-weight: bold;
+    color: #a52a2a;
+    cursor: pointer;
   }
 }
-.historyProfile {
-    position: absolute;
-    margin-left: 21.3%;
-    margin-top: 10px;
-  }
-.historyFeed {
-  position: absolute;
-  margin-top: 40px;
+.WrapOnHistorys.feed {
+  margin-top: 50px;
+}
+.WrapOnHistorys.profile {
+  margin-top: 20px;
 }

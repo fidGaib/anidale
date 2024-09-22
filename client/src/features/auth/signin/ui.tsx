@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { Link, Navigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 import { SIGNIN } from '@/shared/graphql/schema'
 import { ButtonUI } from '@/shared/ui/button/ui'

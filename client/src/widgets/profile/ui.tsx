@@ -1,21 +1,20 @@
 import { useQuery, useReactiveVar } from '@apollo/client'
-import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 
+import { VarAuthData } from '@/app/providers/routes/AppRouter'
 import { MeshBlock } from '@/features/profile'
 import { PROFILE } from '@/shared/graphql/schema'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
 import ButtonUI from '@/shared/ui/button'
 
+import { ModalWindow } from '../modal_window'
 import cl from './ui.module.less'
-import { VarAuthData } from '@/app/providers/routes/AppRouter'
 
 export const ArtWork = () => {
   const params = useParams()
   const id = parseInt(params.id || '')
-  const [showModal, setModal] = useState(false)
   const { data } = useQuery(PROFILE, { variables: { id }, fetchPolicy: 'cache-and-network' })
   const user = {
     login: data?.getUser?.login,
@@ -24,31 +23,36 @@ export const ArtWork = () => {
   document.title = `${user.login} - Профиль`
 
   const AuthData = useReactiveVar(VarAuthData)
+
+  const avatar = useSrcAvatar(user.avatar || '')
   return (
-    <div className={cl.wrapper}>
-      <div className={cl.artwork}>
-        {showModal && (
-          <div onClick={() => setModal(false)} className={cl.modalImage}>
-            <ImageLoading src={useSrcAvatar(user.avatar || '')} alt='anidale' />
+    <>
+      <div className={cl.wrapper}>
+        <div className='playground'>
+          {/* <ModalWindow avatar={avatar} /> */}
+          <div className={cl.artwork}>
+            <ImageLoading className={cl.avatar} src={avatar} />
+            <ImageLoading id={cl.edit_profile_ico} src='/icons/edit.svg' className={cl.meshIcon} />
+            <div id={cl.loginWrap}>
+              <div className={cl.nickname}>
+                {user.login || 'not found :('}{' '}
+                <ImageLoading id={cl.edit_login_ico} src='/icons/edit.svg' className={cl.meshIcon} />
+              </div>
+            </div>
           </div>
-        )}
-        <ImageLoading
-          onClick={() => setModal(true)}
-          className={cl.avatar}
-          src={useSrcAvatar(user.avatar || '')}
-          alt='anidale'
-        />
-        <div className={cl.nickname}>{user.login || 'not found :('}</div>
+          {AuthData.id !== id ? (
+            <div className={cl.wrappSubscribe}>
+              <Link to={'/chat'}>
+                <ButtonUI>Написать</ButtonUI>
+              </Link>
+              <ButtonUI>Подписаться</ButtonUI>
+            </div>
+          ) : (
+            <></>
+          )}
+          <MeshBlock />
+        </div>
       </div>
-      {
-        AuthData.id !== id ? <div className={cl.wrappSubscribe}>
-        <Link to={'/chat'}>
-          <ButtonUI>Написать</ButtonUI>
-        </Link>
-        <ButtonUI>Подписаться</ButtonUI>
-      </div> : <></>
-      }
-      <MeshBlock />
-    </div>
+    </>
   )
 }

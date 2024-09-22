@@ -1,7 +1,9 @@
 import { create } from 'zustand'
 
-import { UserType } from '@/processes/auth'
-
+type UserType = {
+  id: number
+  login: string
+}
 interface SettingsTypes {
   layout: number
   error: string

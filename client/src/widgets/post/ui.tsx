@@ -37,13 +37,15 @@ export const Posts = () => {
         {posts &&
           posts?.map((post: Post) => (
             <div key={post.id} className={cl.wrapper} id={removeId === post.id ? cl.delShow : ''}>
-              <div className={cl.owner}>
-                <PostOwner post={post} />
-                <PostDropdownMenu postId={post.id} userId={post.user.id} />
+              <div className='playground'>
+                <div className={cl.owner}>
+                  <PostOwner post={post} />
+                  <PostDropdownMenu postId={post.id} userId={post.user.id} />
+                </div>
+                <PostDescription description={post.description} />
+                <PostImages images={post.images} />
+                <PostActionWrapp />
               </div>
-              <PostDescription description={post.description} />
-              <PostImages images={post.images} />
-              <PostActionWrapp />
             </div>
           ))}
       </>

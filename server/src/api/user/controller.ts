@@ -55,31 +55,29 @@ class UserController {
     if (user.email && !user.email.match(emailRegex)) {
       throw createGraphQLError('Некорректный E-mail')
     }
-
     return await UserService.update(id, user)
   }
   async remove(id: number) {
     return await UserService.remove(id)
   }
   async logout({ cookies: { refreshToken } }: Request, res: Response) {
-    
     return await UserService.logout(refreshToken)
   }
-  async refresh (res: Response, refreshToken: string, accessToken: string) {
+  async refresh(res: Response, refreshToken: string, accessToken: string) {
     const data = await UserService.refresh(refreshToken, accessToken)
     return {
-      ...data
+      ...data,
     }
   }
   async setCookie(res: Response, refreshToken?: string, accessToken?: string) {
-      res.cookie('refreshToken', refreshToken, {
-        maxAge: 14 * 24 * 60 * 60 * 1000,
-        httpOnly: true,
-      })
-      res.cookie('accessToken', accessToken, {
-        maxAge: 15 * 60 * 1000,
-        httpOnly: true,
-      })
+    res.cookie('refreshToken', refreshToken, {
+      maxAge: 14 * 24 * 60 * 60 * 1000,
+      httpOnly: true,
+    })
+    res.cookie('accessToken', accessToken, {
+      maxAge: 15 * 60 * 1000,
+      httpOnly: true,
+    })
   }
 }
 export default new UserController()

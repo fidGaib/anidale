@@ -13,8 +13,8 @@ const UserResolvers: Resolvers = {
       const { req, res } = ctx
       return await UserController.logout(req, res)
     },
-    async refresh (_, __, ctx) {
-      const {req, res} = ctx
+    async refresh(_, __, ctx) {
+      const { req, res } = ctx
       return await UserController.refresh(res, req.cookies.refreshToken, req.cookies.accessToken)
     },
   },
