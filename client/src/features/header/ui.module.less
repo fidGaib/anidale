@@ -2,7 +2,7 @@
   position: absolute;
   top: 50px;
   z-index: 9;
-  right: 10%;
+  right: 26%;
   box-shadow: 0px 0px 5px 0.1px rgb(200, 200, 200);
   display: flex;
   flex-direction: column;
@@ -10,7 +10,7 @@
   border-radius: var(--playground-border);
   background: var(--playground);
   display: none;
-
+  margin-top: 10px;
   &:hover {
     display: block;
   }
@@ -41,8 +41,6 @@
 .menuSvg {
   width: 20px;
   height: 20px;
-  transform: scale(0.9);
-  margin-top: -3px;
 }
 
 .focusBtn {
@@ -56,7 +54,6 @@
 .headerMenuSvg {
   width: 25px;
   height: 25px;
-  margin-top: 13px;
   cursor: pointer;
 }
 // notification
@@ -71,47 +68,49 @@
   }
 }
 .notificationSvg {
-  width: 25px;
-  height: 25px;
-  margin-top: 10px;
+  width: 30px;
+  height: 30px;
   cursor: pointer;
 }
 .notificationWrapper {
   position: absolute;
   display: none;
   top: 50px;
-  right: 10%;
+  right: 26%;
   background: var(--playground);
   border-radius: var(--playground-border);
   z-index: 999;
-  padding: 0 10px;
   box-shadow: 0px 0px 5px 0.1px rgb(200, 200, 200);
+  margin-top: 10px;
   &:hover {
     display: block;
   }
-  .item {
-    display: flex;
-    margin: 10px 0;
-    img {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      margin-right: 10px;
-    }
-  }
-}
-.notificationWrapper {
   .body {
+    margin-left: 10px;
     .title {
-      color: var(--color-text-main);
       font-family: var(--font-text-main);
       font-size: var(--size-text-main);
       font-weight: bold;
     }
     .description {
-      color: gray;
       font-family: var(--font-text-main);
       font-size: var(--size-text-main);
+    }
+  }
+  .item {
+    display: flex;
+    margin: 10px 0;
+    cursor: pointer;
+    .itemAvatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 10px;
+      }
     }
   }
 }
@@ -122,7 +121,6 @@
     width: 35px;
     height: 35px;
     border-radius: 50%;
-    margin-top: 10px;
   }
   img {
     width: 35px;

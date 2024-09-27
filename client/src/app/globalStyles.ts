@@ -5,9 +5,11 @@ body {
     background: ${({ theme }) => theme.body};
     color: ${({ theme }) => theme.text};
     font-family: calibri;
-    transition: all 0.50s linear;
 }
 .playground {
     background: ${({ theme }) => theme.playground};
+}
+.input {
+    background: ${({ theme }) => theme.input}
 }
 `

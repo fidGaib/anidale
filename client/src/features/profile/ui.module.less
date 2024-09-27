@@ -4,9 +4,10 @@
   border-radius: var(--playground-border);
   display: flex;
   flex-direction: column;
-  width: 80%;
+  width: 70%;
   margin: 0 auto;
   margin-bottom: 10px;
+  margin-top: 10px;
 }
 .loading {
   opacity: 0.7;
@@ -15,12 +16,12 @@
   width: 100%;
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
 }
 .avatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  margin-top: 5px;
   img {
     width: 40px;
     height: 40px;
@@ -33,32 +34,18 @@ textarea {
   resize: none;
   outline: 0;
   font-size: 14px;
-  width: 70%;
-  height: 45px;
+  width: 85%;
+  height: 40px;
   margin-left: 10px;
   font-size: calibri;
   padding-top: 15px;
-  margin-bottom: 5px;
   max-height: 200px;
   overflow-y: hidden;
 }
-
-@media (max-width: 600px) {
-  textarea {
-    width: 60%;
-  }
-}
-@media (max-width: 400px) {
-  textarea {
-    width: 50%;
-  }
-}
-
 .svg {
   height: 25px;
   width: 25px;
   cursor: pointer;
-  margin-top: 13px;
 }
 .label {
   display: flex;
@@ -66,12 +53,14 @@ textarea {
   padding-right: 10px;
 }
 .error {
-  width: 100%;
-  margin-top: 10px;
+  width: 70%;
   font-size: 14px;
   color: var(--accent);
   font-family: calibri;
-  margin-left: 10px;
+  margin: 0 auto;
+  padding: 10px;
+  font-weight: bold;
+  padding-bottom: 0;
 }
 // meshBlock
 .meshBlock {
@@ -101,31 +90,6 @@ textarea {
     }
   }
 }
-.meshContent {
-  display: flex;
+.wrapArts {
   width: 100%;
-  padding: 10px;
-  padding-top: 0;
-  flex-wrap: wrap;
-  p {
-    width: 100%;
-    text-align: center;
-    font-weight: bold;
-    color: var(--accent);
-    font-family: var(--font-text-main);
-    cursor: pointer;
-    padding: 3px;
-  }
-  div {
-    width: 25%;
-  }
-  img {
-    width: 100%;
-    height: 100px;
-    cursor: pointer;
-    transition: all 0.5s;
-    &:hover {
-      opacity: 0.8;
-    }
-  }
 }

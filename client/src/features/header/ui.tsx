@@ -1,14 +1,16 @@
 import { useReactiveVar } from '@apollo/client'
 import { Link } from 'react-router-dom'
 
+import { useDarkModeStore } from '@/app/module'
 import { VarAuthData } from '@/app/providers/routes/AppRouter'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
 
 import cl from './ui.module.less'
 
-export const MenuHeader = ({ themeToggler }: { themeToggler: any }) => {
+export const MenuHeader = () => {
   const AuthData = useReactiveVar(VarAuthData)
+  const setTheme = useDarkModeStore((store) => store.setTheme)
   return (
     <>
       <button className={cl.focusBtn}>
@@ -48,7 +50,7 @@ export const MenuHeader = ({ themeToggler }: { themeToggler: any }) => {
               </li>
               <li>
                 <ImageLoading className={cl.menuSvg} src='/icons/turn.svg' alt='anidale settings icon' />
-                <Link onClick={themeToggler} to={'#'}>
+                <Link onClick={setTheme} to={'#'}>
                   Темный режим
                 </Link>
               </li>
@@ -67,7 +69,7 @@ export const MenuHeader = ({ themeToggler }: { themeToggler: any }) => {
               </li>
               <li>
                 <ImageLoading className={cl.menuSvg} src='/icons/turn.svg' alt='anidale settings icon' />
-                <Link onClick={themeToggler} to={'#'}>
+                <Link onClick={setTheme} to={'#'}>
                   Темный режим
                 </Link>
               </li>
@@ -105,11 +107,20 @@ export const NotificationHeader = () => {
             />
           </button>
           <div className={cl.notificationWrapper}>
-            <div className={cl.item}>
-              <img src={useSrcAvatar(AuthData.avatar)} alt='' />
-              <div className={cl.body}>
-                <p className={cl.title}>{AuthData.login}</p>
-                <p className={cl.description}>Привет! Как твои дела?)</p>
+            <div className='playground'>
+              <div className={cl.item}>
+                <ImageLoading src={useSrcAvatar(AuthData.avatar)} className={cl.itemAvatar} />
+                <div className={cl.body}>
+                  <p className={cl.title}>{AuthData.login ? AuthData.login : 'Акигава'}</p>
+                  <p className={cl.description}>Привет! Как твои дела?</p>
+                </div>
+              </div>
+              <div className={cl.item}>
+                <ImageLoading src={useSrcAvatar(AuthData.avatar)} className={cl.itemAvatar} />
+                <div className={cl.body}>
+                  <p className={cl.title}>{AuthData.login ? AuthData.login : 'Акигава'}</p>
+                  <p className={cl.description}>Привет! Как твои дела?</p>
+                </div>
               </div>
             </div>
           </div>

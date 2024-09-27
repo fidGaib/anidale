@@ -5,14 +5,14 @@ import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 
 import cl from './ui.module.less'
 
-export const Header = ({ themeToggler }: { themeToggler: any }) => {
+export const Header = () => {
   return (
     <header className={cl.wrapper}>
       <Link to={'/feed'}>
         <ImageLoading className={cl.logo} src='http://localhost:5173/src/assets/images/logo.png' />
       </Link>
       <NotificationHeader />
-      <MenuHeader themeToggler={themeToggler} />
+      <MenuHeader />
     </header>
   )
 }

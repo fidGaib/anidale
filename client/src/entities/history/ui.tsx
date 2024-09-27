@@ -1,6 +1,7 @@
 import { useReactiveVar } from '@apollo/client'
 
 import { VarAuthData } from '@/app/providers/routes/AppRouter'
+import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
 
 import cl from './ui.module.less'
@@ -19,10 +20,12 @@ export const HistoryProfile = () => {
   return (
     <div className={`${cl.WrapOnHistorys} ${cl.profile}`}>
       {image_url.map((image) => {
-        if (image.type === 'svg') return <img src={image.src} className={cl.history_add} />
-        else return <img src={image.src} />
+        if (image.type === 'svg') return <ImageLoading src={image.src} className={cl.history_add} />
+        else return <ImageLoading src={image.src} className={cl.others} />
       })}
-      <p>Ещё</p>
+      <p>
+        <div className='playground'>Ещё</div>
+      </p>
     </div>
   )
 }
@@ -40,10 +43,12 @@ export const HistoryFeed = () => {
   return (
     <div className={`${cl.WrapOnHistorys} ${cl.feed}`}>
       {image_url.map((image) => {
-        if (image.type === 'svg') return <img src={image.src} className={cl.history_add} />
-        else return <img src={image.src} />
+        if (image.type === 'svg') return <ImageLoading src={image.src} className={cl.history_add} />
+        else return <ImageLoading src={image.src} className={cl.others} />
       })}
-      <p>Ещё</p>
+      <p>
+        <div className='playground'>Ещё</div>
+      </p>
     </div>
   )
 }

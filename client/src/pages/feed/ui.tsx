@@ -1,5 +1,5 @@
 import { HistoryFeed } from '@/entities/history'
-import { MeshBlockFeed } from '@/features/profile'
+import { MeshBlockFeed } from '@/features/feed'
 import Content from '@/shared/content'
 
 import cl from './ui.module.less'

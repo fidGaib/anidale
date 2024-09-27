@@ -7,7 +7,7 @@ import cl from '../signup/ui.module.less'
 export const Signin = () => {
   document.title = 'AniDale - Вход'
   return (
-    <Content>
+    <Content id={cl.content}>
       <div className={`playground ${cl.wrapLogin}`}>
         <div className={cl.conteiner} id={cl.preview}>
           <ImageLoading

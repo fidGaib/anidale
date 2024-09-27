@@ -30,7 +30,7 @@ export interface PostStore {
   setRemoveId: (id: number) => void
   changeText: (description: string) => void
   setFiles: (file: FileList | File[]) => void
-  validate: (file: File) => Promise<boolean | void>
+  // validate: (file: File) => Promise<boolean | void>
   removeImage: (image: File) => void
   send: (fn: any, owner: number) => void
   handleHeight: (e: any) => void

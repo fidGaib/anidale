@@ -1,19 +1,22 @@
 #loading {
-  background: rgba(169, 169, 169, 0.538);
+  background: rgba(210, 210, 220);
   animation-name: placeHolder;
   animation-iteration-count: infinite;
-  animation-timing-function: ease;
+  animation-timing-function: linear;
+  animation-direction: inherit;
   animation-duration: 1s;
   border: 0;
   img {
     visibility: hidden;
+    width: 100%;
+    height: 100%;
   }
 }
 @keyframes placeHolder {
-  0% {
-    opacity: 0.3;
-  }
-  100% {
+  from {
     opacity: 1;
+  }
+  to {
+    opacity: 0.5;
   }
 }

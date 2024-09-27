@@ -1,26 +1,27 @@
+import { useQuery, useReactiveVar } from '@apollo/client'
+import { makeVar } from '@apollo/client'
 import { lazy, useEffect } from 'react'
 import { Route, Routes } from 'react-router-dom'
 
 import NotFound from '@/pages/not-found'
+import { REFRESH } from '@/shared/graphql/schema'
 
 import { privateRoutes, publicRoutes } from './routes'
-import { useQuery, useReactiveVar } from '@apollo/client'
-import { REFRESH } from '@/shared/graphql/schema'
-import { makeVar } from '@apollo/client'
+
 const Signin = lazy(() => import('@/pages/auth/signin'))
 const Feed = lazy(() => import('@/pages/feed'))
 
 export const VarAuthData = makeVar({
   id: 0,
   avatar: '',
-  login: ''
+  login: '',
 })
 
 const AppRouter = () => {
-  const {data, loading} = useQuery(REFRESH, {fetchPolicy: 'network-only' })
+  const { data, loading } = useQuery(REFRESH, { fetchPolicy: 'network-only' })
   const AuthData = useReactiveVar(VarAuthData)
   useEffect(() => {
-    if(data && data.refresh) {
+    if (data && data.refresh) {
       VarAuthData(data.refresh)
     }
   }, [data, loading])
