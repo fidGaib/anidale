@@ -1,4 +1,3 @@
-import Music from '@/pages/music'
 import { lazy } from 'react'
 
 const Feed = lazy(() => import('@/pages/feed'))
@@ -8,6 +7,9 @@ const Signin = lazy(() => import('@/pages/auth/signin/'))
 const Signout = lazy(() => import('@/pages/auth/signout'))
 const Registration = lazy(() => import('@/pages/auth/signup/'))
 const Settings = lazy(() => import('@/pages/settings'))
+const Music = lazy(() => import('@/pages/music'))
+const Anime = lazy(() => import('@/pages/anime'))
+const Watch = lazy(() => import('@/pages/watch'))
 
 // private routes
 export const privateRoutes = [
@@ -17,6 +19,8 @@ export const privateRoutes = [
   { path: '/friends', element: Friends },
   { path: '/settings', element: Settings },
   { path: '/music', element: Music },
+  { path: '/anime', element: Anime },
+  { path: '/watch', element: Watch },
 ]
 // public routes
 export const publicRoutes = [

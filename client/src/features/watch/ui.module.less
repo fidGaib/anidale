@@ -1,0 +1,135 @@
+.commentaries {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+.commentaries .send__comm {
+  display: flex;
+  margin-bottom: 20px;
+  align-items: center;
+}
+.commentaries .send__comm input {
+  width: 100%;
+  background: rgb(30, 30, 30);
+  margin: 0;
+  font-weight: bold;
+  font-size: 18px;
+  margin-right: 10px;
+}
+.commentaries .send__comm img {
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
+.comm__item {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  background: rgb(30, 30, 30);
+  margin-bottom: 10px;
+}
+.comm__item .avtor {
+  display: flex;
+  align-items: center;
+}
+.comm__item .avtor .login {
+  font-weight: bold;
+  font-size: 24px;
+  margin-left: 20px;
+}
+.comm__item .avtor img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+// video player
+
+.video__controls {
+  position: absolute;
+  left: 0;
+  bottom: 0px;
+  right: 0;
+  background: rgba(35, 35, 35, 0.582);
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+.video__controls_play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 40px;
+  width: 40px;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.video__controls_volume {
+  width: 10%;
+}
+.video__controls_track {
+  width: 90%;
+  margin-left: 20px;
+}
+/*********** Baseline, reset styles ***********/
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+/* Removes default focus */
+input[type='range']:focus {
+  outline: none;
+}
+
+/******** Chrome, Safari, Opera and Edge Chromium styles ********/
+/* slider track */
+input[type='range']::-webkit-slider-runnable-track {
+  background-color: rgb(235, 235, 235);
+  border-radius: 5px;
+  height: 10px;
+}
+
+/* slider thumb */
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default look */
+  appearance: none;
+  margin-top: -2.5px; /* Centers thumb on the track */
+  background-color: brown;
+  border-radius: 10px;
+  height: 15px;
+  width: 15px;
+}
+
+input[type='range']:focus::-webkit-slider-thumb {
+  outline: 3px solid brown;
+  outline-offset: 0.125rem;
+}
+
+/*********** Firefox styles ***********/
+/* slider track */
+input[type='range']::-moz-range-track {
+  background-color: rgb(235, 235, 235);
+  border-radius: 5px;
+  height: 10px;
+}
+
+/* slider thumb */
+input[type='range']::-moz-range-thumb {
+  background-color: rgb(235, 235, 235);
+  border: none; /*Removes extra border that FF applies*/
+  border-radius: 10px;
+  height: 15px;
+  width: 15px;
+}
+
+input[type='range']:focus::-moz-range-thumb {
+  outline: 3px solid rgb(235, 235, 235);
+  outline-offset: 0.125rem;
+}

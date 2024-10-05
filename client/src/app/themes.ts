@@ -7,7 +7,7 @@ export const lightTheme = {
 
 export const darkTheme = {
   body: 'rgb(10,10,10)',
-  text: 'gray',
+  text: 'rgb(100,100,100)',
   playground: 'rgb(30, 30, 30)',
   input: 'rgb(10, 10, 10)',
 }

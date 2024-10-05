@@ -8,6 +8,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 // Import Swiper styles
 import 'swiper/swiper.min.css'
 
+import { useDarkModeStore } from '@/app/module'
 import { Post } from '@/shared/graphql/gql/graphql'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
@@ -15,8 +16,13 @@ import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
 import cl from './ui.module.less'
 
 export const PostOwner = ({ post }: { post: Post }) => {
+  const theme = useDarkModeStore((store) => store.theme)
   return (
-    <Link to={`/profile/${post?.user?.id}`} className={cl.wrappOwner}>
+    <Link
+      to={`/profile/${post?.user?.id}`}
+      className={cl.wrappOwner}
+      style={{ color: `${theme === 'dark' ? 'gray' : '#000'}` }}
+    >
       <ImageLoading src={useSrcAvatar(post?.user?.avatar || '')} alt='anidale' />
       {post?.user?.login}
     </Link>

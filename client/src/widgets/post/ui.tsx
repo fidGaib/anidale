@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { PostActionWrapp, PostDescription, PostImages, PostOwner } from '@/entities/post'
@@ -14,11 +14,11 @@ import cl from './ui.module.less'
 export const Posts = () => {
   const params = useParams()
   const id = parseInt(params.id || '')
-  const limit = 10
-  const page = 0
+  const [limit, setLimit] = useState(1)
+  const [page, setPage] = useState(0)
   const { data, loading } = useQuery<any>(id ? POST_BY_USER : POSTS, {
     variables: id ? { id, limit, page } : { limit, page },
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'network-only',
   })
   const posts = usePostStore((state) => state.posts)
   const addPosts = usePostStore((state) => state.addPost)
@@ -34,18 +34,16 @@ export const Posts = () => {
   else
     return (
       <>
-        {posts &&
+        {posts.length !== 0 &&
           posts?.map((post: Post) => (
-            <div key={post.id} className={cl.wrapper} id={removeId === post.id ? cl.delShow : ''}>
-              <div className='playground'>
-                <div className={cl.owner}>
-                  <PostOwner post={post} />
-                  <PostDropdownMenu postId={post.id} userId={post.user.id} />
-                </div>
-                <PostDescription description={post.description} />
-                <PostImages images={post.images} />
-                <PostActionWrapp />
+            <div key={post.id} className={`playground ${cl.wrapper}`} id={removeId === post.id ? cl.delShow : ''}>
+              <div className={cl.owner}>
+                <PostOwner post={post} />
+                <PostDropdownMenu postId={post.id} userId={post.user.id} />
               </div>
+              <PostDescription description={post.description} />
+              <PostImages images={post.images} />
+              <PostActionWrapp />
             </div>
           ))}
       </>

@@ -12,7 +12,7 @@ const ImageLoading = (props: any) => {
 
   const isVisible = useOnScreen(imgRef)
   return (
-    <div ref={imgRef} id={loading ? cl.loading : ''} {...props}>
+    <div ref={imgRef} id={loading ? cl.loading : cl.div} {...props}>
       {isVisible || !loading ? <img src={props.src} onLoad={onLoad} alt={'anidale'} /> : <img src={''} />}
     </div>
   )
