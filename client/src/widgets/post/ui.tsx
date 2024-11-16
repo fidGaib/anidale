@@ -25,11 +25,29 @@ export const Posts = () => {
   const removeId = usePostStore((state) => state.removeId)
   const clearPosts = usePostStore((state) => state.clearPosts)
 
+  const [fetching, setFetching] = useState(true)
   useEffect(() => {
     if (!data) return
     addPosts(id ? data.getPostsByUser : data.getPosts)
     return () => clearPosts()
   }, [data])
+  useEffect(() => {
+    if(fetching) {
+      setLimit(limit + 10)
+      setFetching(false)
+    }
+  },[fetching])
+  useEffect(() => {
+    document.addEventListener('scroll', scrollHandler)
+    return function () {
+      document.addEventListener('scroll', scrollHandler)
+    }
+  }, [])
+  const scrollHandler = (e: any) => {
+    if(e.target.documentElement.scrollHeight - (e.target.documentElement.scrollTop + window.innerHeight) < 100) {
+      setFetching(true)
+    }
+  }
   if (loading) return <Plug />
   else
     return (
@@ -41,8 +59,8 @@ export const Posts = () => {
                 <PostOwner post={post} />
                 <PostDropdownMenu postId={post.id} userId={post.user.id} />
               </div>
-              <PostDescription description={post.description} />
               <PostImages images={post.images} />
+              <PostDescription description={post.description} />
               <PostActionWrapp />
             </div>
           ))}

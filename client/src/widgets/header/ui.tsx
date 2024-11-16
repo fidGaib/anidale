@@ -11,9 +11,9 @@ export const Header = () => {
   return (
     <header className={cl.wrapper}>
       <Link to={'/feed'}>
-        <ImageLoading
+      <ImageLoading
           className={cl.logo}
-          src={darkMode === 'dark' ? '/logo.png' : 'http://localhost:5173/src/assets/images/logo.png'}
+          src={darkMode === 'dark' ? 'http://localhost:5173/src/assets/images/dark_logo.png' : 'http://localhost:5173/src/assets/images/ligth_logo.png'}
         />
       </Link>
       <NotificationHeader />
