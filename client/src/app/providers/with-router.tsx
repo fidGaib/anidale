@@ -20,7 +20,7 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
   link,
 })
-export const withRouter = (component: () => React.ReactNode) =>
+export const withRouter = (Component: () => React.ReactElement) =>
   function WithRouter() {
     const theme = useDarkModeStore((store) => store.theme)
     return (
@@ -29,7 +29,9 @@ export const withRouter = (component: () => React.ReactNode) =>
           <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
             <GlobalStyles />
             <Header />
-            <Suspense fallback={<Loader />}>{component()}</Suspense>
+            <Suspense fallback={<Loader />}>
+              <Component />
+            </Suspense>
           </ThemeProvider>
         </BrowserRouter>
       </ApolloProvider>
