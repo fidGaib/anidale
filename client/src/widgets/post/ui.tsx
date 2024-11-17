@@ -11,9 +11,9 @@ import cl from './ui.module.less'
 
 export const Posts = () => {
   const id = parseInt(useParams().id || '')
-  const [setRefetch, posts, addPost, removeId, clearPosts] = usePostStore((state) => [
-    state.setRefetch,
-    state.posts,
+  const [feedPosts, profilePosts, addPost, removeId, clearPosts] = usePostStore((state) => [
+    state.feedPosts,
+    state.profilePosts,
     state.addPost,
     state.removeId,
     state.clearPosts,
@@ -24,9 +24,17 @@ export const Posts = () => {
   }, [])
   return (
     <>
-      {posts.length !== 0 &&
-        posts?.map((post: Post) => (
-          <div key={post.id} className={`playground ${cl.wrapper}`} id={removeId === post.id ? cl.delShow : ''}>
+      {id ? <ProfilePosts profilePosts={profilePosts} /> : <FeedPosts feedPosts={feedPosts} />}
+      <RefetchPosts />
+    </>
+  )
+}
+const ProfilePosts = ({ profilePosts }: any) => {
+  return (
+    <>
+      {profilePosts.length !== 0 &&
+        profilePosts?.map((post: Post) => (
+          <div key={post.id} className={`playground ${cl.wrapper}`}>
             <div className={cl.owner}>
               <PostOwner post={post} />
               <PostDropdownMenu postId={post.id} userId={post.user.id} />
@@ -36,11 +44,27 @@ export const Posts = () => {
             <PostActionWrapp />
           </div>
         ))}
-      <RefetchPosts />
     </>
   )
 }
-
+const FeedPosts = ({ feedPosts }: any) => {
+  return (
+    <>
+      {feedPosts.length !== 0 &&
+        feedPosts?.map((post: Post) => (
+          <div key={post.id} className={`playground ${cl.wrapper}`}>
+            <div className={cl.owner}>
+              <PostOwner post={post} />
+              <PostDropdownMenu postId={post.id} userId={post.user.id} />
+            </div>
+            <PostImages images={post.images} />
+            <PostDescription description={post.description} />
+            <PostActionWrapp />
+          </div>
+        ))}
+    </>
+  )
+}
 const RefetchPosts = () => {
   const id = parseInt(useParams().id || '')
   const { ref, inView } = useInView({ threshold: 0.1 })

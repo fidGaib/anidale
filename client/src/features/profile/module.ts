@@ -8,14 +8,19 @@ import { PostStore } from './types'
 export const usePostStore = create<PostStore>()((set, get) => ({
   refetch: false,
   limit: 5,
-  page: 0,
-  posts: [],
+  feedPage: 0,
+  profilePage: 0,
+  feedPosts: [],
+  profilePosts: [],
   removeId: 0,
   description: '',
   images: [],
   error_create: '',
-  setPage(page) {
-    set((state) => ({ page: page }))
+  setFeedPage(page) {
+    set((state) => ({ feedPage: page }))
+  },
+  setProfilePage(page) {
+    set((state) => ({ profilePage: page }))
   },
   setError(message) {
     set(() => ({ error_create: message }))
@@ -25,41 +30,52 @@ export const usePostStore = create<PostStore>()((set, get) => ({
     set(() => ({ description }))
   },
   addPost: (id) => {
-    let typeRequest = { POST_BY_USER, POSTS },
-      request
-    if (id) request = typeRequest.POST_BY_USER
-    else request = typeRequest.POSTS
-    client
-      .query({
-        query: request,
-        variables: { id, limit: get().limit, page: get().page },
-        fetchPolicy: 'network-only',
-      })
-      .then((res) => {
-        if (id) {
+    if (id) {
+      client
+        .query({
+          query: POST_BY_USER,
+          variables: { id, limit: get().limit, page: get().profilePage },
+          fetchPolicy: 'network-only',
+        })
+        .then((res) => {
           // @ts-ignore
-          set((state) => ({ posts: [...state.posts, ...res.data.getPostsByUser] }))
-          get().setPage(get().posts.length)
-        } else {
+          set((state) => ({ profilePosts: [...state.profilePosts, ...res.data.getPostsByUser] }))
+          get().setProfilePage(get().profilePosts.length)
+        })
+        .catch((e) => console.log(e))
+    } else {
+      client
+        .query({
+          query: POSTS,
+          variables: { id, limit: get().limit, page: get().feedPage },
+          fetchPolicy: 'network-only',
+        })
+        .then((res) => {
           // @ts-ignore
-          set((state) => ({ posts: [...state.posts, ...res.data.getPosts] }))
-          get().setPage(get().posts.length)
-        }
-        console.log(get().page)
-      })
-      .catch((e) => console.log(e))
+          set((state) => ({ feedPosts: [...state.feedPosts, ...res.data.getPosts] }))
+          get().setFeedPage(get().feedPosts.length)
+        })
+        .catch((e) => console.log(e))
+    }
   },
   setRefetch: (flag) => {
     set(() => ({ refetch: flag }))
   },
-  removePost: (id) =>
+  removePost: (id) => {
     set((state) => ({
-      posts: state.posts.filter((post) => post.id !== id),
-    })),
+      profilePosts: state.profilePosts.filter((post) => post.id !== id),
+    }))
+    set((state) => ({
+      feedPosts: state.feedPosts.filter((post) => post.id !== id),
+    }))
+  },
   setRemoveId: (id) => set(() => ({ removeId: id })),
   clearPosts: () =>
     set(() => ({
-      posts: [],
+      feedPosts: [],
+      profilePosts: [],
+      feedPage: 0,
+      profilePage: 0,
       removeId: 0,
     })),
   setFiles(fileList) {

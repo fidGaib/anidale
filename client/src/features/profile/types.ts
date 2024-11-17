@@ -20,13 +20,16 @@ export interface Post {
 export interface PostStore {
   refetch: boolean
   limit: number
-  page: number
-  posts: Post[]
+  feedPage: number
+  profilePage: number
+  feedPosts: Post[]
+  profilePosts: Post[]
   removeId: number
   description: string
   images: File[] | []
   error_create: string
-  setPage: (col: number) => void
+  setFeedPage: (col: number) => void
+  setProfilePage: (col: number) => void
   setError: (message: string) => void
   addPost: (id: number) => void
   setRefetch: (flag: boolean) => void
