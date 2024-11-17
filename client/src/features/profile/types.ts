@@ -18,13 +18,18 @@ export interface Post {
   images: PostImages[]
 }
 export interface PostStore {
+  refetch: boolean
+  limit: number
+  page: number
   posts: Post[]
   removeId: number
   description: string
   images: File[] | []
-  error: string
+  error_create: string
+  setPage: (col: number) => void
   setError: (message: string) => void
-  addPost: (post: Post[]) => void
+  addPost: (id: number) => void
+  setRefetch: (flag: boolean) => void
   removePost: (id: number) => void
   clearPosts: () => void
   setRemoveId: (id: number) => void

@@ -20,12 +20,12 @@ export const HistoryProfile = () => {
   return (
     <div className={`${cl.WrapOnHistorys} ${cl.profile}`}>
       {image_url.map((image) => {
-        if (image.type === 'svg') return <ImageLoading src={image.src} className={cl.history_add} />
-        else return <ImageLoading src={image.src} className={cl.others} />
+        if (image.type === 'svg') return <ImageLoading key={image.src} src={image.src} className={cl.history_add} />
+        else return <ImageLoading key={image.src} src={image.src} className={cl.others} />
       })}
-      <p>
-        <div className='playground'>Ещё</div>
-      </p>
+      <div>
+        <p className='playground'>Ещё</p>
+      </div>
     </div>
   )
 }
@@ -43,12 +43,12 @@ export const HistoryFeed = () => {
   return (
     <div className={`${cl.WrapOnHistorys} ${cl.feed}`}>
       {image_url.map((image) => {
-        if (image.type === 'svg') return <ImageLoading src={image.src} className={cl.history_add} />
-        else return <ImageLoading src={image.src} className={cl.others} />
+        if (image.type === 'svg') return <ImageLoading key={image.src} src={image.src} className={cl.history_add} />
+        else return <ImageLoading key={image.src} src={image.src} className={cl.others} />
       })}
-      <p>
-        <div className='playground'>Ещё</div>
-      </p>
+      <div>
+        <p className='playground'>Ещё</p>
+      </div>
     </div>
   )
 }

@@ -28,6 +28,7 @@ export const MakePostImages: React.FC<Props> = ({ className, images, removeImage
       {images.map((image) => (
         <div key={image.size} className={cl.imagePreviewWrapper}>
           <ImageLoading
+            key={image.name}
             className={cl.imagePreviewClose}
             src={'/icons/close.svg'}
             onClick={() => removeImage(image)}
@@ -65,7 +66,7 @@ export const ProfileArts = () => {
       >
         {arts.map((art) => {
           return (
-            <SwiperSlide id={cl.childSwiper}>
+            <SwiperSlide key={art.src} id={cl.childSwiper}>
               <ImageLoading className={cl.item} src={art.src} />
             </SwiperSlide>
           )

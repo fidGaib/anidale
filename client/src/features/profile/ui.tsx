@@ -12,16 +12,21 @@ import { usePostStore } from '@/shared/store'
 import cl from './ui.module.less'
 
 export const MakePost = () => {
-  const params = useParams()
-  const id = parseInt(params.id || '')
-  const error_create = usePostStore((state) => state.error)
-  const description = usePostStore((state) => state.description)
-  const images = usePostStore((state) => state.images)
-  const removeImage = usePostStore((state) => state.removeImage)
-  const handleKeydown = usePostStore((state) => state.handleKeydown)
-  const handleHeight = usePostStore((state) => state.handleHeight)
-  const setFiles = usePostStore((state) => state.setFiles)
-  const send = usePostStore((state) => state.send)
+  const id = parseInt(useParams().id || '')
+
+  const [error_create, description, images, removeImage, handleHeight, handleKeydown, setFiles, send] = usePostStore(
+    (state) => [
+      state.error_create,
+      state.description,
+      state.images,
+      state.removeImage,
+      state.handleHeight,
+      state.handleKeydown,
+      state.setFiles,
+      state.send,
+    ],
+  )
+
   const AuthData = useReactiveVar(VarAuthData)
   const [createPost, { error, loading }] = useMutation(CREATE_POST)
   if (id !== AuthData.id) return <></>
@@ -64,7 +69,7 @@ export const MeshBlockProfile = () => {
       <div className={cl.meshBlock}>
         {meshBlock.map((mesh) => {
           return (
-            <div className={cl.mesh} onClick={() => isLayout(mesh.layout)}>
+            <div key={mesh.icon} className={cl.mesh} onClick={() => isLayout(mesh.layout)}>
               <ImageLoading src={mesh.icon} className={cl.meshIcon} />
               <p>{mesh.text}</p>
             </div>

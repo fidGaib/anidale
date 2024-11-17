@@ -20,7 +20,7 @@ export const MeshBlockFeed = () => {
       <div className={cl.meshBlock}>
         {meshBlock.map((mesh) => {
           return (
-            <div className={cl.mesh} onClick={() => isLayout(mesh.layout)}>
+            <div key={mesh.icon} className={cl.mesh} onClick={() => isLayout(mesh.layout)}>
               <ImageLoading src={mesh.icon} className={cl.meshIcon} />
               <p>{mesh.text}</p>
             </div>
