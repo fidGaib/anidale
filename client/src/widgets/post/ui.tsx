@@ -68,16 +68,21 @@ const FeedPosts = ({ feedPosts }: any) => {
 }
 const RefetchPosts = () => {
   const id = parseInt(useParams().id || '')
-  const { ref, inView } = useInView({ threshold: 0.1 })
-  const [fetchPostsFeed, fetchPostsProfile, clearPosts] = usePostStore((state) => [
+  const { ref, inView } = useInView({ threshold: 0 })
+  const [feedPosts, profilePosts, fetchPostsFeed, fetchPostsProfile, clearPosts] = usePostStore((state) => [
+    state.feedPosts,
+    state.profilePosts,
     state.fetchPostsFeed,
     state.fetchPostsProfile,
     state.clearPosts,
   ])
   useEffect(() => {
     if (inView) {
-      if (id) fetchPostsProfile(id)
-      else fetchPostsFeed()
+      if (id && profilePosts.length > 0) {
+        fetchPostsProfile(id)
+      } else {
+        if (feedPosts.length > 0) fetchPostsFeed()
+      }
     }
   }, [inView])
   return (
