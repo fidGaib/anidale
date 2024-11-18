@@ -30,8 +30,8 @@ export const usePostStore = create<PostStore>()((set, get) => ({
     set(() => ({ description }))
   },
   fetchPostsFeed: () => {
-    if (!get().refetch && get().feedPosts.length) return
-    get().setRefetch(false)
+    if (get().refetch) return
+    set({ refetch: true })
     client
       .query({
         query: POSTS,
@@ -43,12 +43,12 @@ export const usePostStore = create<PostStore>()((set, get) => ({
         set((state) => ({ feedPosts: [...state.feedPosts, ...res.data.getPosts] }))
         get().setFeedPage(get().feedPosts.length)
       })
-      .finally(() => get().setRefetch(true))
       .catch((e) => console.log(e))
+      .finally(() => set({ refetch: false }))
   },
   fetchPostsProfile: (id) => {
-    if (!get().refetch && get().feedPosts.length) return
-    get().setRefetch(false)
+    if (get().refetch) return
+    set({ refetch: true })
     client
       .query({
         query: POST_BY_USER,
@@ -60,8 +60,8 @@ export const usePostStore = create<PostStore>()((set, get) => ({
         set((state) => ({ profilePosts: [...state.profilePosts, ...res.data.getPostsByUser] }))
         get().setProfilePage(get().profilePosts.length)
       })
-      .finally(() => get().setRefetch(true))
       .catch((e) => console.log(e))
+      .finally(() => set({ refetch: false }))
   },
   setRefetch: (flag) => {
     set(() => ({ refetch: flag }))
