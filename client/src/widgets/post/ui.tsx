@@ -11,15 +11,16 @@ import cl from './ui.module.less'
 
 export const Posts = () => {
   const id = parseInt(useParams().id || '')
-  const [feedPosts, profilePosts, addPost, removeId, clearPosts] = usePostStore((state) => [
+  const [feedPosts, profilePosts, fetchPostsFeed, fetchPostsProfile, clearPosts] = usePostStore((state) => [
     state.feedPosts,
     state.profilePosts,
-    state.addPost,
-    state.removeId,
+    state.fetchPostsFeed,
+    state.fetchPostsProfile,
     state.clearPosts,
   ])
   useEffect(() => {
-    addPost(id)
+    if (id) fetchPostsProfile(id)
+    else fetchPostsFeed()
     return () => clearPosts()
   }, [])
   return (
@@ -68,9 +69,16 @@ const FeedPosts = ({ feedPosts }: any) => {
 const RefetchPosts = () => {
   const id = parseInt(useParams().id || '')
   const { ref, inView } = useInView({ threshold: 0.1 })
-  const [addPost, clearPosts] = usePostStore((state) => [state.addPost, state.clearPosts])
+  const [fetchPostsFeed, fetchPostsProfile, clearPosts] = usePostStore((state) => [
+    state.fetchPostsFeed,
+    state.fetchPostsProfile,
+    state.clearPosts,
+  ])
   useEffect(() => {
-    if (inView) addPost(id)
+    if (inView) {
+      if (id) fetchPostsProfile(id)
+      else fetchPostsFeed()
+    }
   }, [inView])
   return (
     <div ref={ref} className='refech' style={{ textAlign: 'center', padding: 10 }}>

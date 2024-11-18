@@ -31,7 +31,8 @@ export interface PostStore {
   setFeedPage: (col: number) => void
   setProfilePage: (col: number) => void
   setError: (message: string) => void
-  addPost: (id: number) => void
+  fetchPostsFeed: () => void
+  fetchPostsProfile: (id: number) => void
   setRefetch: (flag: boolean) => void
   removePost: (id: number) => void
   clearPosts: () => void

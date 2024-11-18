@@ -29,34 +29,37 @@ export const usePostStore = create<PostStore>()((set, get) => ({
     if (description.length > 255) return
     set(() => ({ description }))
   },
-  addPost: (id) => {
-    if (id) {
-      client
-        .query({
-          query: POST_BY_USER,
-          variables: { id, limit: get().limit, page: get().profilePage },
-          fetchPolicy: 'network-only',
-        })
-        .then((res) => {
-          // @ts-ignore
-          set((state) => ({ profilePosts: [...state.profilePosts, ...res.data.getPostsByUser] }))
-          get().setProfilePage(get().profilePosts.length)
-        })
-        .catch((e) => console.log(e))
-    } else {
-      client
-        .query({
-          query: POSTS,
-          variables: { id, limit: get().limit, page: get().feedPage },
-          fetchPolicy: 'network-only',
-        })
-        .then((res) => {
-          // @ts-ignore
-          set((state) => ({ feedPosts: [...state.feedPosts, ...res.data.getPosts] }))
-          get().setFeedPage(get().feedPosts.length)
-        })
-        .catch((e) => console.log(e))
-    }
+  fetchPostsFeed: () => {
+    if (!get().refetch && get().feedPosts.length) return
+    client
+      .query({
+        query: POSTS,
+        variables: { limit: get().limit, page: get().feedPage },
+        fetchPolicy: 'network-only',
+      })
+      .then((res) => {
+        // @ts-ignore
+        set((state) => ({ feedPosts: [...state.feedPosts, ...res.data.getPosts] }))
+        get().setFeedPage(get().feedPosts.length)
+      })
+      .finally(() => get().setRefetch(true))
+      .catch((e) => console.log(e))
+  },
+  fetchPostsProfile: (id) => {
+    if (!get().refetch && get().feedPosts.length) return
+    client
+      .query({
+        query: POST_BY_USER,
+        variables: { id, limit: get().limit, page: get().profilePage },
+        fetchPolicy: 'network-only',
+      })
+      .then((res) => {
+        // @ts-ignore
+        set((state) => ({ profilePosts: [...state.profilePosts, ...res.data.getPostsByUser] }))
+        get().setProfilePage(get().profilePosts.length)
+      })
+      .finally(() => get().setRefetch(true))
+      .catch((e) => console.log(e))
   },
   setRefetch: (flag) => {
     set(() => ({ refetch: flag }))
