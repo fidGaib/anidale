@@ -36,7 +36,7 @@ export const usePostStore = create<PostStore>()((set, get) => ({
       .query({
         query: POSTS,
         variables: { limit: get().limit, page: get().feedPage },
-        fetchPolicy: 'network-only',
+        fetchPolicy: 'cache-first',
       })
       .then((res) => {
         // @ts-ignore
@@ -53,7 +53,7 @@ export const usePostStore = create<PostStore>()((set, get) => ({
       .query({
         query: POST_BY_USER,
         variables: { id, limit: get().limit, page: get().profilePage },
-        fetchPolicy: 'network-only',
+        fetchPolicy: 'cache-first',
       })
       .then((res) => {
         // @ts-ignore

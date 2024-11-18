@@ -22,7 +22,12 @@ type Post {
   description: String
   images: [PostImages]
   date: Date
-  user: User
+  user: Owner
+}
+type Owner {
+  id: Int
+  avatar: String
+  login: String
 }
 type PostImages {
   id: Int

@@ -1,8 +1,8 @@
-import { useMutation, useReactiveVar } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import { useState } from 'react'
 import AvatarEditor from 'react-avatar-editor'
 
-import { VarAuthData } from '@/app/providers/routes/AppRouter'
+import { useRefreshStore } from '@/app/providers/routes/model'
 import { useSettingsStore } from '@/features/settings/module'
 import { UPDATE_USER } from '@/shared/graphql/schema'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
@@ -29,7 +29,7 @@ const Editor = ({ src }: typesEditor) => {
   )
 }
 export const EditLogin = () => {
-  const AuthData = useReactiveVar(VarAuthData)
+  const [refreshData, setRefreshData] = useRefreshStore((state) => [state.refreshData, state.setRefreshData])
   const setLogin = useSettingsStore((state) => state.setLogin)
   const sendLogin = useSettingsStore((state) => state.sendLogin)
   const [UPDATE, { data, error, loading }] = useMutation(UPDATE_USER)
@@ -40,17 +40,17 @@ export const EditLogin = () => {
       <Input
         type='text'
         placeholder='Никнейм...'
-        defaultValue={AuthData.login}
+        defaultValue={refreshData.login}
         onChange={(e) => setLogin(e.target.value)}
         required
       />
       <h2 className={cl.save}>
         <ButtonUI
-          onClick={() => {
-            sendLogin(UPDATE, AuthData).finally(() => {
-              if (data?.update) VarAuthData(data.update)
-            })
-          }}
+        onClick={() => {
+          sendLogin(UPDATE, refreshData).finally(() => {
+            if (data?.update) setRefreshData(data.update)
+          })
+        }}
         >
           Сохранить
         </ButtonUI>
@@ -59,7 +59,7 @@ export const EditLogin = () => {
   )
 }
 export const EditAvatar = () => {
-  const { avatar, id } = useReactiveVar(VarAuthData)
+  const [refreshData] = useRefreshStore((state) => [state.refreshData])
   const [UPDATE, { data, error, loading }] = useMutation(UPDATE_USER)
   const send = useSettingsStore((state) => state.send)
   const setFiles = useSettingsStore((state) => state.setFiles)
@@ -72,7 +72,7 @@ export const EditAvatar = () => {
         </ButtonUI>
       </label> */}
       {/* <ImageLoading className={cl.avatar} src={image.length ? URL.createObjectURL(image[0]) : useSrcAvatar(avatar)} /> */}
-      <Editor src={image.length ? URL.createObjectURL(image[0]) : useSrcAvatar(avatar)} />
+      <Editor src={image.length ? URL.createObjectURL(image[0]) : useSrcAvatar(refreshData.avatar)} />
       <h2 className={cl.save}>
         <p className={cl.error}>{error?.message || loading ? 'Сохранение...' : ''}</p>
         {/*  */}
@@ -83,7 +83,7 @@ export const EditAvatar = () => {
         {/*  */}
         <ButtonUI
           onClick={() => {
-            send(UPDATE, id)
+            send(UPDATE, refreshData.id)
           }}
         >
           Сохранить
@@ -104,13 +104,13 @@ export const EditLoginAvatar = () => {
 }
 // EMAIL && PASSWORD
 export const EditPassEmail = () => {
-  const AuthData = useReactiveVar(VarAuthData)
+  const [refreshData, setRefreshData] = useRefreshStore((state) => [state.refreshData, state.setRefreshData])
   const [newEmail, setNewEmail] = useState('')
   const [NEWEMAIL, { data, error, loading }] = useMutation(UPDATE_USER)
   const sendNewEmail = async () => {
     if ('' === newEmail) return
-    await NEWEMAIL({ variables: { id: AuthData.id, email: newEmail }, fetchPolicy: 'network-only' })
-    if (data?.update) VarAuthData(data.update)
+    await NEWEMAIL({ variables: { id: refreshData.id, email: newEmail }, fetchPolicy: 'network-only' })
+    if (data?.update) setRefreshData(data.update)
   }
   return (
     <div className={cl.wrapper}>
@@ -137,11 +137,11 @@ export const EditPassEmail = () => {
   )
 }
 export const CustomizeSettings = () => {
-  const AuthData = useReactiveVar(VarAuthData)
+  const [refreshData] = useRefreshStore((state) => [state.refreshData])
   return (
     <div className={cl.wrapper}>
       <h2>Задний фон</h2>
-      <ImageLoading className={cl.backround} src={useSrcAvatar(AuthData.avatar)} />
+      <ImageLoading className={cl.backround} src={useSrcAvatar(refreshData.avatar)} />
       <h2>Цвет виджетов</h2>
       <input type='color' />
       <h2>Закругление виджетов</h2>

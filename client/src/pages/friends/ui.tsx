@@ -1,6 +1,4 @@
-import { useReactiveVar } from '@apollo/client'
-
-import { VarAuthData } from '@/app/providers/routes/AppRouter'
+import { useRefreshStore } from '@/app/providers/routes/model'
 import CardUser from '@/entities/friends/ui'
 import Content from '@/shared/content'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
@@ -9,8 +7,8 @@ import Input from '@/shared/ui/input'
 import cl from './ui.module.less'
 
 export const Friends = () => {
-  const { login } = useReactiveVar(VarAuthData)
-  document.title = `${login} - Друзья`
+  const [refreshData] = useRefreshStore((state) => [state.refreshData])
+  document.title = `${refreshData.login} - Друзья`
   return (
     <Content id={cl.content}>
       <div className={cl.meshBlock}>

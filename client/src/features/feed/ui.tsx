@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { lazy, useState } from 'react'
 
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
-import { Posts } from '@/widgets/post'
 
 import cl from './ui.module.less'
+
+import Posts from '@/widgets/post'
 
 export const MeshBlockFeed = () => {
   const meshBlock = [

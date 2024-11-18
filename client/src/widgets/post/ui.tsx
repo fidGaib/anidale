@@ -6,6 +6,7 @@ import { PostActionWrapp, PostDescription, PostImages, PostOwner } from '@/entit
 import { PostDropdownMenu } from '@/features/post'
 import { Post } from '@/features/profile/types'
 import { usePostStore } from '@/shared/store'
+import { Plug } from '@/shared/ui/plug'
 
 import cl from './ui.module.less'
 
@@ -45,7 +46,7 @@ const ProfilePosts = ({ profilePosts, id }: any) => {
             <PostActionWrapp />
           </div>
         ))}
-      {loading && <Loading />}
+      {loading && <Plug />}
     </>
   )
 }
@@ -69,7 +70,7 @@ const FeedPosts = ({ feedPosts }: any) => {
             <PostActionWrapp />
           </div>
         ))}
-      {loading && <Loading />}
+      {loading && <Plug />}
     </>
   )
 }
@@ -86,12 +87,4 @@ const useRefetchPosts = (id?: number) => {
     }
   }, [inView])
   return [ref, refetch, inView] as const
-}
-
-const Loading = () => {
-  return (
-    <div className='refetch' style={{ textAlign: 'center', padding: 10 }}>
-      Загрузка...
-    </div>
-  )
 }

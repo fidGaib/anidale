@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { useDarkModeStore } from '@/app/module'
-import { VarAuthData } from '@/app/providers/routes/AppRouter'
+import { useRefreshStore } from '@/app/providers/routes/model'
 import { Modal } from '@/shared/hooks/Modal'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
@@ -12,10 +12,11 @@ import Input from '@/shared/ui/input'
 import cl from './ui.module.less'
 
 export const MenuHeader = () => {
-  const AuthData = useReactiveVar(VarAuthData)
+  // const AuthData = useReactiveVar(VarAuthData)
+  const [refreshData] = useRefreshStore((state) => [state.refreshData])
   const setTheme = useDarkModeStore((store) => store.setTheme)
   const linksAuth = [
-    { link: `/profile/${AuthData.id}`, text: 'Профиль', icon: '/icons/profile.svg' },
+    { link: `/profile/${refreshData.id}`, text: 'Профиль', icon: '/icons/profile.svg' },
     { link: `/feed`, text: 'Лента', icon: '/icons/feed.svg' },
     { link: `/messages`, text: 'Мессенджер', icon: '/icons/chat.svg' },
     { link: `/friends`, text: 'Друзья', icon: '/icons/friends.svg' },
@@ -31,7 +32,7 @@ export const MenuHeader = () => {
         <ImageLoading className={cl.headerMenuSvg} src='/icons/menu.svg' alt='anidale menu icon' />
       </button>
       <ul className={`playground ${cl.menu}`}>
-        {AuthData.id > 0 ? (
+        {refreshData.id > 0 ? (
           <>
             {linksAuth.map((item) => {
               return (
@@ -75,9 +76,9 @@ export const MenuHeader = () => {
           </>
         )}
       </ul>
-      {AuthData.id > 0 ? (
-        <Link to={`/profile/${AuthData.id}`} className={cl.userAvatar}>
-          <ImageLoading src={useSrcAvatar(AuthData.avatar)} />
+      {refreshData.id > 0 ? (
+        <Link to={`/profile/${refreshData.id}`} className={cl.userAvatar}>
+          <ImageLoading src={useSrcAvatar(refreshData.avatar)} />
         </Link>
       ) : (
         <></>
@@ -162,10 +163,11 @@ export const FindAnime = () => {
   )
 }
 export const NotificationHeader = () => {
-  const AuthData = useReactiveVar(VarAuthData)
+  // const AuthData = useReactiveVar(VarAuthData)
+  const [refreshData] = useRefreshStore((state) => [state.refreshData])
   return (
     <>
-      {AuthData.id === 0 ? (
+      {refreshData.id === 0 ? (
         <div style={{ marginLeft: 'auto' }}></div>
       ) : (
         <>
@@ -179,17 +181,17 @@ export const NotificationHeader = () => {
           <div className={cl.notificationWrapper}>
             <div className='playground'>
               <div className={cl.item}>
-                <ImageLoading src={useSrcAvatar(AuthData.avatar)} className={cl.itemAvatar} />
+                <ImageLoading src={useSrcAvatar(refreshData.avatar)} className={cl.itemAvatar} />
                 <div className={cl.body}>
-                  <p className={cl.title}>{AuthData.login ? AuthData.login : 'Акигава'}</p>
+                  <p className={cl.title}>{refreshData.login ? refreshData.login : 'Акигава'}</p>
                   <p className={cl.description}>Привет! Как твои дела?</p>
                 </div>
               </div>
               <div className={cl.item}>
-                <ImageLoading src={useSrcAvatar(AuthData.avatar)} className={cl.itemAvatar} />
+                <ImageLoading src={useSrcAvatar(refreshData.avatar)} className={cl.itemAvatar} />
                 <div className={cl.body}>
-                  <p className={cl.title}>{AuthData.login ? AuthData.login : 'Акигава'}</p>
-                  <p className={cl.description}>Привет! Как твои дела?</p>
+                  <p className={cl.title}>{refreshData.login ? refreshData.login : 'Акигава'}</p>
+                  <p className={cl.description}>Чем занимаешься?</p>
                 </div>
               </div>
             </div>

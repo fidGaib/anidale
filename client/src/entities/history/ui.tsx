@@ -1,15 +1,13 @@
-import { useReactiveVar } from '@apollo/client'
-
-import { VarAuthData } from '@/app/providers/routes/AppRouter'
+import { useRefreshStore } from '@/app/providers/routes/model'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
 
 import cl from './ui.module.less'
 
 export const HistoryProfile = () => {
-  const { avatar } = useReactiveVar(VarAuthData)
+  const [refreshData] = useRefreshStore((state) => [state.refreshData])
   const image_url = [
-    { src: useSrcAvatar(avatar || '') },
+    { src: useSrcAvatar(refreshData.avatar || '') },
     { src: '/icons/add_photo.svg', type: 'svg' },
     { src: 'https://assets.faceit-cdn.net/avatars/cdf4e907-bfc3-4c5b-86be-15663126d4de_1605010404640.jpg' },
     { src: 'https://pushinka.top/uploads/posts/2023-04/1680492408_pushinka-top-p-top-anime-avi-dlya-ks-krasivo-9.jpg' },
@@ -30,9 +28,9 @@ export const HistoryProfile = () => {
   )
 }
 export const HistoryFeed = () => {
-  const { avatar } = useReactiveVar(VarAuthData)
+  const [refreshData] = useRefreshStore((state) => [state.refreshData])
   const image_url = [
-    { src: useSrcAvatar(avatar || '') },
+    { src: useSrcAvatar(refreshData.avatar || '') },
     { src: '/icons/add_photo.svg', type: 'svg' },
     { src: 'https://assets.faceit-cdn.net/avatars/cdf4e907-bfc3-4c5b-86be-15663126d4de_1605010404640.jpg' },
     { src: 'https://pushinka.top/uploads/posts/2023-04/1680492408_pushinka-top-p-top-anime-avi-dlya-ks-krasivo-9.jpg' },

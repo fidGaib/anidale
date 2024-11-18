@@ -1,8 +1,9 @@
-import { useMutation, useReactiveVar } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { VarAuthData } from '@/app/providers/routes/AppRouter'
+import { useRefreshStore } from '@/app/providers/routes/model'
+// import { VarAuthData } from '@/app/providers/routes/AppRouter'
 import { MakePostImages, ProfileArts } from '@/entities/profile/ui'
 import { CREATE_POST } from '@/shared/graphql/schema'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
@@ -27,9 +28,10 @@ export const MakePost = () => {
     ],
   )
 
-  const AuthData = useReactiveVar(VarAuthData)
+  const [refreshData] = useRefreshStore((state) => [state.refreshData])
+  // const AuthData = useReactiveVar(VarAuthData)
   const [createPost, { error, loading }] = useMutation(CREATE_POST)
-  if (id !== AuthData.id) return <></>
+  if (id !== refreshData.id) return <></>
   return (
     <>
       {error_create || error?.message ? <p className={cl.error}>{error_create || error?.message}</p> : <></>}
@@ -38,19 +40,19 @@ export const MakePost = () => {
           className={`playground ${cl.wrapperForm}`}
           style={{ borderRadius: images?.length ? ' 10px 10px 0 0' : '', padding: '10px' }}
         >
-          <ImageLoading src={useSrcAvatar(AuthData.avatar)} className={cl.avatar} />
+          <ImageLoading src={useSrcAvatar(refreshData.avatar)} className={cl.avatar} />
           <textarea
             className={cl.textarea}
             placeholder='Что у вас нового?'
             value={description}
-            onKeyDown={(e) => handleKeydown(e, createPost, AuthData.id)}
+            onKeyDown={(e) => handleKeydown(e, createPost, refreshData.id)}
             onChange={(e) => handleHeight(e)}
           />
           <label className={cl.label}>
             <ImageLoading className={cl.svg} src='/icons/add_photo.svg' />
             <input multiple type='file' hidden accept='image/*' onChange={(e) => setFiles(e.target.files!)} />
           </label>
-          <ImageLoading className={cl.svg} src='/icons/send.svg' onClick={() => send(createPost, AuthData.id)} />
+          <ImageLoading className={cl.svg} src='/icons/send.svg' onClick={() => send(createPost, refreshData.id)} />
         </div>
         {images?.length ? <MakePostImages {...{ images, removeImage }} className={loading ? cl.loading : ''} /> : <></>}
       </div>

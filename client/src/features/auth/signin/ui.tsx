@@ -1,7 +1,8 @@
 import { useMutation } from '@apollo/client'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 
+import { useRefreshStore } from '@/app/providers/routes/model'
 import { SIGNIN } from '@/shared/graphql/schema'
 import { ButtonUI } from '@/shared/ui/button/ui'
 import Input from '@/shared/ui/input'
@@ -17,12 +18,14 @@ export const FormSignin = () => {
   const { register, handleSubmit } = useForm<InputValues>()
   const [LOGIN, { data, error }] = useMutation(SIGNIN)
 
+  const [refreshData, setRefreshData] = useRefreshStore((state) => [state.refreshData, state.setRefreshData])
   const onSubmit: SubmitHandler<InputValues> = async (variables) => {
     await LOGIN({ variables, fetchPolicy: 'network-only' })
   }
 
   if (data?.login) {
-    window.location.href = `/profile/${data.login.id}`
+    setRefreshData(data?.login)
+    window.location.href = `/profile/${data?.login.id}`
   }
 
   return (

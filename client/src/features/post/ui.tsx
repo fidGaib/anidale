@@ -1,6 +1,6 @@
 import { useMutation, useReactiveVar } from '@apollo/client'
 
-import { VarAuthData } from '@/app/providers/routes/AppRouter'
+import { useRefreshStore } from '@/app/providers/routes/model'
 import { REMOVE_POST } from '@/shared/graphql/schema'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { usePostStore } from '@/shared/store'
@@ -16,13 +16,13 @@ export const PostDropdownMenu = ({ postId, userId }: PorepsMenu) => {
   const [remove] = useMutation(REMOVE_POST)
   const setRemoveId = usePostStore((state) => state.setRemoveId)
   const removeFromStore = usePostStore((state) => state.removePost)
-  const AuthData = useReactiveVar(VarAuthData)
+  const [refreshData] = useRefreshStore((state) => [state.refreshData])
   return (
     <Dropdown className={cl.pizdez}>
       <Dropdown.Header>
         <ImageLoading className={cl.menuPost} src='/icons/menu_post.svg' />
       </Dropdown.Header>
-      {AuthData.id === userId ? (
+      {refreshData.id === userId ? (
         <Dropdown.Body>
           <div className='playground' style={{ padding: '0' }}>
             <li>Сохранить в закладках</li>
