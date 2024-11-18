@@ -7,7 +7,7 @@ import { PostStore } from './types'
 
 export const usePostStore = create<PostStore>()((set, get) => ({
   refetch: false,
-  limit: 5,
+  limit: 10,
   feedPage: 0,
   profilePage: 0,
   feedPosts: [],
