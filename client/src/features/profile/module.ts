@@ -31,6 +31,7 @@ export const usePostStore = create<PostStore>()((set, get) => ({
   },
   fetchPostsFeed: () => {
     if (!get().refetch && get().feedPosts.length) return
+    get().setRefetch(false)
     client
       .query({
         query: POSTS,
@@ -47,6 +48,7 @@ export const usePostStore = create<PostStore>()((set, get) => ({
   },
   fetchPostsProfile: (id) => {
     if (!get().refetch && get().feedPosts.length) return
+    get().setRefetch(false)
     client
       .query({
         query: POST_BY_USER,

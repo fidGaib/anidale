@@ -85,9 +85,5 @@ const RefetchPosts = () => {
       }
     }
   }, [inView])
-  return (
-    <div ref={ref} className='refech' style={{ textAlign: 'center', padding: 10 }}>
-      Загрузка...
-    </div>
-  )
+  return <div ref={ref}></div>
 }
