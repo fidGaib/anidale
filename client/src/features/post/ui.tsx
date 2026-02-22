@@ -31,11 +31,6 @@ export const PostDropdownMenu = ({ postId, userId }: PorepsMenu) => {
                 e.preventDefault()
                 remove({
                   variables: { id: postId },
-                  // update(cache) {
-                  //   const normalizeId: any = cache.identify({ id: postId, __typename: 'Post' })
-                  //   cache.evict(normalizeId)
-                  //   cache.gc()
-                  // },
                 })
               }}
             >
