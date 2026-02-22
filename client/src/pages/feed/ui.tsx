@@ -1,4 +1,4 @@
-import { HistoryFeed } from '@/entities/history'
+// import { HistoryFeed } from '@/entities/history'
 import { MeshBlockFeed } from '@/features/feed'
 import Content from '@/shared/content'
 
@@ -8,7 +8,7 @@ export const Feed = () => {
   document.title = 'AniDale - Лента'
   return (
     <>
-      <HistoryFeed />
+      {/* <HistoryFeed /> */}
       <Content id={cl.content}>
         <MeshBlockFeed />
       </Content>

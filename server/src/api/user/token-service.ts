@@ -1,4 +1,4 @@
-import UserDto from '@/api/dtos/user-dto'
+
 import jwt from 'jsonwebtoken'
 
 import Token from '@/db/models/token-model'
@@ -23,7 +23,7 @@ class TokenService {
     this.refreshSecret = process.env.JWT_REFRESH_SECRET
   }
 
-  async generateTokens({avatar, id,login}: UserDto) {
+  async generateTokens({avatar, id,login}: any) {
     const accessToken = jwt.sign({avatar, id,login}, this.accessSecret, { expiresIn: '15m' })
     const refreshToken = jwt.sign({avatar, id,login}, this.refreshSecret, { expiresIn: '14d' })
     return {

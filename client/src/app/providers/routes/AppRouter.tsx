@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client'
-import { lazy } from 'react'
+import { lazy, useEffect } from 'react'
 import { Route, Routes } from 'react-router-dom'
 
 import NotFound from '@/pages/not-found'
@@ -12,18 +12,25 @@ const Signin = lazy(() => import('@/pages/auth/signin'))
 const Feed = lazy(() => import('@/pages/feed'))
 
 const AppRouter = () => {
-  const [refreshData, setRefreshData] = useRefreshStore((state) => [state.refreshData, state.setRefreshData])
-  const {} = useQuery(REFRESH, {
+  const [refreshData, setRefreshData, reset] = useRefreshStore((state) => [
+    state.refreshData,
+    state.setRefreshData,
+    state.reset,
+  ])
+  const { data, error, loading } = useQuery(REFRESH, {
     fetchPolicy: 'network-only',
-    onCompleted: (fetchedData) => {
-      if (fetchedData.refresh) {
-        setRefreshData(fetchedData.refresh)
-      }
-    },
   })
+  useEffect(() => {
+    handleRefresh()
+  }, [loading, data, error])
+  const handleRefresh = () => {
+    if (loading) return
+    if (error) reset()
+    if (data?.refresh?.id) setRefreshData(data?.refresh)
+  }
   return (
     <Routes>
-      {refreshData.id > 0 ? (
+      {refreshData.id ? (
         <>
           {privateRoutes.map((route) => (
             <Route key={route.path} element={<route.element />} path={route.path} />
