@@ -1,21 +1,61 @@
-// import { useRef, useState } from 'react'
-// import useOnScreen from '../useOnScreen'
+import { useEffect, useState } from 'react'
+import { useInView } from 'react-intersection-observer'
+
 import cl from './style.module.less'
 
 const ImageLoading = (props: any) => {
-  // const [loading, setLoad] = useState(false)
-  // const imgRef = useRef(null)
-  // const onLoad = () => {
-  //   setLoad(false)
-  // }
+  const { ref, inView } = useInView({
+    threshold: 0.1,
+    triggerOnce: true,
+  })
+  const [isImageLoaded, setImageLoaded] = useState(false)
+  const [hasError, setHasError] = useState(false)
+  useEffect(() => {
+    setImageLoaded(false)
+    setHasError(false)
+  }, [props.src])
+  const handleImageLoad = () => {
+    setImageLoaded(true)
+  }
+  const handleImageError = () => {
+    setHasError(true)
+    setImageLoaded(false)
+  }
 
-  // const isVisible = useOnScreen(imgRef)
   return (
-    // <div ref={imgRef} id={loading ? cl.loading : cl.div} {...props}>
-    <div id={cl.div} {...props}>
-      {/* {isVisible || !loading ? <img src={props.src} onLoad={onLoad} alt={'anidale'} /> : <img src={''} />} */}
-      <img src={props.src} alt='anidale' loading='lazy' />
+    <div
+      ref={ref}
+      id={`
+      ${!inView ? cl.loading : ''}
+      ${isImageLoaded ? cl.loaded : ''}
+      ${hasError ? cl.error : ''}
+    `.trim()}
+      {...props}
+    >
+      {inView ? (
+        <>
+          {!isImageLoaded && !hasError && (
+            <div className={cl.loader}>
+              <span className={cl.spinner}></span>
+            </div>
+          )}
+          {hasError && <div className={cl.errorMsg}>404 not found :(</div>}
+          <img
+            src={props.src}
+            alt={props.alt || 'anidale'}
+            onLoad={handleImageLoad}
+            onError={handleImageError}
+            style={{
+              opacity: isImageLoaded ? 1 : 0,
+              transition: 'opacity 0.3s ease-in-out',
+            }}
+          />
+        </>
+      ) : (
+        <div className={cl.placeholder}></div>
+      )}
     </div>
   )
 }
 export default ImageLoading
+// !inView ? cl.loading : cl.div

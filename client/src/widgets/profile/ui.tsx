@@ -1,4 +1,4 @@
-import { useQuery, useReactiveVar } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import { useParams } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 
@@ -15,7 +15,7 @@ import cl from './ui.module.less'
 export const ArtWork = () => {
   const params = useParams()
   const id = parseInt(params.id || '')
-  const { data } = useQuery(PROFILE, { variables: { id }, fetchPolicy: 'cache-first' })
+  const { data } = useQuery(PROFILE, { variables: { id }, fetchPolicy: 'network-only' })
   const user = {
     login: data?.getUser?.login,
     avatar: data?.getUser?.avatar,

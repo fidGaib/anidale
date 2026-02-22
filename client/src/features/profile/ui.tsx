@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { useRefreshStore } from '@/app/providers/routes/model'
-// import { VarAuthData } from '@/app/providers/routes/AppRouter'
 import { MakePostImages, ProfileArts } from '@/entities/profile/ui'
 import { CREATE_POST } from '@/shared/graphql/schema'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
@@ -12,9 +11,9 @@ import { usePostStore } from '@/shared/store'
 
 import cl from './ui.module.less'
 
+// Create post
 export const MakePost = () => {
   const id = parseInt(useParams().id || '')
-
   const [error_create, description, images, removeImage, handleHeight, handleKeydown, setFiles, send] = usePostStore(
     (state) => [
       state.error_create,
@@ -27,9 +26,7 @@ export const MakePost = () => {
       state.send,
     ],
   )
-
   const [refreshData] = useRefreshStore((state) => [state.refreshData])
-  // const AuthData = useReactiveVar(VarAuthData)
   const [createPost, { error, loading }] = useMutation(CREATE_POST)
   if (id !== refreshData.id) return <></>
   return (
@@ -40,7 +37,7 @@ export const MakePost = () => {
           className={`playground ${cl.wrapperForm}`}
           style={{ borderRadius: images?.length ? ' 10px 10px 0 0' : '', padding: '10px' }}
         >
-          <ImageLoading src={useSrcAvatar(refreshData.avatar)} className={cl.avatar} />
+          <ImageLoading src={useSrcAvatar(refreshData.avatar || '')} className={cl.avatar} />
           <textarea
             className={cl.textarea}
             placeholder='Что у вас нового?'
@@ -59,6 +56,7 @@ export const MakePost = () => {
     </>
   )
 }
+// mesh block profile
 export const MeshBlockProfile = () => {
   const meshBlock = [
     { icon: '/icons/arts.svg', text: 'арты', layout: 1 },
@@ -79,8 +77,15 @@ export const MeshBlockProfile = () => {
         })}
       </div>
       {layout === 1 ? <ProfileArts /> : <></>}
-      {layout === 2 ? 'музыка' : <></>}
-      {layout === 3 ? 'видео' : <></>}
+      {layout === 2 ? <ProfileMusic /> : <></>}
+      {layout === 3 ? <ProfileVideo /> : <></>}
     </div>
   )
+}
+const ProfileMusic = () => {
+  const arts = [{ src: '/1.png' }, { src: '/2.png' }, { src: '/4.png' }]
+  return <div></div>
+}
+const ProfileVideo = () => {
+  return <div></div>
 }

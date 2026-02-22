@@ -18,25 +18,13 @@ export interface Post {
   images: PostImages[]
 }
 export interface PostStore {
-  refetch: boolean
-  limit: number
-  feedPage: number
-  profilePage: number
-  feedPosts: Post[]
-  profilePosts: Post[]
-  removeId: number
   description: string
   images: File[] | []
   error_create: string
-  setFeedPage: (col: number) => void
-  setProfilePage: (col: number) => void
   setError: (message: string) => void
-  fetchPostsFeed: () => void
-  fetchPostsProfile: (id: number) => void
-  setRefetch: (flag: boolean) => void
-  removePost: (id: number) => void
+  fetchPostsFeed: () => Promise<void>
+  fetchPostsProfile: (id: number) => Promise<void>
   clearPosts: () => void
-  setRemoveId: (id: number) => void
   changeText: (description: string) => void
   setFiles: (file: FileList | File[]) => void
   // validate: (file: File) => Promise<boolean | void>

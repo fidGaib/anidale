@@ -17,8 +17,8 @@ class PostController {
     if (limit < 0) return []
     return await PostService.findByUser(id, limit, page)
   }
-  async remove(id: number) {
-    return await PostService.remove(id)
+  async remove(post_id: number) {
+    return await PostService.remove(post_id)
   }
   async update(id: number, description?: string, images?: File[]) {
     if (!description?.trim() && !images?.length) throw createGraphQLError('У вас пустые поля')

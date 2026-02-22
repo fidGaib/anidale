@@ -7,7 +7,6 @@ const useOnScreen = (ref: any) => {
     observer.observe(ref.current)
     return () => observer.disconnect()
   }, [])
-
   return isIntersecting
 }
 export default useOnScreen

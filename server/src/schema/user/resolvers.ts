@@ -13,7 +13,7 @@ const UserResolvers: Resolvers = {
       return await UserController.logout(req, res)
     },
     async refresh(_, __, { req, res }) {
-      return await UserController.refresh(res, req.cookies.refreshToken, req.cookies.accessToken)
+      return await UserController.refresh(res, req.cookies.refreshToken)
     },
   },
   Mutation: {
@@ -23,12 +23,12 @@ const UserResolvers: Resolvers = {
     async login(_, args, { req, res }) {
       return await UserController.login(args.user, req, res)
     },
-    async update(_, { user }, { req, res }) {
-      const tokienData = await UserController.refresh(res, req.cookies.refreshToken, req.cookies.accessToken)
+    async updateUser(_, { user }, { req, res }) {
+      const tokienData = await UserController.refresh(res, req.cookies.refreshToken)
       return await UserController.updateUser(tokienData.id, user)
     },
     async remove(_, __, { req, res }) {
-      const tokienData = await UserController.refresh(res, req.cookies.refreshToken, req.cookies.accessToken)
+      const tokienData = await UserController.refresh(res, req.cookies.refreshToken)
       return await UserController.remove(tokienData.id)
     },
   },

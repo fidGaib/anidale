@@ -6,22 +6,9 @@ import { POSTS, POST_BY_USER } from '@/shared/graphql/schema'
 import { PostStore } from './types'
 
 export const usePostStore = create<PostStore>()((set, get) => ({
-  refetch: false,
-  limit: 10,
-  feedPage: 0,
-  profilePage: 0,
-  feedPosts: [],
-  profilePosts: [],
-  removeId: 0,
   description: '',
   images: [],
   error_create: '',
-  setFeedPage(page) {
-    set((state) => ({ feedPage: page }))
-  },
-  setProfilePage(page) {
-    set((state) => ({ profilePage: page }))
-  },
   setError(message) {
     set(() => ({ error_create: message }))
   },
@@ -29,60 +16,32 @@ export const usePostStore = create<PostStore>()((set, get) => ({
     if (description.length > 255) return
     set(() => ({ description }))
   },
-  fetchPostsFeed: () => {
-    if (get().refetch) return
-    set({ refetch: true })
-    client
+  //@ts-ignore
+  fetchPostsFeed: async (page: number, limit: number) => {
+    return await client
       .query({
         query: POSTS,
-        variables: { limit: get().limit, page: get().feedPage },
-        fetchPolicy: 'cache-first',
+        variables: { limit, page },
+        fetchPolicy: 'network-only',
       })
       .then((res) => {
-        // @ts-ignore
-        set((state) => ({ feedPosts: [...state.feedPosts, ...res.data.getPosts] }))
-        get().setFeedPage(get().feedPosts.length)
+        return res.data.getPosts
       })
       .catch((e) => console.log(e))
-      .finally(() => set({ refetch: false }))
   },
-  fetchPostsProfile: (id) => {
-    if (get().refetch) return
-    set({ refetch: true })
-    client
+  //@ts-ignore
+  fetchPostsProfile: async (id: number, page: number, limit: number) => {
+    return await client
       .query({
         query: POST_BY_USER,
-        variables: { id, limit: get().limit, page: get().profilePage },
-        fetchPolicy: 'cache-first',
+        variables: { id, limit, page },
+        fetchPolicy: 'network-only',
       })
       .then((res) => {
-        // @ts-ignore
-        set((state) => ({ profilePosts: [...state.profilePosts, ...res.data.getPostsByUser] }))
-        get().setProfilePage(get().profilePosts.length)
+        return res.data.getPostsByUser
       })
       .catch((e) => console.log(e))
-      .finally(() => set({ refetch: false }))
   },
-  setRefetch: (flag) => {
-    set(() => ({ refetch: flag }))
-  },
-  removePost: (id) => {
-    set((state) => ({
-      profilePosts: state.profilePosts.filter((post) => post.id !== id),
-    }))
-    set((state) => ({
-      feedPosts: state.feedPosts.filter((post) => post.id !== id),
-    }))
-  },
-  setRemoveId: (id) => set(() => ({ removeId: id })),
-  clearPosts: () =>
-    set(() => ({
-      feedPosts: [],
-      profilePosts: [],
-      feedPage: 0,
-      profilePage: 0,
-      removeId: 0,
-    })),
   setFiles(fileList) {
     get().setError('')
     const files = Array.from(fileList)
@@ -104,8 +63,6 @@ export const usePostStore = create<PostStore>()((set, get) => ({
         images: [],
         error: '',
       }))
-      // const post = res?.data?.createPost
-      // get().addPost([post])
     })
   },
   handleHeight: (e) => {

@@ -1,22 +1,28 @@
 import { storagePath } from "@/config";
 import avatar from "../dtos/avatar-random";
 import tokenService from "./token-service";
-import Feed from "@/db/models/feed-model";
 import Token from "@/db/models/token-model";
 import User from "@/db/models/user-model";
 import { compare, hash } from "bcrypt";
 import { createGraphQLError } from "graphql-yoga";
 import { v4 } from "uuid";
 import FileStorageService, { SaveImage } from "../post/file-service";
+
 type UpdateUser = {
-  avatar?: File[]
+  avatar?: File
   email?: string
   isActivated?: boolean
   login?: string
   pass?: string
+  activationLink?: String
 };
 
+// | ----------------> UserService <---------------- |
+
 class UserService {
+
+// | ----------------> REGISTRATION <---------------- |
+
   async registration(email: string, pass: string) {
     const candidate = await User.findUnique({ where: { email: email.trim() } });
     if (candidate) throw createGraphQLError("E-mail занят");
@@ -24,8 +30,6 @@ class UserService {
     const avatar_random = Math.round(Math.random() * avatar.length);
     const hashPass = await hash(pass + process.env.PASS_PEPPER, 10);
     const activationLink = v4();
-
-    const feed = await Feed.create({ data: {} });
 
     const user = await User.create({
       data: {
@@ -35,10 +39,8 @@ class UserService {
         isActivated: false,
         login: `bot#` + defaultLogin,
         avatar: avatar[avatar_random],
-        feedId: feed.id,
       },
       select: {
-        pass: true,
         id: true,
         avatar: true,
         email: true,
@@ -53,6 +55,8 @@ class UserService {
       user,
     };
   }
+// | ----------------> LOGIN <---------------- |
+
   async login(email: string, pass: string) {
     const candidate = await User.findUnique({
       where: { email },
@@ -77,55 +81,61 @@ class UserService {
       user: candidate,
     };
   }
+  
+// | ----------------> GET User <---------------- |
+
   async getUser(id: number) {
     const user = await User.findUnique({
       where: { id },
-      include: { feed: { include: { posts: true } }, friends: true },
+      include: { posts: true},
     });
     if (!user) throw createGraphQLError("Пользователь не найден");
     return user;
   }
+
+// | ----------------> GET UserS <---------------- |
   async getUsers() {
-    return await User.findMany({
-      include: { feed: { include: { posts: true } }, friends: true },
-    });
+    return await User.findMany();
   }
-  async update(id: number, user: UpdateUser) {
+  
+// | ----------------> UPDATE USER <---------------- |
+
+  async updateUser(id: number, user: UpdateUser) {
     // Find User
     const candidate = await User.findUnique({ where: { id } });
     if (!candidate) throw createGraphQLError("Пользователь не найден");
-    // Update E-mail
-    if (candidate.email !== user.email?.trim() && user.email?.trim()) {
-      const email = await User.findUnique({
-        where: { email: user.email?.trim() },
-      });
-      if (email) throw createGraphQLError("E-mail занят");
-    }
-    // Update Password
-    else if (user.pass) {
-      const hashPass = await hash(user.pass + process.env.PASS_PEPPER, 10);
-      user.pass = hashPass;
-    }
-    // Update Avatar
-    else if (user.avatar?.length) {
+    // Update avatar
+    if (user.avatar) {
       let avatar = <SaveImage[]>[]
       const StorageService = new FileStorageService(storagePath)
-      avatar = await Promise.all(user.avatar.map((image: File) => StorageService.saveImage(image)))
-      const userData = await User.update({
+      avatar = await Promise.all([StorageService.saveImage(user.avatar, 'avatars/')])
+      // find  double image by medium
+      const res = await User.findMany({
+        where: {
+          avatar: candidate.avatar
+        }, select: {id: true}
+      })
+      if(res.length === 1)  await StorageService.removeAvatar(candidate.avatar)
+      return await User.update({
         where: { id },
-        data: {avatar: avatar[0].small},
+        data: {avatar: avatar[0].medium},
+        select: {
+          avatar: true,
+        }
       });
-      return userData
     } 
     else if(user?.login) {
-      const userData = await User.update({
+      return await User.update({
         where: { id },
-        data: {login: user.login}
+        data: {login: user.login},
+        select: {
+          login: true,
+        }
       });
-      return userData
     }
     else throw createGraphQLError("Произошла не предвиденная ошибка");
   }
+// | ----------------> REMOVE USER <---------------- |
   async remove(id: number) {
     const user = await User.findUnique({
       where: {
@@ -143,17 +153,18 @@ class UserService {
         id,
       },
     });
-    await Feed.deleteMany({
-      where: {
-        id: user.feedId,
-      },
-    });
     return true;
   }
+
+// | ----------------> LOGOUT <---------------- |
+
   async logout(refreshToken: string) {
     return await tokenService.removeToken(refreshToken);
   }
-  async refresh(refreshToken: string, accessToken: string) {
+
+// | ----------------> REFRESH <---------------- |
+
+  async refresh(refreshToken: string) {
     if(!refreshToken) throw createGraphQLError("Вы не авторизованы")
     const tokenFromDB = await Token.findMany({ where: { refreshToken } })
     const userFromDB = await User.findUnique({ where:{ id: tokenFromDB[0].userId } })

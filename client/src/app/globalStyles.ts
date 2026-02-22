@@ -1,6 +1,6 @@
 import { createGlobalStyle } from 'styled-components'
 
-export default createGlobalStyle`
+const GlobalStyles = createGlobalStyle`
 body {
     background: ${({ theme }) => theme.body};
     color: ${({ theme }) => theme.text};
@@ -10,6 +10,8 @@ body {
     background: ${({ theme }) => theme.playground};
 }
 .input {
-    background: ${({ theme }) => theme.input}
+    background: ${({ theme }) => theme.input};
+    color: ${({ theme }) => theme.text};
 }
 `
+export default GlobalStyles

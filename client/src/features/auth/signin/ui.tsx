@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { Link, Navigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 import { useRefreshStore } from '@/app/providers/routes/model'
 import { SIGNIN } from '@/shared/graphql/schema'
@@ -18,7 +18,7 @@ export const FormSignin = () => {
   const { register, handleSubmit } = useForm<InputValues>()
   const [LOGIN, { data, error }] = useMutation(SIGNIN)
 
-  const [refreshData, setRefreshData] = useRefreshStore((state) => [state.refreshData, state.setRefreshData])
+  const [_, setRefreshData] = useRefreshStore((state) => [state.refreshData, state.setRefreshData])
   const onSubmit: SubmitHandler<InputValues> = async (variables) => {
     await LOGIN({ variables, fetchPolicy: 'network-only' })
   }

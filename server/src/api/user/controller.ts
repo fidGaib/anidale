@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { createGraphQLError } from 'graphql-yoga'
 
 import { Login, Registration, UpdateUser } from '@/schema/resolvers-types'
+import { validateEmail } from '@/utils/validator-email'
 
 import UserService from './service'
 
@@ -19,6 +20,14 @@ class UserController {
     } else if (pass !== pass2) {
       throw createGraphQLError('Пароли не совпадают')
     }
+    await validateEmail(EmailTrim)
+      .then((result) => {
+        if (!result.valid) throw createGraphQLError(`${result.reason}`)
+      })
+      .catch((err) => {
+        throw createGraphQLError(`${err}`)
+      })
+
     const { refreshToken, accessToken, user } = await UserService.registration(EmailTrim, Pass2Trim)
 
     this.setCookie(res, refreshToken, accessToken)
@@ -36,6 +45,13 @@ class UserController {
     } else if (!email.match(emailRegex)) {
       throw createGraphQLError('Некорректный E-mail')
     }
+    await validateEmail(EmailTrim)
+      .then((result) => {
+        if (!result.valid) throw createGraphQLError(`${result.reason}`)
+      })
+      .catch((err) => {
+        throw createGraphQLError(`${err}`)
+      })
     const { refreshToken, accessToken, user } = await UserService.login(EmailTrim, PassTrim)
     this.setCookie(res, refreshToken, accessToken)
     return {
@@ -51,23 +67,30 @@ class UserController {
     return await UserService.getUsers()
   }
   async updateUser(id: number, user?: UpdateUser) {
-    if (!user) throw Error('User not found')
-    if (user.email && !user.email.match(emailRegex)) {
-      throw createGraphQLError('Некорректный E-mail')
+    if (user === undefined) return
+    if (user?.email?.trim()) {
+      await validateEmail(user?.email?.trim())
+        .then((result) => {
+          if (!result.valid) throw createGraphQLError(`${result.reason}`)
+        })
+        .catch((err) => {
+          throw createGraphQLError(`${err}`)
+        })
     }
-    return await UserService.update(id, user)
+    return await UserService.updateUser(id, user)
   }
   async remove(id: number) {
     return await UserService.remove(id)
   }
   async logout({ cookies: { refreshToken } }: Request, res: Response) {
-    return await UserService.logout(refreshToken)
+    const result = await UserService.logout(refreshToken)
+    res.clearCookie('refreshToken')
+    res.clearCookie('accessToken')
+    return result
   }
-  async refresh(res: Response, refreshToken: string, accessToken: string) {
-    const data = await UserService.refresh(refreshToken, accessToken)
-    return {
-      ...data,
-    }
+  async refresh(_: Response, refreshToken: string) {
+    const data = await UserService.refresh(refreshToken)
+    return { ...data }
   }
   async setCookie(res: Response, refreshToken?: string, accessToken?: string) {
     res.cookie('refreshToken', refreshToken, {

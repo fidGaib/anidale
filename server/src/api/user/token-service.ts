@@ -16,7 +16,7 @@ class TokenService {
   private refreshSecret: string
 
   constructor() {
-    if (!process.env.JWT_ACCESS_SECRET || !process.env.JWT_REFRESH_SECRET) {
+    if (!process.env.JWT_ACCESS_SECRET  || !process.env.JWT_REFRESH_SECRET) {
       throw Error('No jwt secrets found')
     }
     this.accessSecret = process.env.JWT_ACCESS_SECRET

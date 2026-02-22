@@ -3,21 +3,25 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 import { shallow } from 'zustand/shallow'
 
 interface typeRefreshData {
-  id: number
-  avatar: string
-  login: string
+  id?: number
+  avatar?: string
+  login?: string
 }
 interface typeUserStore {
-  refreshData: { id: number; avatar: string; login: string }
+  refreshData: typeRefreshData
   setRefreshData: (refreshData: typeRefreshData) => void
+  reset: () => void
 }
 const RefreshStore = create(
   persist<typeUserStore>(
     (set) => ({
       refreshData: { id: 0, avatar: '', login: '' },
-      setRefreshData: (refreshData) => {
-        set({ refreshData })
+      setRefreshData: (newData) => {
+        set((state) => ({
+          refreshData: { ...state.refreshData, ...newData }, // Частичное обновление
+        }))
       },
+      reset: () => set({ refreshData: { id: 0, avatar: '', login: '' } }),
     }),
     { name: 'refreshData', storage: createJSONStorage(() => sessionStorage) },
   ),

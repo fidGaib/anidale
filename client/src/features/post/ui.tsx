@@ -1,9 +1,8 @@
-import { useMutation, useReactiveVar } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 
 import { useRefreshStore } from '@/app/providers/routes/model'
 import { REMOVE_POST } from '@/shared/graphql/schema'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
-import { usePostStore } from '@/shared/store'
 import Dropdown from '@/shared/ui/dropdown'
 
 import cl from './ui.module.less'
@@ -14,8 +13,6 @@ interface PorepsMenu {
 }
 export const PostDropdownMenu = ({ postId, userId }: PorepsMenu) => {
   const [remove] = useMutation(REMOVE_POST)
-  const setRemoveId = usePostStore((state) => state.setRemoveId)
-  const removeFromStore = usePostStore((state) => state.removePost)
   const [refreshData] = useRefreshStore((state) => [state.refreshData])
   return (
     <Dropdown className={cl.pizdez}>
@@ -34,16 +31,12 @@ export const PostDropdownMenu = ({ postId, userId }: PorepsMenu) => {
                 e.preventDefault()
                 remove({
                   variables: { id: postId },
-                  update(cache) {
-                    const normalizeId: any = cache.identify({ id: postId, __typename: 'Post' })
-                    cache.evict(normalizeId)
-                    cache.gc()
-                  },
+                  // update(cache) {
+                  //   const normalizeId: any = cache.identify({ id: postId, __typename: 'Post' })
+                  //   cache.evict(normalizeId)
+                  //   cache.gc()
+                  // },
                 })
-                setRemoveId(postId)
-                setTimeout(() => {
-                  removeFromStore(postId)
-                }, 1000)
               }}
             >
               Удалить

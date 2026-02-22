@@ -1,6 +1,6 @@
 import prisma from '../db'
 
-prisma.post
+// prisma.post
 
 const Post = prisma.post
 const PostImage = prisma.postImage

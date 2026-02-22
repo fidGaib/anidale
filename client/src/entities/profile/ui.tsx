@@ -40,24 +40,19 @@ export const MakePostImages: React.FC<Props> = ({ className, images, removeImage
     </div>
   )
 }
+interface Art {
+  src: string
+  alt?: string
+}
 export const ProfileArts = () => {
-  const arts = [
-    { src: '/1.png' },
-    { src: '/2.png' },
-    {
-      src: '/4.png',
-    },
-  ]
+  const arts = [{ src: '/1.png' }, { src: '/2.png' }, { src: '/4.png' }]
   return (
     <div className={cl.meshContent}>
       <Swiper
         style={{
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           '--swiper-navigation-color': '#fff',
           '--swiper-pagination-color': '#fff',
-
-          width: '100%',
         }}
         spaceBetween={0}
         navigation={true}

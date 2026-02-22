@@ -1,165 +1,190 @@
 import { useMutation } from '@apollo/client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useRef } from 'react'
 import AvatarEditor from 'react-avatar-editor'
+import Dropzone from 'react-dropzone'
 
 import { useRefreshStore } from '@/app/providers/routes/model'
 import { useSettingsStore } from '@/features/settings/module'
-import { UPDATE_USER } from '@/shared/graphql/schema'
+import { updateUserQuery } from '@/shared/graphql/schema'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
-import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
 import { ButtonUI } from '@/shared/ui/button/ui'
 import Input from '@/shared/ui/input'
 
 import cl from './ui.module.less'
 
-interface typesEditor {
-  src: string
-}
-
-const Editor = ({ src }: typesEditor) => {
-  return (
-    <AvatarEditor
-      image={src}
-      width={300}
-      height={300}
-      borderRadius={300}
-      scale={1.1}
-      style={{ borderRadius: '50%', margin: '0 auto' }}
-    />
-  )
-}
-export const EditLogin = () => {
-  const [refreshData, setRefreshData] = useRefreshStore((state) => [state.refreshData, state.setRefreshData])
-  const setLogin = useSettingsStore((state) => state.setLogin)
-  const sendLogin = useSettingsStore((state) => state.sendLogin)
-  const [UPDATE, { data, error, loading }] = useMutation(UPDATE_USER)
-  return (
-    <>
-      <h2>Информация</h2>
-      <p className={cl.error}>{error?.message || loading ? 'Сохранение...' : ''}</p>
-      <Input
-        type='text'
-        placeholder='Никнейм...'
-        defaultValue={refreshData.login}
-        onChange={(e) => setLogin(e.target.value)}
-        required
-      />
-      <h2 className={cl.save}>
-        <ButtonUI
-        onClick={() => {
-          sendLogin(UPDATE, refreshData).finally(() => {
-            if (data?.update) setRefreshData(data.update)
-          })
-        }}
-        >
-          Сохранить
-        </ButtonUI>
-      </h2>
-    </>
-  )
-}
-export const EditAvatar = () => {
-  const [refreshData] = useRefreshStore((state) => [state.refreshData])
-  const [UPDATE, { data, error, loading }] = useMutation(UPDATE_USER)
-  const send = useSettingsStore((state) => state.send)
-  const setFiles = useSettingsStore((state) => state.setFiles)
-  const image = useSettingsStore((state) => state.image)
-  return (
-    <>
-      {/* <label htmlFor='upl' className={cl.upload}>
-        <ButtonUI>
-          <ImageLoading className={cl.changeAvatar} src='/icons/add_photo.svg' /> Загрузить
-        </ButtonUI>
-      </label> */}
-      {/* <ImageLoading className={cl.avatar} src={image.length ? URL.createObjectURL(image[0]) : useSrcAvatar(avatar)} /> */}
-      <Editor src={image.length ? URL.createObjectURL(image[0]) : useSrcAvatar(refreshData.avatar)} />
-      <h2 className={cl.save}>
-        <p className={cl.error}>{error?.message || loading ? 'Сохранение...' : ''}</p>
-        {/*  */}
-        <label htmlFor='upl' className={cl.upload}>
-          <ImageLoading className={cl.changeAvatar} src='/icons/add_photo.svg' />
-        </label>
-        <Input id={'upl'} type='file' accept='image/*' onChange={(e) => setFiles(e.target.files!)} hidden required />
-        {/*  */}
-        <ButtonUI
-          onClick={() => {
-            send(UPDATE, refreshData.id)
-          }}
-        >
-          Сохранить
-        </ButtonUI>
-      </h2>
-    </>
-  )
-}
-// LOGIN && AVATAR
-export const EditLoginAvatar = () => {
+// Layout editor login && avatar
+export const LayoutLoginAvatar = () => {
   return (
     <div className={cl.wrapper}>
-      <h2>Профиль</h2>
-      <EditAvatar />
+      <AvatarEditorComponent />
       <EditLogin />
     </div>
   )
 }
-// EMAIL && PASSWORD
-export const EditPassEmail = () => {
+// Edit Login
+const EditLogin = () => {
   const [refreshData, setRefreshData] = useRefreshStore((state) => [state.refreshData, state.setRefreshData])
-  const [newEmail, setNewEmail] = useState('')
-  const [NEWEMAIL, { data, error, loading }] = useMutation(UPDATE_USER)
-  const sendNewEmail = async () => {
-    if ('' === newEmail) return
-    await NEWEMAIL({ variables: { id: refreshData.id, email: newEmail }, fetchPolicy: 'network-only' })
-    if (data?.update) setRefreshData(data.update)
+  const errorInStore = useSettingsStore((state) => state.errorLogin)
+  const setLogin = useSettingsStore((state) => state.setLogin)
+  const [login, isSetLogin] = useState(refreshData.login)
+  //Отслеживаем изменения data и обновляем refreshData
+  const [updateUser, { data, error, loading }] = useMutation(updateUserQuery)
+  useEffect(() => {
+    if (data?.updateUser && data.updateUser.login !== null) {
+      setRefreshData({ login: data.updateUser.login })
+    }
+  }, [data])
+  useEffect(() => {
+    if (!login) return
+    setLogin(login)
+  }, [login])
+  return (
+    <>
+      <h2>Информация</h2>
+      <p className={cl.error}>{error?.message || loading ? 'Сохранение...' : errorInStore || error?.message}</p>
+      <div className={cl.editLogin}>
+        <Input
+          type='text'
+          placeholder='Введите логин...'
+          value={login}
+          onChange={(e) => isSetLogin(e.target.value)}
+          required
+        />
+        {refreshData.login !== login ? (
+          <ButtonUI
+            onClick={async () => {
+              await updateUser({ variables: { login, avatar: '' } })
+            }}
+          >
+            Сохранить
+          </ButtonUI>
+        ) : (
+          <></>
+        )}
+      </div>
+    </>
+  )
+}
+const AvatarEditorComponent = () => {
+  const [image, setImage] = useState<File | string>('')
+  const [scale, setScale] = useState(1)
+  const [rotate, setRotate] = useState(0)
+  const editorRef = useRef<AvatarEditor>(null)
+  const validateFile = useSettingsStore((state) => state.validateFile)
+  const errorInStore = useSettingsStore((state) => state.errorAvatar)
+
+  // Обработка загрузки файла
+  const handleDrop = async (acceptedFiles: File[]) => {
+    if (acceptedFiles.length > 0) {
+      if (await validateFile(acceptedFiles)) {
+        setImage(acceptedFiles[0])
+      }
+    }
   }
+
+  // Получение обрезанного изображения
+  const saveAvatar = () => {
+    if (!editorRef.current) return
+
+    // Получаем canvas с обрезанным изображением
+    const canvas = editorRef.current.getImageScaledToCanvas()
+
+    // Конвертируем в data URL
+    canvas.toBlob((blob) => {
+      if (!blob) return
+      const file = new File([blob], 'avatar', {
+        type: blob.type,
+        lastModified: Date.now(),
+      })
+      uploadAvatarToServer(file)
+    })
+  }
+
+  const [updateUser, { data, error, loading }] = useMutation(updateUserQuery)
+  const [refreshData, setRefreshData] = useRefreshStore((state) => [state.refreshData, state.setRefreshData])
+  const uploadAvatarToServer = async (file: File) => {
+    await updateUser({ variables: { avatar: file }, fetchPolicy: 'network-only' })
+  }
+  useEffect(() => {
+    if (data?.updateUser && data.updateUser.avatar !== null) {
+      setRefreshData({ avatar: data.updateUser.avatar })
+      setImage('')
+    }
+  }, [data])
   return (
-    <div className={cl.wrapper}>
-      <h2>Email</h2>
-      <p className={cl.error}>{error?.message || loading ? 'Сохранение...' : ''}</p>
-      <Input
-        type='email'
-        placeholder='E-mail...'
-        defaultValue={newEmail}
-        value={newEmail}
-        onChange={(e) => setNewEmail(e.target.value)}
-      />
-      <h2 className={cl.save}>
-        <ButtonUI onClick={sendNewEmail}>Получить подтверждение на почту</ButtonUI>
-      </h2>
-      <h2>Пароль</h2>
-      <Input type='password' placeholder='Старый пароль...' defaultValue={''} />
-      <Input type='password' placeholder='Новый пароль...' defaultValue={''} />
-      <Input type='password' placeholder='Подтвердите пароль...' defaultValue={''} />
-      <h2 className={cl.save}>
-        <ButtonUI>Сохранить</ButtonUI>
-      </h2>
-    </div>
-  )
-}
-export const CustomizeSettings = () => {
-  const [refreshData] = useRefreshStore((state) => [state.refreshData])
-  return (
-    <div className={cl.wrapper}>
-      <h2>Задний фон</h2>
-      <ImageLoading className={cl.backround} src={useSrcAvatar(refreshData.avatar)} />
-      <h2>Цвет виджетов</h2>
-      <input type='color' />
-      <h2>Закругление виджетов</h2>
-      <input type='number' defaultValue={10} />
-      <h2>Цвет основного текста</h2>
-      <input type='color' />
-      <h2>Акцент</h2>
-      <input type='color' />
-      <h2 className={cl.save}>
-        <ButtonUI>Сохранить</ButtonUI>
-      </h2>
-    </div>
-  )
-}
-export const OtherSettings = () => {
-  return (
-    <div className={cl.wrapper}>
-      <h2>Прочее</h2>
+    <div className={cl.container}>
+      <h2>Изменить фотографию профиля</h2>
+      {/* Зона загрузки */}
+      {!image && (
+        <Dropzone onDrop={handleDrop} accept={{ 'image/*': ['.jpeg', '.jpg', '.png', '.gif', '.webp'] }}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()} className={cl.dropzone}>
+              <input {...getInputProps()} />
+              <ImageLoading src='/icons/add_photo.svg' />
+            </div>
+          )}
+        </Dropzone>
+      )}
+
+      {/* Редактор */}
+      {image && (
+        <div className={cl.editorWrapper}>
+          <AvatarEditor
+            ref={editorRef}
+            image={image}
+            width={250}
+            height={250}
+            border={50}
+            color={[0, 0, 0, 0.6]} // RGBA
+            scale={scale}
+            rotate={rotate}
+            onLoadSuccess={() => console.log('Изображение загружено')}
+          />
+
+          {/* Управление масштабом */}
+          <div className={cl.controls}>
+            <label>
+              Масштаб:
+              <input
+                type='range'
+                value={scale}
+                min={1}
+                max={5}
+                step={0.1}
+                onChange={(e) => setScale(parseFloat(e.target.value))}
+                className={cl.customRange}
+              />
+            </label>
+
+            {/* Управление поворотом */}
+            <label>
+              Поворот:
+              <input
+                type='range'
+                value={rotate}
+                min={0}
+                max={360}
+                onChange={(e) => setRotate(parseInt(e.target.value, 10))}
+                className={cl.customRange}
+              />
+            </label>
+          </div>
+          <p className={cl.error}>{error?.message || loading ? 'Сохранение...' : errorInStore || error?.message}</p>
+        </div>
+      )}
+
+      {/* Кнопки действий */}
+      {image && (
+        <div className={`${cl.actions}`}>
+          <ButtonUI onClick={() => setImage('')} disabled={!image}>
+            Удалить
+          </ButtonUI>
+          <ButtonUI onClick={saveAvatar} disabled={!image}>
+            Сохранить
+          </ButtonUI>
+        </div>
+      )}
     </div>
   )
 }

@@ -1,90 +1,94 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
 import { useParams } from 'react-router-dom'
 
 import { PostActionWrapp, PostDescription, PostImages, PostOwner } from '@/entities/post'
 import { PostDropdownMenu } from '@/features/post'
-import { Post } from '@/features/profile/types'
+import { Post as TypePost } from '@/features/profile/types'
+import { useSocket } from '@/shared/hooks/useSocket'
 import { usePostStore } from '@/shared/store'
 import { Plug } from '@/shared/ui/plug'
 
 import cl from './ui.module.less'
 
 export const Posts = () => {
-  const id = parseInt(useParams().id || '')
-  const [feedPosts, profilePosts, fetchPostsFeed, fetchPostsProfile, clearPosts] = usePostStore((state) => [
-    state.feedPosts,
-    state.profilePosts,
-    state.fetchPostsFeed,
-    state.fetchPostsProfile,
-    state.clearPosts,
-  ])
+  const profileUrlId = parseInt(useParams().id || '')
+  const [fetchPostsFeed, fetchPostsProfile] = usePostStore((state) => [state.fetchPostsFeed, state.fetchPostsProfile])
+  const [posts, setPosts] = useState<TypePost[]>([])
+  const [skip, setSkip] = useState(0)
+  const [hasMore, setHasMore] = useState(true)
+  const [loading, setLoading] = useState(false)
+  const [limit] = useState(10)
+  const [lastPostId, setLastPostId] = useState(0)
+  const { socket, isConnected } = useSocket()
+  const [ref, inView] = useInView({
+    threshold: 0,
+  })
   useEffect(() => {
-    if (id) fetchPostsProfile(id)
-    else fetchPostsFeed()
-    return () => clearPosts()
-  }, [])
-  return <>{id ? <ProfilePosts profilePosts={profilePosts} id={id} /> : <FeedPosts feedPosts={feedPosts} />}</>
-}
-const ProfilePosts = ({ profilePosts, id }: any) => {
-  const [lastPostRef, loading] = useRefetchPosts(id)
-  return (
-    <>
-      {profilePosts.length !== 0 &&
-        profilePosts?.map((post: Post, index: number) => (
-          <div
-            key={post.id}
-            className={`playground ${cl.wrapper}`}
-            ref={index === profilePosts.length - 1 ? lastPostRef : null}
-          >
-            <div className={cl.owner}>
-              <PostOwner post={post} />
-              <PostDropdownMenu postId={post.id} userId={post.user.id} />
-            </div>
-            <PostImages images={post.images} />
-            <PostDescription description={post.description} />
-            <PostActionWrapp />
-          </div>
-        ))}
-      {loading && <Plug />}
-    </>
-  )
-}
-const FeedPosts = ({ feedPosts }: any) => {
-  const [lastPostRef, loading] = useRefetchPosts()
-  return (
-    <>
-      {feedPosts.length !== 0 &&
-        feedPosts?.map((post: Post, index: number) => (
-          <div
-            key={post.id}
-            className={`playground ${cl.wrapper}`}
-            ref={index === feedPosts.length - 1 ? lastPostRef : null}
-          >
-            <div className={cl.owner}>
-              <PostOwner post={post} />
-              <PostDropdownMenu postId={post.id} userId={post.user.id} />
-            </div>
-            <PostImages images={post.images} />
-            <PostDescription description={post.description} />
-            <PostActionWrapp />
-          </div>
-        ))}
-      {loading && <Plug />}
-    </>
-  )
-}
-
-const useRefetchPosts = (id?: number) => {
-  const { ref, inView } = useInView({ threshold: 0.1 })
-  const [fetchPostsFeed, fetchPostsProfile, refetch] = usePostStore(
-    ({ fetchPostsFeed, fetchPostsProfile, refetch }) => [fetchPostsFeed, fetchPostsProfile, refetch],
-  )
-  useEffect(() => {
-    if (inView) {
-      if (id) fetchPostsProfile(id)
-      else fetchPostsFeed()
+    if (!socket || !isConnected) return
+    const handleNewPost = ({ post }: { post: TypePost }) => {
+      // Добавляем новый пост в начало списка
+      setPosts((prev) => [post, ...prev])
+      console.log(post)
+      setLastPostId(post.id)
     }
-  }, [inView])
-  return [ref, refetch, inView] as const
+    socket.on('newPost', handleNewPost)
+    return () => {
+      socket.off('newPost', handleNewPost)
+    }
+  }, [socket, isConnected])
+  useEffect(() => {
+    if (inView && hasMore && !loading) loadPosts()
+  }, [profileUrlId, inView, hasMore])
+
+  const loadPosts = async () => {
+    setLoading(true)
+    try {
+      if (profileUrlId) {
+        //@ts-ignore
+        const fetchedPosts: TypePost[] = await fetchPostsProfile(profileUrlId, skip, limit)
+        if (fetchedPosts.length > 0) {
+          //@ts-ignore
+          setPosts((prev) => [...prev, ...fetchedPosts])
+          setSkip(skip + 1)
+        } else setHasMore(false)
+      } else {
+        //@ts-ignore
+        const fetchedPosts: TypePost[] = await fetchPostsFeed(skip, limit)
+        if (fetchedPosts.length > 0) {
+          //@ts-ignore
+          setPosts((prev) => [...prev, ...fetchedPosts])
+          setSkip(skip + 1)
+          if (fetchedPosts.length < 10) {
+            setHasMore(false)
+          }
+        } else setHasMore(false)
+      }
+    } catch (e) {
+      console.log(e)
+    } finally {
+      setLoading(false)
+    }
+  }
+  return (
+    <>
+      {posts?.map((post: TypePost) => {
+        return (
+          <div key={post.id} className={`playground ${cl.wrapper}`}>
+            <div className={cl.owner}>
+              <PostOwner post={post} />
+              <PostDropdownMenu postId={post.id} userId={post.user.id} />
+            </div>
+            <PostImages images={post.images} />
+            <PostDescription description={post.description} />
+            <PostActionWrapp />
+          </div>
+        )
+      })}
+      <div ref={ref}>
+        {loading && <Plug />}
+        {!hasMore && <div style={{ height: '1px' }}></div>}
+      </div>
+    </>
+  )
 }

@@ -1,4 +1,3 @@
-import { useReactiveVar } from '@apollo/client'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
@@ -12,7 +11,6 @@ import Input from '@/shared/ui/input'
 import cl from './ui.module.less'
 
 export const MenuHeader = () => {
-  // const AuthData = useReactiveVar(VarAuthData)
   const [refreshData] = useRefreshStore((state) => [state.refreshData])
   const setTheme = useDarkModeStore((store) => store.setTheme)
   const linksAuth = [
@@ -78,7 +76,7 @@ export const MenuHeader = () => {
       </ul>
       {refreshData.id > 0 ? (
         <Link to={`/profile/${refreshData.id}`} className={cl.userAvatar}>
-          <ImageLoading src={useSrcAvatar(refreshData.avatar)} />
+          <ImageLoading src={useSrcAvatar(refreshData.avatar || '')} />
         </Link>
       ) : (
         <></>
@@ -163,7 +161,6 @@ export const FindAnime = () => {
   )
 }
 export const NotificationHeader = () => {
-  // const AuthData = useReactiveVar(VarAuthData)
   const [refreshData] = useRefreshStore((state) => [state.refreshData])
   return (
     <>
@@ -181,14 +178,14 @@ export const NotificationHeader = () => {
           <div className={cl.notificationWrapper}>
             <div className='playground'>
               <div className={cl.item}>
-                <ImageLoading src={useSrcAvatar(refreshData.avatar)} className={cl.itemAvatar} />
+                <ImageLoading src={useSrcAvatar(refreshData.avatar || '')} className={cl.itemAvatar} />
                 <div className={cl.body}>
                   <p className={cl.title}>{refreshData.login ? refreshData.login : 'Акигава'}</p>
                   <p className={cl.description}>Привет! Как твои дела?</p>
                 </div>
               </div>
               <div className={cl.item}>
-                <ImageLoading src={useSrcAvatar(refreshData.avatar)} className={cl.itemAvatar} />
+                <ImageLoading src={useSrcAvatar(refreshData.avatar || '')} className={cl.itemAvatar} />
                 <div className={cl.body}>
                   <p className={cl.title}>{refreshData.login ? refreshData.login : 'Акигава'}</p>
                   <p className={cl.description}>Чем занимаешься?</p>

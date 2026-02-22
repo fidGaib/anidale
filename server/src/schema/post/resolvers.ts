@@ -16,7 +16,7 @@ const PostResolvers: Resolvers = {
   Mutation: {
     async createPost(_, { post }, ctx) {
       const { req, res } = ctx
-      const user = await UserController.refresh(res, req.cookies.refreshToken, req.cookies.accessToken)
+      const user = await UserController.refresh(res, req.cookies.refreshToken)
       const { description, images } = post
       const postData = await postController.create(user.id, description, images)
 
@@ -27,16 +27,13 @@ const PostResolvers: Resolvers = {
     },
     async updatePost(_, { post }, ctx) {
       const { req, res } = ctx
-      const user = await UserController.refresh(res, req.cookies.refreshToken, req.cookies.accessToken)
-      let description, images
-      if (post?.description) description = post.description
-      if (post?.images) images = post.images
-      return await postController.update(user.id, description, images)
+      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      return await postController.update(user.id, post!.description, post!.images)
     },
-    async removePost(_, __, ctx) {
+    async removePost(_, post, ctx) {
       const { req, res } = ctx
-      const user = await UserController.refresh(res, req.cookies.refreshToken, req.cookies.accessToken)
-      return await postController.remove(user.id)
+      await UserController.refresh(res, req.cookies.refreshToken)
+      return await postController.remove(post.id)
     },
   },
 }

@@ -6,6 +6,7 @@ import { ThemeProvider } from 'styled-components'
 
 import { useDarkModeStore } from '../module'
 import { darkTheme, lightTheme } from '../themes'
+import { SocketProvider } from './socket-context'
 
 const Header = lazy(() => import('@/widgets/header'))
 const Loader = lazy(() => import('@/shared/loader'))
@@ -23,15 +24,17 @@ export const withRouter = (Component: () => React.ReactElement) =>
     const theme = useDarkModeStore((store) => store.theme)
     return (
       <ApolloProvider client={client}>
-        <BrowserRouter>
-          <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
-            <Suspense fallback={<Loader />}>
-              <GlobalStyles />
-              <Header />
-              <Component />
-            </Suspense>
-          </ThemeProvider>
-        </BrowserRouter>
+        <SocketProvider>
+          <BrowserRouter>
+            <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
+              <Suspense fallback={<Loader />}>
+                <GlobalStyles />
+                <Header />
+                <Component />
+              </Suspense>
+            </ThemeProvider>
+          </BrowserRouter>
+        </SocketProvider>
       </ApolloProvider>
     )
   }

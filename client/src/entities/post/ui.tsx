@@ -59,8 +59,8 @@ export const PostImages = ({ images }: Post) => {
         modules={[FreeMode, Navigation]}
         className={cl.wrappImages}
       >
-        {images.map((image) => (
-          <SwiperSlide key={image!.id} id={cl.childSwiper}>
+        {images?.map((image) => (
+          <SwiperSlide key={image?.medium! + image?.id} id={cl.childSwiper}>
             <ImageLoading className={cl.small} src={`http://localhost:5000/storage/${image!.small}.webp`} />
             <ImageLoading className={cl.medium} src={`http://localhost:5000/storage/${image!.medium}.webp`} />
           </SwiperSlide>
