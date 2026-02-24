@@ -5,7 +5,6 @@ import { useParams } from 'react-router-dom'
 
 import { useRefreshStore } from '@/app/providers/routes/model'
 import { PostActionWrapp, PostDescription, PostImages, PostOwner } from '@/entities/post'
-import { PostDropdownMenu } from '@/features/post'
 import { Post as TypePost } from '@/features/profile/types'
 import { REMOVE_POST } from '@/shared/graphql/schema'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'

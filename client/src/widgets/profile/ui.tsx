@@ -1,14 +1,24 @@
 import { useQuery } from '@apollo/client'
+import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Link } from 'react-router-dom'
+import { FreeMode } from 'swiper'
+import 'swiper/css/free-mode'
+import 'swiper/css/navigation'
+import { Swiper, SwiperSlide } from 'swiper/react'
+// Import Swiper styles
+import 'swiper/swiper.min.css'
 
 import { useRefreshStore } from '@/app/providers/routes/model'
-import { MeshBlockProfile } from '@/features/profile'
+import { ProfileArts, ProfileMusic } from '@/entities/profile'
+import { MakePost } from '@/features/profile'
 import { PROFILE } from '@/shared/graphql/schema'
+import { Modal } from '@/shared/hooks/Modal'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
 import ButtonUI from '@/shared/ui/button'
 
+import Posts from '../post'
 // import { ModalWindow } from '../modal_window'
 import cl from './ui.module.less'
 
@@ -25,12 +35,36 @@ export const ArtWork = () => {
   const [refreshData] = useRefreshStore((state) => [state.refreshData])
 
   const avatar = useSrcAvatar(user.avatar || '')
+
+  const meshBlock = [
+    { icon: '/icons/arts.svg', text: 'посты', layout: 1 },
+    { icon: '/icons/arts.svg', text: 'арты', layout: 2 },
+    { icon: '/icons/music.svg', text: 'музыка', layout: 3 },
+    { icon: '/icons/video.svg', text: 'видео', layout: 4 },
+  ]
+  const [layout, isLayout] = useState(1)
+  const [active__modal, setActiveModal] = useState(false)
+  const [modalSrcArt, setModalSrcArt] = useState('')
   return (
     <>
+      <Modal active={active__modal} setActive={setActiveModal}>
+        <div className={cl.artInModal}>
+          <ImageLoading src={modalSrcArt} />
+          <ButtonUI>Загрузить</ButtonUI>
+          <ButtonUI>Поделиться</ButtonUI>
+          <ButtonUI>Пожаловаться</ButtonUI>
+        </div>
+      </Modal>
       <div className={`playground ${cl.wrapper}`} style={{ padding: 0 }}>
-        {/* <ModalWindow avatar={avatar} /> */}
         <div className={cl.artwork}>
-          <ImageLoading className={cl.avatar} src={avatar} />
+          <ImageLoading
+            onClick={() => {
+              setModalSrcArt(avatar)
+              setActiveModal(true)
+            }}
+            className={cl.avatar}
+            src={avatar}
+          />
           <ImageLoading id={cl.edit_profile_ico} src='/icons/edit.svg' className={cl.meshIcon} />
           <div id={cl.loginWrap}>
             <div className={`playground ${cl.nickname}`}>
@@ -49,8 +83,38 @@ export const ArtWork = () => {
         ) : (
           <></>
         )}
-        <MeshBlockProfile />
+        <div className={cl.wrapperSwiper}>
+          <Swiper
+            spaceBetween={0}
+            modules={[FreeMode]}
+            width={350}
+            breakpoints={{
+              280: {
+                slidesPerView: 4,
+              },
+            }}
+          >
+            {meshBlock.map((mesh) => {
+              return (
+                <SwiperSlide key={mesh.icon} className={cl.mesh} onClick={() => isLayout(mesh.layout)}>
+                  <ImageLoading src={mesh.icon} className={cl.meshIcon} />
+                  <p>{mesh.text}</p>
+                </SwiperSlide>
+              )
+            })}
+          </Swiper>
+        </div>
+        {layout === 2 ? <ProfileArts /> : <></>}
+        {layout === 3 ? <ProfileMusic /> : <></>}
       </div>
+      {layout === 1 ? (
+        <>
+          <MakePost />
+          <Posts />
+        </>
+      ) : (
+        <></>
+      )}
     </>
   )
 }

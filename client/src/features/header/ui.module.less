@@ -1,8 +1,8 @@
 .menu {
   position: absolute;
-  top: 50px;
-  z-index: 9;
-  right: 36%;
+  top: 60px;
+  z-index: 10;
+  right: 0;
   box-shadow: 0px 0px 5px 0.1px rgb(200, 200, 200);
   display: flex;
   flex-direction: column;
@@ -71,8 +71,8 @@
   margin-right: 5px;
   border: 0;
   outline: 0;
-  margin-left: 72%;
   background: 0;
+  margin-left: auto;
   &:focus + .notificationWrapper {
     display: block;
   }
@@ -98,7 +98,7 @@
   position: absolute;
   display: none;
   top: 80px;
-  right: 26%;
+  right: 0;
   background: var(--playground);
   border-radius: var(--playground-border);
   z-index: 999;
@@ -145,6 +145,11 @@
     width: 35px;
     height: 35px;
     border-radius: 50%;
+  }
+}
+@media (min-width: 0px) and (max-width: 500px) {
+  .userAvatar {
+    display: none;
   }
 }
 .search__anime {

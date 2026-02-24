@@ -30,7 +30,7 @@ export const MenuHeader = () => {
         <ImageLoading className={cl.headerMenuSvg} src='/icons/menu.svg' alt='anidale menu icon' />
       </button>
       <ul className={`playground ${cl.menu}`}>
-        {refreshData.id > 0 ? (
+        {refreshData.id! > 0 ? (
           <>
             {linksAuth.map((item) => {
               return (
@@ -74,7 +74,7 @@ export const MenuHeader = () => {
           </>
         )}
       </ul>
-      {refreshData.id > 0 ? (
+      {refreshData.id! > 0 ? (
         <Link to={`/profile/${refreshData.id}`} className={cl.userAvatar}>
           <ImageLoading src={useSrcAvatar(refreshData.avatar || '')} />
         </Link>

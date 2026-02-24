@@ -7,18 +7,22 @@
 }
 html {
   width: 100vw;
-  max-width: 100%;
   min-height: 100vh;
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
+
 body {
   width: 100%;
   min-height: 100vh;
   background-color: var(--bodyColor);
+  overflow-x: hidden; /* Предотвращает горизонтальный скролл из‑за отступов */
 }
 #root {
   width: 100%;
-  min-height: 100%;
+  min-height: 100vh; /* Лучше использовать vh, а не % */
+  display: flex;
+  flex-direction: column;
 }
 img {
   object-fit: cover;
@@ -27,4 +31,50 @@ img {
 .playground {
   border-radius: 10px;
   padding: 10px;
+}
+/* Target Input */
+input[type='range'] {
+  -webkit-appearance: none;
+  width: 100%;
+  background: transparent;
+  cursor: pointer;
+  --range-pct: 0%;
+  border-radius: 10px;
+  height: 8px;
+}
+
+/* --- Webkit Browsers --- */
+input[type='range']::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 10px;
+  background: linear-gradient(to right, #a52a2a var(--range-pct), #e0e0e0 var(--range-pct));
+}
+
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 20px;
+  width: 20px;
+  background: #a52a2a;
+  border-radius: 30px;
+  border: 2px solid #ffffff;
+  box-shadow: 0px 4px 0px rgba(0, 0, 0, 0);
+  margin-top: -6px;
+}
+
+/* --- Firefox --- */
+input[type='range']::-moz-range-track {
+  height: 8px;
+  background: linear-gradient(to right, #a52a2a var(--range-pct, 0%), #e8e8e8 var(--range-pct, 0%));
+  border-radius: 10px;
+  border: 0px solid #cbd5e1;
+  box-shadow: 0px 2px 0px rgba(0, 0, 0, 0);
+}
+
+input[type='range']::-moz-range-thumb {
+  height: 20px;
+  width: 20px;
+  background: #a52a2a;
+  border-radius: 30px;
+  border: 2px solid #ffffff;
+  box-shadow: 0px 4px 0px rgba(0, 0, 0, 0);
 }

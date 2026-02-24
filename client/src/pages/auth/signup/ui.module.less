@@ -1,11 +1,6 @@
-#content {
-  width: 70%;
-}
 .wrapLogin {
   display: flex;
-  width: 60%;
-  margin: 0 auto;
-  margin-top: 10px;
+  width: 100%;
 }
 .conteiner {
   width: 50%;
@@ -19,4 +14,20 @@
   height: 100%;
   width: 100%;
   cursor: pointer;
+}
+@media (max-width: 600px) {
+  .conteiner {
+    width: 100%;
+  }
+  .wrapLogin {
+    flex-direction: column;
+  }
+}
+@media (min-width: 600px) and (max-width: 1300px) {
+  .conteiner {
+    width: 100%;
+  }
+  .wrapLogin {
+    flex-direction: column;
+  }
 }

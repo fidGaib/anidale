@@ -1,7 +1,15 @@
 .content {
   width: 40%;
   margin: 0 auto;
-  background: var(--playground);
-  padding: 10px;
-  border-radius: var(--playground-border);
+}
+
+@media (max-width: 600px) {
+  .content {
+    width: 100%;
+  }
+}
+@media (min-width: 600px) and (max-width: 1300px) {
+  .content {
+    width: 60%;
+  }
 }

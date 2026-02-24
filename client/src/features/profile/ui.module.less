@@ -4,9 +4,8 @@
   border-radius: var(--playground-border);
   display: flex;
   flex-direction: column;
-  width: 70%;
+  width: 100%;
   margin: 0 auto;
-  margin-bottom: 10px;
   margin-top: 10px;
 }
 .loading {
@@ -15,8 +14,15 @@
 .wrapperForm {
   width: 100%;
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
+  flex-wrap: wrap;
+  margin: 0 auto;
+  margin-top: 10px;
+}
+@media (min-width: 1600px) and (max-width: 3000px) {
+  .wrapperForm {
+    width: 70%;
+  }
 }
 .avatar {
   width: 40px;
@@ -28,7 +34,12 @@
     border-radius: 50%;
   }
 }
-textarea {
+@media (min-width: 0px) and (max-width: 400px) {
+  .avatar {
+    display: none;
+  }
+}
+.textarea {
   background: 0;
   border: 0;
   resize: none;
@@ -41,6 +52,11 @@ textarea {
   padding-top: 12px;
   max-height: 200px;
   overflow-y: hidden;
+}
+@media (min-width: 0px) and (max-width: 650px) {
+  .textarea {
+    width: 65%;
+  }
 }
 .svg {
   height: 25px;
@@ -63,33 +79,7 @@ textarea {
   padding-bottom: 0;
 }
 // meshBlock
-.meshBlock {
-  width: 100%;
-  justify-content: center;
-  display: flex;
-  margin-bottom: 5px;
-  .mesh {
-    display: flex;
-    align-items: center;
-    padding: 5px 10px;
-    border-radius: 8px;
-    margin: 0 5px;
-    cursor: pointer;
-    .meshIcon {
-      width: 20px;
-      height: 20px;
-      padding: 0;
-      margin: 0;
-    }
-    p {
-      color: var(--color-text-main);
-      font-family: var(--font-text-main);
-      font-size: var(--size-text-main);
-      padding-left: 10px;
-      font-weight: 500;
-    }
-  }
-}
+
 .wrapArts {
   width: 100%;
 }

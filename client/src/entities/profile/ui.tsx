@@ -1,16 +1,16 @@
-import { HTMLAttributes } from 'react'
-// import required modules
-import { FreeMode, Navigation } from 'swiper'
-import 'swiper/css/free-mode'
-import 'swiper/css/navigation'
-// swiper
-import { Swiper, SwiperSlide } from 'swiper/react'
-// Import Swiper styles
-import 'swiper/swiper.min.css'
+import { HTMLAttributes, useState } from 'react'
+import Dropzone from 'react-dropzone'
+import { useParams } from 'react-router-dom'
 
+import { useSettingsStore } from '@/features/settings/module'
+import { AudioPlayer, OneMusic } from '@/pages/music'
+import { Modal } from '@/shared/hooks/Modal'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
+import { useAudioPlayer } from '@/shared/hooks/useAudioPlayer'
+import ButtonUI from '@/shared/ui/button'
 
 import cl from './ui.module.less'
+import memphis from '/memphis.mp3'
 
 interface Props extends HTMLAttributes<HTMLElement> {
   className: string
@@ -40,33 +40,75 @@ export const MakePostImages: React.FC<Props> = ({ className, images, removeImage
     </div>
   )
 }
-interface Art {
-  src: string
-  alt?: string
-}
 export const ProfileArts = () => {
-  const arts = [{ src: '/1.png' }, { src: '/2.png' }, { src: '/4.png' }]
+  const [arts, setArts] = useState([{ src: '/1.png' }, { src: '/2.png' }, { src: '/4.png' }])
+  const [active__modal, setActiveModal] = useState(false)
+  const [modalSrcArt, setModalSrcArt] = useState('')
+  const [image, setImage] = useState<File | string>('')
+  const validateFile = useSettingsStore((state) => state.validateFile)
+  // Обработка загрузки файла
+  const handleDrop = async (acceptedFiles: File[]) => {
+    if (acceptedFiles.length > 0) {
+      if (await validateFile(acceptedFiles)) {
+        setImage(acceptedFiles[0])
+      }
+    }
+  }
+  const { id } = useParams()
   return (
-    <div className={cl.meshContent}>
-      <Swiper
-        style={{
-          // @ts-ignore
-          '--swiper-navigation-color': '#fff',
-          '--swiper-pagination-color': '#fff',
-        }}
-        spaceBetween={0}
-        navigation={true}
-        modules={[FreeMode, Navigation]}
-        className={cl.wrappImages}
-      >
-        {arts.map((art) => {
+    <>
+      {id ? (
+        <div className={cl.loadArt}>
+          {/* Зона загрузки */}
+          {!image && (
+            <Dropzone onDrop={handleDrop} accept={{ 'image/*': ['.jpeg', '.jpg', '.png', '.gif', '.webp'] }}>
+              {({ getRootProps, getInputProps }) => (
+                <div {...getRootProps()} className={cl.dropzone}>
+                  <input {...getInputProps()} />
+                  <ImageLoading src='/icons/add_photo.svg' />
+                </div>
+              )}
+            </Dropzone>
+          )}
+        </div>
+      ) : (
+        <></>
+      )}
+      <div className={cl.pinterestGrid}>
+        <Modal active={active__modal} setActive={setActiveModal}>
+          <div className={cl.artInModal}>
+            <ImageLoading src={modalSrcArt} />
+            <ButtonUI>Загрузить</ButtonUI>
+            <ButtonUI>Поделиться</ButtonUI>
+            <ButtonUI>Пожаловаться</ButtonUI>
+          </div>
+        </Modal>
+        {arts.map((image, i) => {
           return (
-            <SwiperSlide key={art.src} id={cl.childSwiper}>
-              <ImageLoading className={cl.item} src={art.src} />
-            </SwiperSlide>
+            <>
+              <div
+                key={image.src + i}
+                className={cl.gridItem}
+                onClick={() => {
+                  setModalSrcArt(image.src)
+                  setActiveModal(true)
+                }}
+              >
+                <ImageLoading src={image.src} />
+              </div>
+            </>
           )
         })}
-      </Swiper>
-    </div>
+      </div>
+    </>
+  )
+}
+export const ProfileMusic = () => {
+  const { playingButton } = useAudioPlayer(memphis)
+  return (
+    <>
+      <AudioPlayer />
+      <OneMusic playingButton={playingButton} title={'Неизвестный трек'} artist={'Неизвестный исполнитель'} />
+    </>
   )
 }
