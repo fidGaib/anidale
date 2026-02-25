@@ -2,7 +2,7 @@ import { useRefreshStore } from '@/app/providers/routes/model'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
 
-import cl from './ui.module.less'
+import cl from './ui.module.css'
 
 export const HistoryProfile = () => {
   const [refreshData] = useRefreshStore((state) => [state.refreshData])

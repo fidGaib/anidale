@@ -1,12 +1,14 @@
 #content {
   width: 45%;
 }
+
 .head_music {
   width: 100%;
   display: flex;
   align-items: center;
   height: 30px;
 }
+
 .head_music p {
   margin-left: 20px;
   font-weight: bold;
@@ -14,10 +16,12 @@
   font-family: var(--font-text-main);
   font-size: var(--size-text-main);
   cursor: pointer;
-  &:hover {
-    color: var(--accent);
-  }
 }
+
+.head_music p:hover {
+  color: var(--accent);
+}
+
 .one_child {
   width: 100%;
   display: flex;
@@ -27,32 +31,39 @@
   border-radius: var(--playground-border);
   transition: all 0.5s;
   margin-top: 5px;
-  &:hover {
-    background: #ebebeb;
-    transition: 0.5s;
-    .play_icon {
-      display: block;
-    }
-    .pause_icon {
-      display: block;
-    }
-  }
 }
+
+.one_child:hover {
+  background: #ebebeb;
+  transition: 0.5s;
+}
+
+.one_child:hover .play_icon {
+  display: block;
+}
+
+.one_child:hover .pause_icon {
+  display: block;
+}
+
 .one_child img {
   width: 40px;
   height: 40px;
   border-radius: 10px;
 }
+
 .info_music {
   padding: 5px;
   margin-left: 15px;
 }
+
 .info_music .title {
   font-weight: bold;
   color: var(--color-text-main);
   font-family: var(--font-text-main);
   font-size: var(--size-text-main);
 }
+
 .info_music .owner {
   color: gray;
   font-family: var(--font-text-main);
@@ -63,13 +74,15 @@
   text-align: center;
   width: 50%;
   margin: 0 auto;
-  .preview {
-    border-radius: 20px;
-    width: 100px;
-    height: 100px;
-    cursor: pointer;
-  }
 }
+
+.stateMusic .preview {
+  border-radius: 20px;
+  width: 100px;
+  height: 100px;
+  cursor: pointer;
+}
+
 .musicIcons {
   width: 40px;
   height: 40px;
@@ -77,15 +90,18 @@
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.5s;
-  &:hover {
-    background: #ebebeb;
-  }
 }
+
+.musicIcons:hover {
+  background: #ebebeb;
+}
+
 .time {
   color: var(--accent);
   font-family: var(--font-text-main);
   font-size: var(--size-text-main);
 }
+
 input[type='range'] {
   background-color: #27ae60;
 }

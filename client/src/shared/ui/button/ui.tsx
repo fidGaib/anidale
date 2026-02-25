@@ -1,4 +1,4 @@
-import cl from './ui.module.less'
+import cl from './ui.module.css'
 
 export const ButtonUI = (props: any) => {
   return (

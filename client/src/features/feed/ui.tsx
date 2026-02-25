@@ -2,16 +2,15 @@ import { useState } from 'react'
 import { FreeMode } from 'swiper'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
-import { ProfileArts, ProfileMusic } from '@/entities/profile'
+import { ProfileMusic } from '@/entities/profile'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import Posts from '@/widgets/post'
 
-import cl from './ui.module.less'
+import cl from './ui.module.css'
 
 export const MeshBlockFeed = () => {
   const meshBlock = [
     { icon: '/icons/note.svg', text: 'посты', layout: 1 },
-    { icon: '/icons/arts.svg', text: 'арты', layout: 2 },
     { icon: '/icons/music.svg', text: 'музыка', layout: 3 },
     { icon: '/icons/video.svg', text: 'видео', layout: 4 },
   ]
@@ -40,7 +39,6 @@ export const MeshBlockFeed = () => {
         </Swiper>
       </div>
       {layout === 1 ? <Posts /> : <></>}
-      {layout === 2 ? <ProfileArts /> : <></>}
       {layout === 3 ? <ProfileMusic /> : <></>}
     </>
   )

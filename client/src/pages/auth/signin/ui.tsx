@@ -2,7 +2,7 @@ import { FormSignin } from '@/features/auth'
 import Content from '@/shared/content'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 
-import cl from '../signup/ui.module.less'
+import cl from '../signup/ui.module.css'
 
 export const Signin = () => {
   document.title = 'AniDale - Вход'

@@ -7,7 +7,7 @@ import { SIGNIN } from '@/shared/graphql/schema'
 import { ButtonUI } from '@/shared/ui/button/ui'
 import Input from '@/shared/ui/input'
 
-import cl from './styles.module.less'
+import cl from './styles.module.css'
 
 interface InputValues {
   email: string

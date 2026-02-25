@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { FreeMode, Navigation } from 'swiper'
 import 'swiper/css/free-mode'
 import 'swiper/css/navigation'
@@ -11,7 +10,7 @@ import Content from '@/shared/content'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import ButtonUI from '@/shared/ui/button'
 
-import cl from './ui.module.less'
+import cl from './ui.module.css'
 
 export const Anime = () => {
   const anime = [

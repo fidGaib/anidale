@@ -10,10 +10,12 @@
   border-radius: var(--playground-border);
   background: var(--playground);
   display: none;
-  &:hover {
-    display: block;
-  }
 }
+
+.menu:hover {
+  display: block;
+}
+
 .menu li {
   display: flex;
   align-items: center;
@@ -21,10 +23,12 @@
   padding: 3px 10px;
   border-radius: 5px;
   list-style: none;
-  &:hover {
-    background: rgba(211, 211, 211, 0.612);
-  }
 }
+
+.menu li:hover {
+  background: rgba(211, 211, 211, 0.612);
+}
+
 .menu li a {
   text-transform: lowercase;
   font-family: monospace, sans-serif;
@@ -37,6 +41,7 @@
   font-family: var(--font-text-main);
   font-size: var(--size-text-main);
 }
+
 .menuSvg {
   width: 20px;
   height: 20px;
@@ -46,54 +51,64 @@
   border: 0;
   outline: 0;
   background: 0;
-  &:focus + .menu {
-    display: block;
-  }
 }
+
+.focusBtn:focus + .menu {
+  display: block;
+}
+
 .headerMenuSvg {
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  img {
-    border-radius: 5px;
-    width: 40px;
-    height: 40px;
-    padding: 5px;
-    transition: 0.3s;
-    &:hover {
-      background: lightgray;
-    }
-  }
 }
-// notification
+
+.headerMenuSvg img {
+  border-radius: 5px;
+  width: 40px;
+  height: 40px;
+  padding: 5px;
+  transition: 0.3s;
+}
+
+.headerMenuSvg img:hover {
+  background: lightgray;
+}
+
+/* notification */
 .notification {
   margin-right: 5px;
   border: 0;
   outline: 0;
   background: 0;
   margin-left: auto;
-  &:focus + .notificationWrapper {
-    display: block;
-  }
 }
+
+.notification:focus + .notificationWrapper {
+  display: block;
+}
+
 .notificationSvg {
   cursor: pointer;
   transition: 0.3s;
   display: flex;
   align-items: center;
   justify-content: center;
-  img {
-    width: 40px;
-    height: 40px;
-    padding: 5px;
-    border-radius: 10px;
-    transition: 0.3s;
-    &:hover {
-      background: lightgray;
-    }
-  }
 }
+
+.notificationSvg img {
+  width: 40px;
+  height: 40px;
+  padding: 5px;
+  border-radius: 10px;
+  transition: 0.3s;
+}
+
+.notificationSvg img:hover {
+  background: lightgray;
+}
+
 .notificationWrapper {
   position: absolute;
   display: none;
@@ -104,85 +119,101 @@
   z-index: 999;
   box-shadow: 0px 0px 5px 0.1px rgb(200, 200, 200);
   margin-top: 10px;
-  .body {
-    margin-left: 10px;
-    .title {
-      font-family: var(--font-text-main);
-      font-size: var(--size-text-main);
-      font-weight: bold;
-    }
-    .description {
-      font-family: var(--font-text-main);
-      font-size: var(--size-text-main);
-    }
-  }
-  .item {
-    display: flex;
-    margin: 10px 0;
-    cursor: pointer;
-    .itemAvatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      img {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        margin-right: 10px;
-      }
-    }
-  }
+}
+
+.notificationWrapper .body {
+  margin-left: 10px;
+}
+
+.notificationWrapper .body .title {
+  font-family: var(--font-text-main);
+  font-size: var(--size-text-main);
+  font-weight: bold;
+}
+
+.notificationWrapper .body .description {
+  font-family: var(--font-text-main);
+  font-size: var(--size-text-main);
+}
+
+.notificationWrapper .item {
+  display: flex;
+  margin: 10px 0;
+  cursor: pointer;
+}
+
+.notificationWrapper .item .itemAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.notificationWrapper .item .itemAvatar img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
 }
 
 .userAvatar {
   margin-left: 10px;
-  div {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-  }
-  img {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-  }
 }
+
+.userAvatar div {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+}
+
+.userAvatar img {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+}
+
 @media (min-width: 0px) and (max-width: 500px) {
   .userAvatar {
     display: none;
   }
 }
+
 .search__anime {
   margin-right: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
-  img {
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
-    border-radius: 10px;
-    transition: 0.3s;
-    &:hover {
-      background: lightgray;
-    }
-  }
 }
+
+.search__anime img {
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: 0.3s;
+}
+
+.search__anime img:hover {
+  background: lightgray;
+}
+
 .search__in__modal {
   display: flex;
   align-items: center;
   width: 100%;
 }
+
 .search__in__modal .search__icon {
   display: flex;
   align-items: center;
 }
+
 .search__in__modal .search__icon img {
   width: 35px;
   height: 35px;
   margin-right: -35px;
   z-index: 9;
 }
+
 .search__in__modal input {
   width: 100%;
   margin: 0;
@@ -190,6 +221,7 @@
   font-weight: bold;
   font-size: 18px;
 }
+
 .response__shearch__item {
   padding: 10px 20px;
   transition: 0.3s;
@@ -199,31 +231,36 @@
   align-items: center;
   cursor: pointer;
   text-decoration: none;
-  &:hover {
-    background: rgb(50, 50, 50);
-  }
 }
-.response__shearch__item.ligth_hover {
-  &:hover {
-    background: rgb(235, 235, 235);
-  }
+
+.response__shearch__item:hover {
+  background: rgb(50, 50, 50);
 }
+
+.response__shearch__item.ligth_hover:hover {
+  background: rgb(235, 235, 235);
+}
+
 .response__shearch__item .item__image {
   width: 70px;
   height: 70px;
 }
+
 .response__shearch__item .item__image img {
   width: 70px;
   height: 70px;
   border-radius: 10px;
 }
+
 .response__shearch__item .description {
   margin-left: 20px;
 }
+
 .response__shearch__item .description .title {
   font-weight: bold;
   font-size: 16px;
 }
+
 .placeholder {
   width: 100%;
   height: 100%;

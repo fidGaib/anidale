@@ -1,8 +1,5 @@
 import { create } from 'zustand'
 
-type UserType = {
-  login: string
-}
 interface SettingsTypes {
   layout: number
   errorLogin: string

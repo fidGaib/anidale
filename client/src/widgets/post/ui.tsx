@@ -4,7 +4,7 @@ import { useInView } from 'react-intersection-observer'
 import { useParams } from 'react-router-dom'
 
 import { useRefreshStore } from '@/app/providers/routes/model'
-import { PostActionWrapp, PostDescription, PostImages, PostOwner } from '@/entities/post'
+import { PostActionWrapp, PostImages, PostOwner } from '@/entities/post'
 import { Post as TypePost } from '@/features/profile/types'
 import { REMOVE_POST } from '@/shared/graphql/schema'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
@@ -13,7 +13,7 @@ import { usePostStore } from '@/shared/store'
 import Dropdown from '@/shared/ui/dropdown'
 import { Plug } from '@/shared/ui/plug'
 
-import cl from './ui.module.less'
+import cl from './ui.module.css'
 
 export const Posts = () => {
   const profileUrlId = parseInt(useParams().id || '')
@@ -116,7 +116,7 @@ export const Posts = () => {
               </Dropdown>
             </div>
             <PostImages images={post.images} />
-            <PostDescription description={post.description} />
+            {post.description ? <div className={cl.text}>{post.description}</div> : <></>}
             <PostActionWrapp />
           </div>
         )

@@ -3,11 +3,13 @@ import { Resolvers } from '@/schema/resolvers-types'
 
 const UserResolvers: Resolvers = {
   Query: {
+    //@ts-ignore
     async getUsers() {
-      return await UserController.fetchMany()
+      return await UserController.find()
     },
+    //@ts-ignore
     async getUser(_, { id }) {
-      return await UserController.fetchOne(id)
+      return await UserController.find(id)
     },
     async logout(_, __, { req, res }) {
       return await UserController.logout(req, res)
@@ -23,6 +25,7 @@ const UserResolvers: Resolvers = {
     async login(_, args, { req, res }) {
       return await UserController.login(args.user, req, res)
     },
+    //@ts-ignore
     async updateUser(_, { user }, { req, res }) {
       const tokienData = await UserController.refresh(res, req.cookies.refreshToken)
       return await UserController.updateUser(tokienData.id, user)

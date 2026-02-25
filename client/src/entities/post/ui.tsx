@@ -16,7 +16,7 @@ import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
 import ButtonUI from '@/shared/ui/button'
 
-import cl from './ui.module.less'
+import cl from './ui.module.css'
 
 export const PostOwner = ({ post }: { post: Post }) => {
   const theme = useDarkModeStore((store) => store.theme)
@@ -30,9 +30,6 @@ export const PostOwner = ({ post }: { post: Post }) => {
       {post?.user?.login}
     </Link>
   )
-}
-export const PostDescription = ({ description }: Post) => {
-  return <>{description ? <div className={cl.text}>{description}</div> : <></>}</>
 }
 export const PostActionWrapp = () => {
   return (

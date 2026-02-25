@@ -5,7 +5,7 @@ import { GET_USERS } from '@/shared/graphql/schema'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
 
-import cl from './ui.module.less'
+import cl from './ui.module.css'
 
 interface UserType {
   id: number

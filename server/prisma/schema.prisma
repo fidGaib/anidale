@@ -20,16 +20,27 @@ model User {
   isActivated Boolean
   createdAt   DateTime @default(now())
   posts       Post[]
+  arts       Art[]
   tokens      Token[]
 }
-
+model Art {
+  id          Int      @id @default(autoincrement())
+  high      String
+  medium    String
+  small     String
+  type      String
+  vertical  Boolean
+  date        DateTime @default(now())
+  owner      Int
+  user        User     @relation(fields: [owner], references: [id])
+}
 model Post {
   id          Int      @id @default(autoincrement())
   description String
   date        DateTime @default(now())
   images      PostImage[]
-  user        User     @relation(fields: [owner], references: [id])
   owner      Int
+  user        User     @relation(fields: [owner], references: [id])
 }
 
 model PostImage {

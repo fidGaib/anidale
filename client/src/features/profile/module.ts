@@ -5,6 +5,7 @@ import { POSTS, POST_BY_USER } from '@/shared/graphql/schema'
 
 import { PostStore } from './types'
 
+//post
 export const usePostStore = create<PostStore>()((set, get) => ({
   description: '',
   images: [],

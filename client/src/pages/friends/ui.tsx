@@ -4,7 +4,7 @@ import Content from '@/shared/content'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import Input from '@/shared/ui/input'
 
-import cl from './ui.module.less'
+import cl from './ui.module.css'
 
 export const Friends = () => {
   const [refreshData] = useRefreshStore((state) => [state.refreshData])

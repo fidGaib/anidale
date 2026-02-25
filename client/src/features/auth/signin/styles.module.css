@@ -4,6 +4,7 @@
   display: flex;
   justify-content: center;
 }
+
 .form {
   display: flex;
   flex-direction: column;
@@ -12,9 +13,11 @@
   width: 100%;
   height: 100%;
 }
+
 .form input {
   width: 70%;
 }
+
 .form button {
   background: var(--accent);
   color: #fff;
@@ -28,10 +31,12 @@
   font-size: var(--size-text-main);
   font-family: var(--font-text-main);
 }
+
 .redirect {
   margin-top: 10px;
   font-family: calibri;
 }
+
 .redirect a {
   color: #000;
   text-decoration: none;
@@ -39,19 +44,9 @@
   font-family: calibri;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 1300px) {
   .container {
     width: 100%;
-  }
-  .form {
-    width: 100%;
-  }
-}
-@media (min-width: 600px) and (max-width: 1300px) {
-  .container {
-    width: 100%;
-  }
-  .form {
-    width: 100%;
+    height: 200px;
   }
 }

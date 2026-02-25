@@ -2,7 +2,7 @@ import { useDarkModeStore } from '@/app/module'
 import { usePayerStore } from '@/pages/watch/module'
 import Input from '@/shared/ui/input'
 
-import cl from './ui.module.less'
+import cl from './ui.module.css'
 
 export const ControlsVideo = ({ ref__player, handle_screenfull }: any) => {
   const handle__volume = usePayerStore((store) => store.handle__volume)

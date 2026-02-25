@@ -1,8 +1,6 @@
 :root {
   --playground-border: 10px;
-  //main text
   --size-text-main: 14px;
   --font-text-main: Calibri;
-  // accent
   --accent: brown;
 }

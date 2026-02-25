@@ -8,7 +8,7 @@ import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
 import { usePostStore } from '@/shared/store'
 
-import cl from './ui.module.less'
+import cl from './ui.module.css'
 
 // Create post
 export const MakePost = () => {

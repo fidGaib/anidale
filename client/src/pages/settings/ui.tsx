@@ -1,9 +1,8 @@
-import SettingsMenu from '@/features/settings'
 import { useSettingsStore } from '@/features/settings/module'
 import Content from '@/shared/content'
 import { LayoutLoginAvatar } from '@/widgets/settings'
 
-import cl from './ui.module.less'
+import cl from './ui.module.css'
 
 export const Settings = () => {
   document.title = `AniDale - Настройки`

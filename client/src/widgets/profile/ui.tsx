@@ -6,11 +6,10 @@ import { FreeMode } from 'swiper'
 import 'swiper/css/free-mode'
 import 'swiper/css/navigation'
 import { Swiper, SwiperSlide } from 'swiper/react'
-// Import Swiper styles
 import 'swiper/swiper.min.css'
 
 import { useRefreshStore } from '@/app/providers/routes/model'
-import { ProfileArts, ProfileMusic } from '@/entities/profile'
+import { ProfileMusic } from '@/entities/profile'
 import { MakePost } from '@/features/profile'
 import { PROFILE } from '@/shared/graphql/schema'
 import { Modal } from '@/shared/hooks/Modal'
@@ -19,8 +18,7 @@ import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
 import ButtonUI from '@/shared/ui/button'
 
 import Posts from '../post'
-// import { ModalWindow } from '../modal_window'
-import cl from './ui.module.less'
+import cl from './ui.module.css'
 
 export const ArtWork = () => {
   const params = useParams()
@@ -38,9 +36,8 @@ export const ArtWork = () => {
 
   const meshBlock = [
     { icon: '/icons/arts.svg', text: 'посты', layout: 1 },
-    { icon: '/icons/arts.svg', text: 'арты', layout: 2 },
-    { icon: '/icons/music.svg', text: 'музыка', layout: 3 },
-    { icon: '/icons/video.svg', text: 'видео', layout: 4 },
+    { icon: '/icons/music.svg', text: 'музыка', layout: 2 },
+    { icon: '/icons/video.svg', text: 'видео', layout: 3 },
   ]
   const [layout, isLayout] = useState(1)
   const [active__modal, setActiveModal] = useState(false)
@@ -104,8 +101,8 @@ export const ArtWork = () => {
             })}
           </Swiper>
         </div>
-        {layout === 2 ? <ProfileArts /> : <></>}
-        {layout === 3 ? <ProfileMusic /> : <></>}
+        {layout === 2 ? <ProfileMusic /> : <></>}
+        {layout === 3 ? <></> : <></>}
       </div>
       {layout === 1 ? (
         <>

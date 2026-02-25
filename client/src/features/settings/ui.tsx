@@ -1,5 +1,5 @@
 import { useSettingsStore } from './module'
-import cl from './ui.module.less'
+import cl from './ui.module.css'
 
 export const SettingsMenu = () => {
   const setLayout = useSettingsStore((state) => state.setLayout)

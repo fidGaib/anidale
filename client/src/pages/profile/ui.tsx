@@ -2,7 +2,7 @@
 import Content from '@/shared/content'
 import { ArtWork } from '@/widgets/profile'
 
-import cl from './ui.module.less'
+import cl from './ui.module.css'
 
 export const Profile = () => {
   return (

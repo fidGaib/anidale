@@ -6,7 +6,7 @@ import { useDarkModeStore } from '@/app/module'
 import { ControlsVideo } from '@/features/watch'
 import { dataAnime, usePayerStore } from '@/pages/watch/module'
 
-import cl from './ui.module.less'
+import cl from './ui.module.css'
 
 export const ViedeoWrapper = () => {
   const ref__player = useRef()

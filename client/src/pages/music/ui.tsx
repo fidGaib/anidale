@@ -1,7 +1,7 @@
 import Content from '@/shared/content'
 import { useAudioPlayer } from '@/shared/hooks/useAudioPlayer'
 
-import cl from './ui.module.less'
+import cl from './ui.module.css'
 import memphis from '/memphis.mp3'
 
 export const Music = () => {

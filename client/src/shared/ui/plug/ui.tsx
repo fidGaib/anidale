@@ -1,4 +1,4 @@
-import cl from './styles/plug.module.less'
+import cl from './styles/plug.module.css'
 
 export const Plug = () => {
   return (

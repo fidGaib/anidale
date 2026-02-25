@@ -2,7 +2,7 @@ import { FormSignup } from '@/features/auth'
 import Content from '@/shared/content'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 
-import cl from './ui.module.less'
+import cl from './ui.module.css'
 
 export const Registration = () => {
   document.title = 'AniDale - Добро пожаловать!'

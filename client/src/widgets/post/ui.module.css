@@ -2,10 +2,12 @@
   width: 100%;
   position: relative;
 }
+
 .reloadPosts {
   position: absolute;
   left: 30px;
 }
+
 .wrapper {
   width: 100%;
   max-height: 600px;
@@ -14,16 +16,19 @@
   margin-top: 10px;
   position: relative;
 }
+
 @media (min-width: 1600px) and (max-width: 3000px) {
   .wrapper {
     width: 70%;
   }
 }
+
 .owner {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
 }
+
 #delShow {
   animation-name: delShow;
   animation-duration: 500ms;
@@ -31,6 +36,7 @@
   animation-iteration-count: 1;
   animation-fill-mode: forwards;
 }
+
 @keyframes delShow {
   0% {
     opacity: 1;
@@ -58,25 +64,39 @@
     display: none;
   }
 }
+
 .scrollToTop {
   position: fixed;
   right: 30px;
   bottom: 5%;
-  img {
-    width: 40px;
-    height: 40px;
-    background: #fff;
-    border-radius: 50%;
-    cursor: pointer;
-    box-shadow: 0px 0px 5px 0.1px rgb(200, 200, 200);
-  }
 }
+
+.scrollToTop img {
+  width: 40px;
+  height: 40px;
+  background: #fff;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0px 0px 5px 0.1px rgb(200, 200, 200);
+}
+
 .menuPost {
   margin-left: auto;
   width: 27px;
   height: 27px;
   cursor: pointer;
 }
+
 .pizdez {
   margin-left: auto;
+}
+
+.text {
+  width: 100%;
+  font-size: 14px;
+  font-family: calibri, sans-serif;
+  padding: 10px;
+  word-wrap: break-word;
+  white-space: normal;
+  hyphens: auto;
 }

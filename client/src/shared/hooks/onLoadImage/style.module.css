@@ -1,4 +1,4 @@
-// #loading {
+/* // #loading {
 //   background: rgba(210, 210, 220);
 //   animation-name: placeHolder;
 //   animation-iteration-count: infinite;
@@ -17,7 +17,7 @@
 //   to {
 //     opacity: 0.5;
 //   }
-// }
+// } */
 #error {
   display: flex;
   align-items: center;

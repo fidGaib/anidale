@@ -10,18 +10,21 @@
     width: 70%;
   }
 }
+
 .wrappSubscribe {
   display: flex;
   margin: 0 auto;
   justify-content: center;
   align-items: center;
   margin-bottom: 10px;
-  button {
-    color: var(--accent);
-    background: #ffe6e6;
-    margin-left: 10px;
-  }
 }
+
+.wrappSubscribe button {
+  color: var(--accent);
+  background: #ffe6e6;
+  margin-left: 10px;
+}
+
 .artwork {
   display: flex;
   width: 100%;
@@ -29,19 +32,22 @@
   align-items: center;
   position: relative;
   padding: 20px;
-  .avatar {
-    border-radius: 50%;
-    img {
-      width: 250px;
-      height: 250px;
-      border-radius: 50%;
-      cursor: pointer;
-      transition: all 0.5s;
-      &:hover {
-        opacity: 0.8;
-      }
-    }
-  }
+}
+
+.artwork .avatar {
+  border-radius: 50%;
+}
+
+.artwork .avatar img {
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.5s;
+}
+
+.artwork .avatar img:hover {
+  opacity: 0.8;
 }
 
 @media (min-width: 720px) and (max-width: 1600px) {
@@ -50,12 +56,14 @@
     height: 200px;
   }
 }
+
 @media (min-width: 0px) and (max-width: 720px) {
   .artwork .avatar img {
     width: 100px;
     height: 100px;
   }
 }
+
 #edit_profile_ico {
   position: absolute;
   right: 10px;
@@ -63,6 +71,7 @@
   cursor: pointer;
   padding: 5px;
 }
+
 #loginWrap {
   z-index: 1;
   position: absolute;
@@ -70,57 +79,62 @@
   justify-content: center;
   bottom: 10px;
 }
+
 .nickname {
   border-radius: 20px;
-  // color: #000;
-  // background: rgb(235, 235, 235);
   padding: 3px 15px;
   font-weight: bold;
   overflow: hidden;
-  font-family: calibri;
+  font-family: calibri, sans-serif;
   font-size: 18px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
 #edit_login_ico {
   cursor: pointer;
   padding: 5px;
   margin-left: 10px;
 }
+
 .wrapperSwiper {
   justify-content: center;
   display: flex;
-  .mesh {
-    display: flex;
-    align-items: center;
-    padding: 5px 10px;
-    border-radius: 8px;
-    margin: 0 5px;
-    cursor: pointer;
-    width: 100px;
+}
 
-    .meshIcon {
-      width: 20px;
-      height: 20px;
-      padding: 0;
-      margin: 0;
-    }
-    p {
-      color: var(--color-text-main);
-      font-family: var(--font-text-main);
-      font-size: var(--size-text-main);
-      padding-left: 10px;
-    }
-  }
+.wrapperSwiper .mesh {
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 8px;
+  margin: 0 5px;
+  cursor: pointer;
+  width: 100px;
+}
+
+.wrapperSwiper .mesh .meshIcon {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  margin: 0;
+}
+
+.wrapperSwiper .mesh p {
+  color: var(--color-text-main);
+  font-family: var(--font-text-main);
+  font-size: var(--size-text-main);
+  padding-left: 10px;
 }
 
 .artInModal {
   width: 100%;
-  img {
-    width: 100%;
-  }
 }
+
+.artInModal img {
+  width: 100%;
+}
+
 .pizdez {
   justify-content: center;
   display: flex;

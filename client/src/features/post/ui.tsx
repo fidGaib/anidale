@@ -5,7 +5,7 @@ import { REMOVE_POST } from '@/shared/graphql/schema'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import Dropdown from '@/shared/ui/dropdown'
 
-import cl from './ui.module.less'
+import cl from './ui.module.css'
 
 interface PorepsMenu {
   postId: number

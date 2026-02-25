@@ -1,6 +1,6 @@
 import React from 'react'
 
-import cl from './ui.module.less'
+import cl from './ui.module.css'
 
 interface Props extends React.PropsWithChildren {
   className?: string

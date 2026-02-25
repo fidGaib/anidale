@@ -1,18 +1,20 @@
-// create post
 .imagesPreview {
   display: flex;
   flex-wrap: wrap;
-  .imagePreviewWrapper {
-    position: relative;
-  }
   margin: 0 auto;
   margin-top: -1px;
 }
+
+.imagesPreview .imagePreviewWrapper {
+  position: relative;
+}
+
 @media (min-width: 1600px) and (max-width: 3000px) {
   .imagesPreview {
     width: 70%;
   }
 }
+
 .imagePreviewClose {
   all: unset;
   position: absolute;
@@ -22,16 +24,18 @@
   width: 25px;
   cursor: pointer;
 }
+
 .imagePreview {
   width: 100px;
-  img {
-    width: 100px;
-    aspect-ratio: 1 / 1;
-    border-radius: 10px;
-  }
 }
+
+.imagePreview img {
+  width: 100px;
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+}
+
 .imagesPreview {
-  display: flex;
   gap: 2px;
 }
 
@@ -41,44 +45,51 @@
   padding: 10px;
   padding-top: 0;
   flex-wrap: wrap;
-  p {
-    width: 100%;
-    text-align: center;
-    font-weight: bold;
-    color: var(--accent);
-    font-family: var(--font-text-main);
-    cursor: pointer;
-    margin-top: 5px;
-  }
-  img {
-    width: 100%;
-    height: 100px;
-    cursor: pointer;
-    transition: all 0.5s;
-    &:hover {
-      opacity: 0.8;
-    }
-  }
 }
+
+.meshContent p {
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+  color: var(--accent);
+  font-family: var(--font-text-main);
+  cursor: pointer;
+  margin-top: 5px;
+}
+
+.meshContent img {
+  width: 100%;
+  height: 100px;
+  cursor: pointer;
+  transition: all 0.5s;
+}
+
+.meshContent img:hover {
+  opacity: 0.8;
+}
+
 .wrappImages {
   width: 100%;
   height: 300px;
-  #childSwiper {
-    display: flex;
-    justify-content: center;
-    overflow: hidden;
-    .item {
-      width: 100%;
-      height: 100%;
-    }
-    img {
-      width: 100%;
-      height: 100%;
-      border-radius: 10px;
-    }
-  }
 }
-// pinterest
+
+.wrappImages #childSwiper {
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.wrappImages #childSwiper .item {
+  width: 100%;
+  height: 100%;
+}
+
+.wrappImages #childSwiper img {
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+}
+
 .pinterestGrid {
   column-count: 3;
   column-gap: 5px;
@@ -86,6 +97,7 @@
   padding: 15px;
   box-sizing: border-box;
 }
+
 .gridItem {
   break-inside: avoid;
   margin-bottom: 5px;
@@ -94,28 +106,32 @@
   background: #f5f5f5;
   position: relative;
 }
+
 .gridItem img {
   width: 100%;
   height: auto;
   display: block;
 }
+
 .gridItem:hover img {
   cursor: pointer;
   transform: scale(1.05);
 }
-// in modal art
+
 .artInModal {
   width: 100%;
-  img {
-    width: 100%;
-  }
 }
-// MUSIC
+
+.artInModal img {
+  width: 100%;
+}
+
 .musicWrapper {
   width: 100%;
   display: flex;
   flex-direction: column;
 }
+
 .musicItem {
   width: 100%;
   display: flex;
@@ -124,42 +140,48 @@
   align-items: center;
   border-radius: var(--playground-border);
   transition: all 0.5s;
-  &:hover {
-    background: #ebebeb;
-    transition: 0.5s;
-  }
-  img {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-  }
 }
+
+.musicItem:hover {
+  background: #ebebeb;
+  transition: 0.5s;
+}
+
+.musicItem img {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+}
+
 .wrapInfoMusic {
   padding: 5px;
   margin-left: 15px;
-  .musicName {
-    font-weight: bold;
-    color: var(--color-text-main);
-    font-family: var(--font-text-main);
-    font-size: var(--size-text-main);
-  }
-  .musicAvtor {
-    color: gray;
-    font-family: var(--font-text-main);
-    font-size: var(--size-text-main);
-  }
+}
+
+.wrapInfoMusic .musicName {
+  font-weight: bold;
+  color: var(--color-text-main);
+  font-family: var(--font-text-main);
+  font-size: var(--size-text-main);
+}
+
+.wrapInfoMusic .musicAvtor {
+  color: gray;
+  font-family: var(--font-text-main);
+  font-size: var(--size-text-main);
 }
 
 .stateMusic {
   text-align: center;
   width: 50%;
   margin: 0 auto;
-  .preview {
-    border-radius: 20px;
-    width: 100px;
-    height: 100px;
-    cursor: pointer;
-  }
+}
+
+.stateMusic .preview {
+  border-radius: 20px;
+  width: 100px;
+  height: 100px;
+  cursor: pointer;
 }
 
 .musicIcons {
@@ -169,9 +191,10 @@
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.5s;
-  &:hover {
-    background: #ebebeb;
-  }
+}
+
+.musicIcons:hover {
+  background: #ebebeb;
 }
 
 .time {
@@ -179,7 +202,6 @@
   font-family: var(--font-text-main);
   font-size: var(--size-text-main);
 }
-// dropzone
 
 .dropzone {
   border: 2px dashed;
@@ -195,12 +217,14 @@
   width: 25%;
   margin: 0 auto;
   margin-top: 10px;
-  img {
-    width: 40px;
-    height: 40px;
-  }
-  &:hover {
-    border-color: #a52a2a;
-    opacity: 0.5;
-  }
+}
+
+.dropzone img {
+  width: 40px;
+  height: 40px;
+}
+
+.dropzone:hover {
+  border-color: #a52a2a;
+  opacity: 0.5;
 }

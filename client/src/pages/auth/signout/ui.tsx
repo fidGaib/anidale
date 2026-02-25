@@ -22,9 +22,8 @@ export const Signout = () => {
     }
     if (data?.logout === true) {
       reset()
-      navigate('/signin', { replace: true }) // Мягкий редирект
+      navigate('/signin', { replace: true })
     } else {
-      // Если logout вернул false/null — что-то пошло не так
       console.warn('Выход не подтверждён сервером')
       navigate('/signin', { replace: true })
     }
@@ -34,8 +33,4 @@ export const Signout = () => {
   }
 
   return null
-  // if (data?.logout) {
-  //   reset()
-  //   window.location.href = `/signin`
-  // }
 }

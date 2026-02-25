@@ -11,7 +11,7 @@ import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { ButtonUI } from '@/shared/ui/button/ui'
 import Input from '@/shared/ui/input'
 
-import cl from './ui.module.less'
+import cl from './ui.module.css'
 
 // Layout editor login && avatar
 export const LayoutLoginAvatar = () => {

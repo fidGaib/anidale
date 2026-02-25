@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
 
-import cl from './style.module.less'
+import cl from './style.module.css'
 
 const ImageLoading = (props: any) => {
   const { ref, inView } = useInView({

@@ -2,7 +2,7 @@ import { useLocation } from 'react-router-dom'
 
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 
-import cl from './styles.module.less'
+import cl from './styles.module.css'
 
 const NotFound: React.FC = () => {
   const location = useLocation()

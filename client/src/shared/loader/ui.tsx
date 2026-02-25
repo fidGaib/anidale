@@ -1,5 +1,5 @@
 import ImageLoading from '../hooks/onLoadImage/onLoadImage'
-import cl from './ui.module.less'
+import cl from './ui.module.css'
 
 export const Loader = () => {
   return (

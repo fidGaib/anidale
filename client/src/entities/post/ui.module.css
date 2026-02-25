@@ -1,0 +1,99 @@
+.wrappOwner {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  font-family: calibri, sans-serif;
+  font-weight: bold;
+  font-size: 16px;
+  height: 50px;
+}
+
+.wrappOwner div {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.wrappOwner img {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+}
+
+.wrappActions {
+  width: 100%;
+  display: flex;
+}
+
+.wrappActions .icon {
+  cursor: pointer;
+  border-radius: 30px;
+  margin-left: 10px;
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.wrappActions .icon img {
+  width: 23px;
+  height: 25px;
+}
+
+.wrappImages {
+  width: 100%;
+  height: 300px;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 10px;
+  margin-top: 5px;
+}
+
+.wrappImages #childSwiper {
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.wrappImages .small {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+}
+
+.wrappImages .small img {
+  width: 100%;
+  height: 100%;
+  filter: blur(15px);
+  transform: scale(1.1);
+}
+
+.wrappImages .medium {
+  max-width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.wrappImages .medium img {
+  max-width: 100%;
+  height: 100%;
+  z-index: 1;
+  margin: 0 auto;
+}
+
+.modalImage {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: red;
+}
+
+.artInModal {
+  width: 100%;
+}
+
+.artInModal img {
+  width: 100%;
+}

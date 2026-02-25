@@ -1,6 +1,6 @@
 import { HTMLAttributes } from 'react'
 
-import cl from './styles.module.less'
+import cl from './styles.module.css'
 
 const Dropdown: React.FC<HTMLAttributes<HTMLElement>> = ({ className, children, ...rest }) => {
   return (

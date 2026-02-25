@@ -2,7 +2,7 @@ import { ViedeoWrapper } from '@/entities/watch'
 import { CommentAnime } from '@/features/watch'
 import Content from '@/shared/content'
 
-import cl from './ui.module.less'
+import cl from './ui.module.css'
 
 export const Watch = () => {
   return (

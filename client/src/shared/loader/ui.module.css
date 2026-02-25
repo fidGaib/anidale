@@ -4,11 +4,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  // background: rgb(235, 235, 235);
-  div {
-    border-radius: 50%;
-  }
 }
+
+.loader div {
+  border-radius: 50%;
+}
+
 .loader img {
   width: 200px;
   height: 200px;
@@ -21,6 +22,7 @@
   padding: 10px;
   background: transparent;
 }
+
 @keyframes fadeIn {
   0% {
     transform: scale(1);
@@ -32,7 +34,6 @@
     transform: scale(0.75);
     border: 5px dashed brown;
     border-radius: 50%;
-    /* box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.782); */
     padding: 5px;
   }
   100% {

@@ -1,0 +1,31 @@
+type Query {
+  getArts(limit: Int!, page: Int!): [Art!]
+  getArtsByUser(id: Int!, limit: Int!, page: Int!): [Art!]
+}
+type Mutation {
+  createArt(images: CreateArt!): [Art!]
+  #   removeArt(id: Int!): Boolean
+  #   updateArt(id: Int!, art: UpdateArt): Art
+}
+# input UpdateArt {
+#   owner: Int!
+#   images: [FILE]
+# }
+input CreateArt {
+  images: [FILE]
+}
+type Art {
+  id: Int
+  high: String
+  medium: String
+  small: String
+  type: String
+  vertical: Boolean
+  date: Date
+  user: Owner
+}
+type Owner {
+  id: Int
+  avatar: String
+  login: String
+}

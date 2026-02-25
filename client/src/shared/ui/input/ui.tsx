@@ -1,6 +1,6 @@
 import { InputHTMLAttributes, forwardRef } from 'react'
 
-import cl from './ui.module.less'
+import cl from './ui.module.css'
 
 type Props = InputHTMLAttributes<HTMLInputElement>
 

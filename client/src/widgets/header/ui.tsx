@@ -5,7 +5,7 @@ import { FindAnime, MenuHeader, NotificationHeader } from '@/features/header'
 import Content from '@/shared/content'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 
-import cl from './ui.module.less'
+import cl from './ui.module.css'
 
 export const Header = () => {
   const darkMode = useDarkModeStore((store) => store.theme)

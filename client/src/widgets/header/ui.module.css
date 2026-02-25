@@ -6,10 +6,11 @@
 }
 .logo {
   height: 40px;
-  img {
-    width: 43.6px;
-    height: 38.5px;
-    object-fit: fill;
-    margin-top: 5px;
-  }
+}
+
+.logo img {
+  width: 43.6px;
+  height: 38.5px;
+  object-fit: fill;
+  margin-top: 5px;
 }
