@@ -1,4 +1,3 @@
-import { config } from 'dotenv'
 import 'dotenv/config'
 import http from 'http'
 import { Server as IoServer } from 'socket.io'
@@ -6,8 +5,6 @@ import { Server as IoServer } from 'socket.io'
 import { parseCookies } from './handlers/cookie-parser'
 import { serveStatic } from './handlers/file-upload'
 import { yoga } from './schema'
-
-config()
 
 const server = http.createServer()
 const io = new IoServer(server, {

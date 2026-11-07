@@ -18,16 +18,19 @@ type UpdateUser = {
   pass?: string
   activationLink?: String
 }
-type TypeUser = {
+// Поля, которые можно отдавать в публичных запросах (без email, пароля и токенов)
+type PublicUser = {
   id: number
-  email: string
-  pass: string
   login: string
   avatar: string
-  activationLink: string | null
-  isActivated: boolean
   createdAt: Date
 }
+const publicUserSelect = {
+  id: true,
+  login: true,
+  avatar: true,
+  createdAt: true,
+} as const
 // | ----------------> UserService <---------------- |
 
 class UserService {
@@ -37,7 +40,8 @@ class UserService {
     const candidate = await User.findUnique({ where: { email: email.trim() } })
     if (candidate) throw createGraphQLError('E-mail занят')
     const defaultLogin = Math.round(Math.random() * 99999999)
-    const avatar_random = Math.round(Math.random() * avatar.length)
+    // Math.floor: индекс от 0 до length - 1; Math.round мог дать length и вернуть undefined
+    const avatar_random = Math.floor(Math.random() * avatar.length)
     const hashPass = await hash(pass + process.env.PASS_PEPPER, 10)
     const activationLink = v4()
 
@@ -91,17 +95,18 @@ class UserService {
 
   // | ----------------> GET User <---------------- |
 
-  async find(id?: number): Promise<TypeUser | TypeUser[]> {
+  async find(id?: number): Promise<PublicUser | PublicUser[]> {
     if (id) {
       const user = await User.findUnique({
         where: { id },
-        include: { posts: true },
+        select: publicUserSelect,
       })
       if (!user) throw createGraphQLError('Пользователь не найден')
       return user
     }
     return await User.findMany({
-      include: { posts: true },
+      select: publicUserSelect,
+      orderBy: { id: 'asc' },
     })
   }
 
@@ -195,13 +200,13 @@ class UserService {
 
   async refresh(refreshToken: string) {
     if (!refreshToken) throw createGraphQLError('Вы не авторизованы')
-    const tokenFromDB = await Token.findMany({ where: { refreshToken } })
-    const userFromDB = await User.findUnique({ where: { id: tokenFromDB[0].userId } })
-    if (!tokenFromDB || !userFromDB) throw createGraphQLError('Вы не авторизованы')
+    // Один запрос вместо двух: токен вместе с пользователем
+    const tokenData = await tokenService.findToken(refreshToken)
+    if (!tokenData?.user) throw createGraphQLError('Вы не авторизованы')
     return {
-      id: userFromDB.id,
-      avatar: userFromDB.avatar,
-      login: userFromDB.login,
+      id: tokenData.user.id,
+      avatar: tokenData.user.avatar,
+      login: tokenData.user.login,
     }
   }
 }

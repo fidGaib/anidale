@@ -32,7 +32,6 @@ export const ControlsVideo = ({ ref__player, handle_screenfull }: any) => {
           type='range'
           onChange={(e: any) => {
             handle_prodress_track(e.target.value, ref__player)
-            console.log(playedSeconds)
           }}
           min={0}
           max={loadedSeconds}

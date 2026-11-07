@@ -13,7 +13,6 @@
   "dependencies": {
     "@apollo/client": "^3.11.10",
     "apollo-upload-client": "^17.0.0",
-    "caniuse-lite": "^1.0.30001549",
     "compose-function": "^3.0.3",
     "graphql": "^16.9.0",
     "react": "^18.3.1",
@@ -45,6 +44,7 @@
     "@typescript-eslint/parser": "^5.56.0",
     "@vitejs/plugin-react-swc": "^3.7.1",
     "autoprefixer": "^10.4.14",
+    "caniuse-lite": "^1.0.30001549",
     "eslint": "^8.36.0",
     "eslint-define-config": "^1.17.0",
     "eslint-plugin-prettier": "^4.2.1",

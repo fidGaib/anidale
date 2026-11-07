@@ -25,11 +25,6 @@ const PostResolvers: Resolvers = {
         images: postData.images,
       }
     },
-    async updatePost(_, { post }, ctx) {
-      const { req, res } = ctx
-      const user = await UserController.refresh(res, req.cookies.refreshToken)
-      return await postController.update(user.id, post!.description, post!.images)
-    },
     async removePost(_, post, ctx) {
       const { req, res } = ctx
       await UserController.refresh(res, req.cookies.refreshToken)

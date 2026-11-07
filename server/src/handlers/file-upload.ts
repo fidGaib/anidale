@@ -38,6 +38,16 @@ export const serveStatic = (req: http.IncomingMessage, res: http.ServerResponse)
     // Создаём поток для чтения файла (эффективнее, чем fs.readFile для больших файлов)
     const fileStream = fs.createReadStream(normalizedPath)
 
+    // Без обработчика 'error' ошибка чтения файла уронит весь процесс
+    fileStream.on('error', () => {
+      if (!res.headersSent) {
+        res.writeHead(500)
+        res.end('Internal Server Error')
+      } else {
+        res.destroy()
+      }
+    })
+
     res.writeHead(200, {
       'Content-Type': contentType,
       'Cache-Control': 'public, max-age=31536000', // Кеширование на год

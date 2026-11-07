@@ -5,16 +5,21 @@ import FileStorageService, { SaveImage } from './file-service'
 // import { io } from '@/index'
 import { createGraphQLError } from 'graphql-yoga'
 
+const MAX_PAGE_LIMIT = 50
+
 class PostService {
   async find(
     limit: number,
     page: number,
     userId?: number
   ){
-    const skip = page * limit;
+    // Защита от запросов вида limit = 1000000 и отрицательных значений
+    const take = Math.min(Math.max(Math.trunc(limit) || 1, 1), MAX_PAGE_LIMIT)
+    const pageNum = Math.max(Math.trunc(page) || 0, 0)
+    const skip = pageNum * take;
     const whereCondition = userId ? { owner: userId } : undefined;
     const posts = await Post.findMany({
-      take: limit,
+      take,
       skip: skip,
       where: whereCondition,
       orderBy: { id: 'desc' },
@@ -34,12 +39,26 @@ class PostService {
   }
 
   async create(owner: number, description: string, images?: File[]) {
-    let postImages = <SaveImage[]>[]
-    if(description && images?.length === 0) {
+    const storage = new FileStorageService(storagePath)
+    // Файлы сохраняем до записи в БД; если запись не удалась, удаляем их, чтобы не копить мусор
+    const postImages: SaveImage[] = images?.length
+      ? await Promise.all(images.map((image) => storage.saveImage(image, 'posts/')))
+      : []
+    try {
+      // Пост и картинки создаются одним вложенным запросом, Prisma выполняет его атомарно
       const post = await Post.create({
         data: {
           owner,
           description,
+          images: {
+            create: postImages.map((info) => ({
+              high: info.high,
+              medium: info.medium,
+              small: info.small,
+              vertical: info.vertical,
+              type: info.type,
+            })),
+          },
         },
         include: {
           user: {
@@ -51,51 +70,10 @@ class PostService {
           },
         },
       })
-      // io.emit('newPost', {
-      //   post: {
-      //     ...post,
-      //     images: postImages,
-      //     user: post.user
-      //   }
-      // })
       return { post, images: postImages }
-    }
-    else if (images?.length) {
-      const post = await Post.create({
-        data: {
-          owner,
-          description,
-        },
-        include: {
-          user: {
-            select: {
-              id: true,
-              avatar: true,
-              login: true,
-            },
-          },
-        },
-      })
-      const StorageService = new FileStorageService(storagePath)
-      postImages = await Promise.all(images.map(async (image) => await StorageService.saveImage(image, 'posts/')))
-      await PostImage.createMany({
-        data: postImages.map((info) => ({
-          postId: post.id,
-          high: info.high,
-          medium: info.medium,
-          small: info.small,
-          vertical: info.vertical,
-          type: info.type,
-        })),
-      })
-      // io.emit('newPost', {
-      //   post: {
-      //     ...post,
-      //     images: postImages,
-      //     user: post.user
-      //   }
-      // })
-      return { post, images: postImages }
+    } catch (error) {
+      if (postImages.length) await storage.removeFiles(postImages)
+      throw error
     }
   }
   // async getNewPosts(lastPostId: number) {
