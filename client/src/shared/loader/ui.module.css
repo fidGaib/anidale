@@ -6,21 +6,14 @@
   align-items: center;
 }
 
-.loader div {
-  border-radius: 50%;
-}
-
-.loader img {
+.spinner {
   width: 200px;
   height: 200px;
-  object-fit: cover;
-  object-position: center;
   border-radius: 50%;
+  border: 3px dashed brown;
   animation-name: fadeIn;
   animation-duration: 2s;
   animation-iteration-count: infinite;
-  padding: 10px;
-  background: transparent;
 }
 
 @keyframes fadeIn {
@@ -34,7 +27,6 @@
     transform: scale(0.75);
     border: 5px dashed brown;
     border-radius: 50%;
-    padding: 5px;
   }
   100% {
     transform: scale(1);

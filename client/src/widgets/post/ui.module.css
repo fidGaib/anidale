@@ -91,6 +91,12 @@
   margin-left: auto;
 }
 
+.retry {
+  display: flex;
+  justify-content: center;
+  padding: 15px 0;
+}
+
 .text {
   width: 100%;
   font-size: 14px;

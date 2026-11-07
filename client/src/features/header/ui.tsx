@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 
 import { useDarkModeStore } from '@/app/module'
 import { useRefreshStore } from '@/app/providers/routes/model'
+import { assetUrl } from '@/shared/config'
 import { Modal } from '@/shared/hooks/Modal'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
@@ -14,20 +15,20 @@ export const MenuHeader = () => {
   const [refreshData] = useRefreshStore((state) => [state.refreshData])
   const setTheme = useDarkModeStore((store) => store.setTheme)
   const linksAuth = [
-    { link: `/profile/${refreshData.id}`, text: 'Профиль', icon: '/icons/profile.svg' },
-    { link: `/feed`, text: 'Лента', icon: '/icons/feed.svg' },
-    { link: `/messages`, text: 'Мессенджер', icon: '/icons/chat.svg' },
-    { link: `/friends`, text: 'Друзья', icon: '/icons/friends.svg' },
-    { link: `/groups`, text: 'Сообщества', icon: '/icons/groups.svg' },
-    { link: `/music`, text: 'Музыка', icon: '/icons/music.svg' },
-    { link: `/anime`, text: 'Аниме', icon: '/icons/manga.svg' },
-    { link: `/settings`, text: 'Настройки', icon: '/icons/settings.svg' },
+    { link: `/profile/${refreshData.id}`, text: 'Профиль', icon: 'profile.svg' },
+    { link: `/feed`, text: 'Лента', icon: 'feed.svg' },
+    { link: `/messages`, text: 'Мессенджер', icon: 'chat.svg' },
+    { link: `/friends`, text: 'Друзья', icon: 'friends.svg' },
+    { link: `/groups`, text: 'Сообщества', icon: 'groups.svg' },
+    { link: `/music`, text: 'Музыка', icon: 'music.svg' },
+    { link: `/anime`, text: 'Аниме', icon: 'manga.svg' },
+    { link: `/settings`, text: 'Настройки', icon: 'settings.svg' },
   ]
-  const linksNotAuth = [{ link: `/feed`, text: 'Лента', icon: '/icons/feed.svg' }]
+  const linksNotAuth = [{ link: `/feed`, text: 'Лента', icon: assetUrl('icons/feed.svg') }]
   return (
     <>
       <button className={cl.focusBtn}>
-        <ImageLoading className={cl.headerMenuSvg} src='/icons/menu.svg' alt='anidale menu icon' />
+        <ImageLoading className={cl.headerMenuSvg} src={assetUrl('icons/menu.svg')} alt='anidale menu icon' />
       </button>
       <ul className={`playground ${cl.menu}`}>
         {refreshData.id! > 0 ? (
@@ -35,19 +36,23 @@ export const MenuHeader = () => {
             {linksAuth.map((item) => {
               return (
                 <li key={item.text}>
-                  <ImageLoading className={cl.menuSvg} src={item.icon} alt={`anidale ${item.text}`} />
+                  <ImageLoading
+                    className={cl.menuSvg}
+                    src={assetUrl('icons/' + item.icon)}
+                    alt={`anidale ${item.text}`}
+                  />
                   <Link to={item.link}>{item.text}</Link>
                 </li>
               )
             })}
             <li>
-              <ImageLoading className={cl.menuSvg} src='/icons/turn.svg' alt='anidale settings icon' />
+              <ImageLoading className={cl.menuSvg} src={assetUrl('icons/turn.svg')} alt='anidale settings icon' />
               <Link onClick={setTheme} to={'#'}>
                 Темный режим
               </Link>
             </li>
             <li>
-              <ImageLoading className={cl.menuSvg} src='/icons/logout.svg' alt='anidale logout icon' />
+              <ImageLoading className={cl.menuSvg} src={assetUrl('icons/logout.svg')} alt='anidale logout icon' />
               <Link to={'/signout'}>Выйти</Link>
             </li>
           </>
@@ -62,13 +67,13 @@ export const MenuHeader = () => {
               )
             })}
             <li>
-              <ImageLoading className={cl.menuSvg} src='/icons/turn.svg' alt='anidale settings icon' />
+              <ImageLoading className={cl.menuSvg} src={assetUrl('icons/turn.svg')} alt='anidale settings icon' />
               <Link onClick={setTheme} to={'#'}>
                 Темный режим
               </Link>
             </li>
             <li>
-              <ImageLoading className={cl.menuSvg} src='/icons/sigin.svg' alt='anidale sigin icon' />
+              <ImageLoading className={cl.menuSvg} src={assetUrl('icons/sigin.svg')} alt='anidale sigin icon' />
               <Link to={'/signin'}>Войти</Link>
             </li>
           </>
@@ -115,7 +120,11 @@ export const FindAnime = () => {
   })
   return (
     <>
-      <ImageLoading className={cl.search__anime} onClick={() => setActiveModal(true)} src='/icons/search.svg' />
+      <ImageLoading
+        className={cl.search__anime}
+        onClick={() => setActiveModal(true)}
+        src={assetUrl('icons/search.svg')}
+      />
       <Modal active={active__modal} setActive={setActiveModal}>
         <div className={cl.search__in__modal}>
           <Input
@@ -171,7 +180,7 @@ export const NotificationHeader = () => {
           <button className={cl.notification}>
             <ImageLoading
               className={cl.notificationSvg}
-              src='/icons/notification.svg'
+              src={assetUrl('icons/notification.svg')}
               alt='anidale notification icon'
             />
           </button>

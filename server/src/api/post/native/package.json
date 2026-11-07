@@ -1,0 +1,12 @@
+{
+  "name": "file-storage-native",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "build": "napi build --release --platform",
+    "build:debug": "napi build"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^2.16.0"
+  }
+}

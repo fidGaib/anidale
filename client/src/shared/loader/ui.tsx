@@ -1,10 +1,13 @@
-import ImageLoading from '../hooks/onLoadImage/onLoadImage'
 import cl from './ui.module.css'
 
+/**
+ * Глобальный fallback для Suspense. Раньше здесь грузился gif на 1.5 МБ,
+ * который попадал в критический путь первой загрузки — заменили на CSS-анимацию.
+ */
 export const Loader = () => {
   return (
     <div className={cl.loader}>
-      <ImageLoading src='http://localhost:5173/src/assets/images/loading.gif' alt='anidale' />
+      <div className={cl.spinner} />
     </div>
   )
 }

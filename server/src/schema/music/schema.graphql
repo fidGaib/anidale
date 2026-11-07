@@ -1,0 +1,24 @@
+type Query {
+  getMusic(id: Int!, limit: Int!, page: Int!): [Music!]
+}
+type Mutation {
+  createMusic(music: CreateMusic!): Music!
+  removeMusic(id: Int!): Boolean!
+}
+input CreateMusic {
+  owner: Int!
+  title: String!
+  image: FILE!
+}
+type Music {
+  id: Int
+  title: String
+  image: String
+  date: Date
+  user: Owner
+}
+type Owner {
+  id: Int
+  avatar: String
+  login: String
+}

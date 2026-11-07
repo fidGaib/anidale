@@ -2,13 +2,11 @@ export interface User {
   id: number
   login: string
   avatar: string
-  email: string
 }
 export interface PostImages {
   id: number
-  high: string
-  medium: string
   small: string
+  medium: string
   type: string
 }
 export interface Post {
@@ -22,9 +20,8 @@ export interface PostStore {
   images: File[] | []
   error_create: string
   setError: (message: string) => void
-  fetchPostsFeed: () => Promise<void>
-  fetchPostsProfile: (id: number) => Promise<void>
-  clearPosts: () => void
+  fetchPostsFeed: (page: number, limit: number) => Promise<Post[]>
+  fetchPostsProfile: (id: number, page: number, limit: number) => Promise<Post[]>
   changeText: (description: string) => void
   setFiles: (file: FileList | File[]) => void
   // validate: (file: File) => Promise<boolean | void>

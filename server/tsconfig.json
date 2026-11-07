@@ -16,10 +16,10 @@
     "allowJs": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      
+      "@/*": ["src/*"]
     },
-    "outDir": "dist"
+    "outDir": "dist",
+    "ignoreDeprecations": "6.0"
   },
   "include": ["src/**/*", "generate-env.ts", "codegen.ts"],
   "ts-node": {

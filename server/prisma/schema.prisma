@@ -20,18 +20,16 @@ model User {
   isActivated Boolean
   createdAt   DateTime @default(now())
   posts       Post[]
-  arts       Art[]
   tokens      Token[]
+  musics      Music[]
 }
-model Art {
+
+model Music {
   id          Int      @id @default(autoincrement())
-  high      String
-  medium    String
-  small     String
-  type      String
-  vertical  Boolean
+  title       String
   date        DateTime @default(now())
-  owner      Int
+  image       String
+  owner       Int
   user        User     @relation(fields: [owner], references: [id])
 }
 model Post {

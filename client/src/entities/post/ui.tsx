@@ -1,15 +1,8 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-// import required modules
-import { FreeMode, Navigation } from 'swiper'
-import 'swiper/css/free-mode'
-import 'swiper/css/navigation'
-// swiper
-import { Swiper, SwiperSlide } from 'swiper/react'
-// Import Swiper styles
-import 'swiper/swiper.min.css'
 
 import { useDarkModeStore } from '@/app/module'
+import { assetUrl, storageUrl } from '@/shared/config'
 import { Post } from '@/shared/graphql/gql/graphql'
 import { Modal } from '@/shared/hooks/Modal'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
@@ -35,10 +28,10 @@ export const PostActionWrapp = () => {
   return (
     <div className={cl.wrappActions}>
       <div className={cl.icon}>
-        <ImageLoading src='/icons/like.svg' alt='anidale like icon' />
+        <ImageLoading src={assetUrl('icons/like.svg')} alt='anidale like icon' />
       </div>
       <div className={cl.icon}>
-        <ImageLoading src='/icons/comm.svg' alt='anidale comments icon' />
+        <ImageLoading src={assetUrl('icons/comm.svg')} alt='anidale comments icon' />
       </div>
     </div>
   )
@@ -46,44 +39,63 @@ export const PostActionWrapp = () => {
 export const PostImages = ({ images }: Post) => {
   const [active__modal, setActiveModal] = useState(false)
   const [modalSrcArt, setModalSrcArt] = useState('')
+  const scrollerRef = useRef<HTMLDivElement>(null)
+
   if (!images?.length) return <></>
-  else
-    return (
-      <>
-        <Modal active={active__modal} setActive={setActiveModal}>
-          <div className={cl.artInModal}>
-            <ImageLoading src={modalSrcArt} />
-            <ButtonUI>Загрузить</ButtonUI>
-            <ButtonUI>Поделиться</ButtonUI>
-            <ButtonUI>Пожаловаться</ButtonUI>
-          </div>
-        </Modal>
-        <Swiper
-          style={{
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            '--swiper-navigation-color': '#fff',
-            '--swiper-pagination-color': '#fff',
-          }}
-          spaceBetween={0}
-          navigation={true}
-          modules={[FreeMode, Navigation]}
-          className={cl.wrappImages}
-        >
-          {images?.map((image) => (
-            <SwiperSlide
-              key={image?.medium! + image?.id}
-              id={cl.childSwiper}
+
+  const scrollByPage = (direction: 1 | -1) => {
+    const scroller = scrollerRef.current
+    if (!scroller) return
+    scroller.scrollBy({ left: direction * scroller.clientWidth, behavior: 'smooth' })
+  }
+
+  return (
+    <>
+      <Modal active={active__modal} setActive={setActiveModal}>
+        <div className={cl.artInModal}>
+          <ImageLoading src={modalSrcArt} />
+          <ButtonUI>Загрузить</ButtonUI>
+          <ButtonUI>Поделиться</ButtonUI>
+          <ButtonUI>Пожаловаться</ButtonUI>
+        </div>
+      </Modal>
+      <div className={cl.wrappImages}>
+        <div className={cl.scroller} ref={scrollerRef}>
+          {images.map((image, index) => (
+            <div
+              key={`${image?.id ?? index}-${image?.medium ?? ''}`}
+              className={cl.imageSlide}
               onClick={() => {
-                setModalSrcArt(`http://localhost:5000/storage/${image!.medium}.webp`)
+                setModalSrcArt(storageUrl(`${image?.medium ?? ''}.webp`))
                 setActiveModal(true)
               }}
             >
-              <ImageLoading className={cl.small} src={`http://localhost:5000/storage/${image!.small}.webp`} />
-              <ImageLoading className={cl.medium} src={`http://localhost:5000/storage/${image!.medium}.webp`} />
-            </SwiperSlide>
+              <ImageLoading className={cl.small} src={storageUrl(`${image?.small ?? ''}.webp`)} />
+              <ImageLoading className={cl.medium} src={storageUrl(`${image?.medium ?? ''}.webp`)} />
+            </div>
           ))}
-        </Swiper>
-      </>
-    )
+        </div>
+        {images.length > 1 && (
+          <>
+            <button
+              type='button'
+              aria-label='Предыдущее изображение'
+              className={`${cl.navButton} ${cl.navPrev}`}
+              onClick={() => scrollByPage(-1)}
+            >
+              ‹
+            </button>
+            <button
+              type='button'
+              aria-label='Следующее изображение'
+              className={`${cl.navButton} ${cl.navNext}`}
+              onClick={() => scrollByPage(1)}
+            >
+              ›
+            </button>
+          </>
+        )}
+      </div>
+    </>
+  )
 }

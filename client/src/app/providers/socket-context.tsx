@@ -2,6 +2,8 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { Socket, io } from 'socket.io-client'
 
+import { SOCKET_URL } from '@/shared/config'
+
 interface SocketContextType {
   socket: Socket | null
   isConnected: boolean
@@ -18,7 +20,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     // Создаём соединение при монтировании компонента
-    const socket = io('http://localhost:5000', {
+    const socket = io(SOCKET_URL, {
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionAttempts: Infinity,

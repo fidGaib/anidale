@@ -1,4 +1,4 @@
-import { HTMLAttributes, useState } from 'react'
+import { HTMLAttributes } from 'react'
 
 import { AudioPlayer, OneMusic } from '@/pages/music'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'

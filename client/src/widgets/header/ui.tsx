@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom'
 
+import darkLogo from '@/assets/images/dark_logo.png'
+import lightLogo from '@/assets/images/ligth_logo.png'
 import { useDarkModeStore } from '@/app/module'
 import { FindAnime, MenuHeader, NotificationHeader } from '@/features/header'
 import Content from '@/shared/content'
@@ -14,11 +16,7 @@ export const Header = () => {
       <Link to={'/feed'}>
         <ImageLoading
           className={cl.logo}
-          src={
-            darkMode === 'dark'
-              ? 'http://localhost:5173/src/assets/images/dark_logo.png'
-              : 'http://localhost:5173/src/assets/images/ligth_logo.png'
-          }
+          src={darkMode === 'dark' ? darkLogo : lightLogo}
         />
       </Link>
       <NotificationHeader />

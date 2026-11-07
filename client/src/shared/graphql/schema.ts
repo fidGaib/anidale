@@ -60,40 +60,7 @@ export const PROFILE = graphql(`
     }
   }
 `)
-export const profileArtsQuery = graphql(`
-  query profileArts($id: Int!, $limit: Int!, $page: Int!) {
-    getArtsByUser(id: $id, limit: $limit, page: $page) {
-      id
-      medium
-      small
-      type
-      vertical
-      date
-      user {
-        id
-        avatar
-        login
-      }
-    }
-  }
-`)
-export const feedArtsQuery = graphql(`
-  query feedArts($limit: Int!, $page: Int!) {
-    getArts(limit: $limit, page: $page) {
-      id
-      medium
-      small
-      type
-      vertical
-      date
-      user {
-        id
-        avatar
-        login
-      }
-    }
-  }
-`)
+
 export const POST_BY_USER = graphql(`
   query POST_BY_USER($id: Int!, $limit: Int!, $page: Int!) {
     getPostsByUser(id: $id, limit: $limit, page: $page) {
@@ -148,6 +115,16 @@ export const CREATE_POST = graphql(`
         login
         avatar
       }
+    }
+  }
+`)
+export const CREATE_MUSIC = graphql(`
+  mutation CREATE_MUSIC($owner: Int!, $title: String!, $image: File!) {
+    createMusic(music: { owner: $owner, title: $title, image: $image }) {
+      id
+      owner
+      title
+      image
     }
   }
 `)

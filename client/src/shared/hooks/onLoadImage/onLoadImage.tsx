@@ -21,7 +21,6 @@ const ImageLoading = (props: any) => {
     setHasError(true)
     setImageLoaded(false)
   }
-
   return (
     <div
       ref={ref}

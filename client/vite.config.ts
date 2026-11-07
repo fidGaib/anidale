@@ -16,4 +16,18 @@ export default defineConfig({
       plugins: [autoprefixer()],
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        // Вендоры меняются реже кода приложения — выносим их в отдельные
+        // долгоживущие чанки, чтобы после деплоя кэш браузера оставался валидным.
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'apollo-vendor': ['@apollo/client', 'graphql', 'apollo-upload-client'],
+          'socket-vendor': ['socket.io-client'],
+          'styled-vendor': ['styled-components'],
+        },
+      },
+    },
+  },
 })

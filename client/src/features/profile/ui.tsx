@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom'
 import { useRefreshStore } from '@/app/providers/routes/model'
 import { MakePostImages } from '@/entities/profile/ui'
 import { CREATE_POST } from '@/shared/graphql/schema'
+import { assetUrl } from '@/shared/config'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
 import { usePostStore } from '@/shared/store'
@@ -44,10 +45,14 @@ export const MakePost = () => {
           onChange={(e) => handleHeight(e)}
         />
         <label className={cl.label}>
-          <ImageLoading className={cl.svg} src='/icons/add_photo.svg' />
+          <ImageLoading className={cl.svg} src={assetUrl('icons/add_photo.svg')} />
           <input multiple type='file' hidden accept='image/*' onChange={(e) => setFiles(e.target.files!)} />
         </label>
-        <ImageLoading className={cl.svg} src='/icons/send.svg' onClick={() => send(createPost, refreshData.id!)} />
+        <ImageLoading
+          className={cl.svg}
+          src={assetUrl('icons/send.svg')}
+          onClick={() => send(createPost, refreshData.id!)}
+        />
       </div>
       {images?.length ? <MakePostImages {...{ images, removeImage }} className={loading ? cl.loading : ''} /> : <></>}
     </>

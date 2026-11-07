@@ -2,7 +2,7 @@ import { storagePath } from '@/config'
 import { Post, PostImage } from '@/db/models/post-model'
 
 import FileStorageService, { SaveImage } from './file-service'
-import { io } from '@/index'
+// import { io } from '@/index'
 import { createGraphQLError } from 'graphql-yoga'
 
 class PostService {
@@ -51,13 +51,13 @@ class PostService {
           },
         },
       })
-      io.emit('newPost', {
-        post: {
-          ...post,
-          images: postImages,
-          user: post.user
-        }
-      })
+      // io.emit('newPost', {
+      //   post: {
+      //     ...post,
+      //     images: postImages,
+      //     user: post.user
+      //   }
+      // })
       return { post, images: postImages }
     }
     else if (images?.length) {
@@ -88,34 +88,34 @@ class PostService {
           type: info.type,
         })),
       })
-      io.emit('newPost', {
-        post: {
-          ...post,
-          images: postImages,
-          user: post.user
-        }
-      })
+      // io.emit('newPost', {
+      //   post: {
+      //     ...post,
+      //     images: postImages,
+      //     user: post.user
+      //   }
+      // })
       return { post, images: postImages }
     }
   }
-  async getNewPosts(lastPostId: number) {
-    return await Post.findMany({
-      where: {
-        id: { gt: lastPostId }, // Посты с ID больше последнего
-      },
-      orderBy: { id: 'desc' },
-      include: {
-        images: true,
-        user: {
-          select: {
-            id: true,
-            avatar: true,
-            login: true,
-          },
-        },
-      },
-    });
-  }
+  // async getNewPosts(lastPostId: number) {
+  //   return await Post.findMany({
+  //     where: {
+  //       id: { gt: lastPostId }, // Посты с ID больше последнего
+  //     },
+  //     orderBy: { id: 'desc' },
+  //     include: {
+  //       images: true,
+  //       user: {
+  //         select: {
+  //           id: true,
+  //           avatar: true,
+  //           login: true,
+  //         },
+  //       },
+  //     },
+  //   });
+  // }
 
   async remove(post_id: number): Promise<boolean> {
     const storageService = new FileStorageService(storagePath);
@@ -148,14 +148,6 @@ class PostService {
       console.error('Error removing post:', error);
       throw error;
     }
-  }
-
-  async update(id: number, description?: string, images?: File[]) {
-    const newPost = {
-      description,
-    }
-    const post = await Post.update({ where: { id }, data: newPost, include: { user: true } })
-    return { post, images }
   }
 }
 export default new PostService()

@@ -1,33 +1,49 @@
-import { useEffect } from 'react'
+import { RefObject, useEffect } from 'react'
 
-const useOutsideClick = (ref: any, handler: any, notOutRef: any) => {
+type ElementRef = RefObject<HTMLElement>
+
+/**
+ * Вызывает handler по клику вне ref (и вне notOutRef, если он передан).
+ *
+ * Важно: один и тот же listener добавляется и снимается с одинаковыми опциями.
+ * В прежней версии добавлялся анонимный обработчик, а удалялся handler с capture=true,
+ * поэтому слушатель не снимался никогда.
+ */
+const useOutsideClick = (
+  ref: ElementRef,
+  handler: (event: MouseEvent) => void,
+  notOutRef?: ElementRef | null,
+) => {
   useEffect(() => {
-    document.addEventListener('mousedown', (e) => {
-      const el = ref?.current
+    const listener = (event: MouseEvent) => {
+      const el = ref.current
       const notOut = notOutRef?.current
-      if (!el || el.contains(e.target) || !notOut || notOut.contains(e.target)) {
-        return
-      }
-      handler(e)
-    })
-    return () => {
-      document.removeEventListener('mousedown', handler, true)
+      const target = event.target as Node | null
+
+      if (!el || el.contains(target) || (notOut && notOut.contains(target))) return
+
+      handler(event)
     }
-  }, [ref, handler])
+
+    document.addEventListener('mousedown', listener)
+    return () => document.removeEventListener('mousedown', listener)
+  }, [ref, handler, notOutRef])
 }
+
 export default useOutsideClick
 
-export const useOutsideClickModal = (ref: any, handler: any) => {
+export const useOutsideClickModal = (ref: ElementRef, handler: (event: MouseEvent) => void) => {
   useEffect(() => {
-    document.addEventListener('mousedown', (e) => {
-      const el = ref?.current
-      if (!el || el.contains(e.target)) {
-        return
-      }
-      handler(e)
-    })
-    return () => {
-      document.removeEventListener('mousedown', handler, true)
+    const listener = (event: MouseEvent) => {
+      const el = ref.current
+      const target = event.target as Node | null
+
+      if (!el || el.contains(target)) return
+
+      handler(event)
     }
+
+    document.addEventListener('mousedown', listener)
+    return () => document.removeEventListener('mousedown', listener)
   }, [ref, handler])
 }

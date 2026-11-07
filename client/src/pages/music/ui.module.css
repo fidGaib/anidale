@@ -21,7 +21,19 @@
 .head_music p:hover {
   color: var(--accent);
 }
-
+.head_music .load_music {
+  margin-left: auto;
+}
+.load_music img {
+  width: 30px;
+  height: 30px;
+  padding: 5px;
+}
+.load_music img:hover {
+  cursor: pointer;
+  background: rgb(224, 224, 224);
+  border-radius: 10px;
+}
 .one_child {
   width: 100%;
   display: flex;

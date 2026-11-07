@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import ReactPlayer from 'react-player'
+import ReactPlayer from 'react-player/lazy'
 import screenfull from 'screenfull'
 
 import { useDarkModeStore } from '@/app/module'

@@ -3,7 +3,36 @@ import { create } from 'zustand'
 import { client } from '@/app/providers/with-router'
 import { POSTS, POST_BY_USER } from '@/shared/graphql/schema'
 
-import { PostStore } from './types'
+import { PostStore, Post } from './types'
+
+interface RawPost {
+  id?: number | null
+  description?: string | null
+  user?: { id?: number | null; login?: string | null; avatar?: string | null } | null
+  images?: Array<{
+    id?: number | null
+    small?: string | null
+    medium?: string | null
+    type?: string | null
+  } | null> | null
+}
+
+/** Приводит ответ GraphQL (все поля nullable) к типу, с которым работает UI. */
+const toPost = (post: RawPost): Post => ({
+  id: post.id ?? 0,
+  description: post.description ?? '',
+  user: {
+    id: post.user?.id ?? 0,
+    login: post.user?.login ?? '',
+    avatar: post.user?.avatar ?? '',
+  },
+  images: (post.images ?? []).flatMap((image) =>
+    image
+      ? [{ id: image.id ?? 0, small: image.small ?? '', medium: image.medium ?? '', type: image.type ?? '' }]
+      : [],
+  ),
+})
+
 
 //post
 export const usePostStore = create<PostStore>()((set, get) => ({
@@ -17,31 +46,23 @@ export const usePostStore = create<PostStore>()((set, get) => ({
     if (description.length > 255) return
     set(() => ({ description }))
   },
-  //@ts-ignore
   fetchPostsFeed: async (page: number, limit: number) => {
-    return await client
-      .query({
-        query: POSTS,
-        variables: { limit, page },
-        fetchPolicy: 'network-only',
-      })
-      .then((res) => {
-        return res.data.getPosts
-      })
-      .catch((e) => console.log(e))
+    const { data } = await client.query({
+      query: POSTS,
+      variables: { limit, page },
+      fetchPolicy: 'network-only',
+    })
+
+    return (data.getPosts ?? []).map(toPost)
   },
-  //@ts-ignore
   fetchPostsProfile: async (id: number, page: number, limit: number) => {
-    return await client
-      .query({
-        query: POST_BY_USER,
-        variables: { id, limit, page },
-        fetchPolicy: 'network-only',
-      })
-      .then((res) => {
-        return res.data.getPostsByUser
-      })
-      .catch((e) => console.log(e))
+    const { data } = await client.query({
+      query: POST_BY_USER,
+      variables: { id, limit, page },
+      fetchPolicy: 'network-only',
+    })
+
+    return (data.getPostsByUser ?? []).map(toPost)
   },
   setFiles(fileList) {
     get().setError('')
