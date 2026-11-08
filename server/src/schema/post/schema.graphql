@@ -17,6 +17,10 @@ type Post {
   images: [PostImages]
   date: Date
   user: Owner
+  likesCount: Int
+  "Поставил ли лайк текущий пользователь (для гостя всегда false)"
+  liked: Boolean
+  commentsCount: Int
 }
 type Owner {
   id: Int

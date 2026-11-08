@@ -8,10 +8,22 @@ import { createGraphQLError } from 'graphql-yoga'
 const MAX_PAGE_LIMIT = 50
 
 class PostService {
+  /** Добавляет к посту счётчики и признак «лайк поставил просматривающий» (viewerId). */
+  static withStats<T extends { _count?: { likes: number; comments: number }; likes?: { id: number }[] }>(post: T) {
+    const { _count, likes, ...rest } = post
+    return {
+      ...rest,
+      likesCount: _count?.likes ?? 0,
+      commentsCount: _count?.comments ?? 0,
+      liked: (likes?.length ?? 0) > 0,
+    }
+  }
+
   async find(
     limit: number,
     page: number,
-    userId?: number
+    userId?: number,
+    viewerId?: number
   ){
     // Защита от запросов вида limit = 1000000 и отрицательных значений
     const take = Math.min(Math.max(Math.trunc(limit) || 1, 1), MAX_PAGE_LIMIT)
@@ -32,10 +44,13 @@ class PostService {
             login: true,
           },
         },
+        _count: { select: { likes: true, comments: true } },
+        // Только лайк просматривающего: нужен для флага liked, гостю не запрашиваем
+        ...(viewerId ? { likes: { where: { userId: viewerId }, select: { id: true }, take: 1 } } : {}),
       },
     });
 
-    return posts;
+    return posts.map((post) => PostService.withStats(post));
   }
 
   async create(owner: number, description: string, images?: File[]) {
@@ -61,6 +76,7 @@ class PostService {
           },
         },
         include: {
+          images: true,
           user: {
             select: {
               id: true,
@@ -70,7 +86,7 @@ class PostService {
           },
         },
       })
-      return { post, images: postImages }
+      return { post, images: post.images }
     } catch (error) {
       if (postImages.length) await storage.removeFiles(postImages)
       throw error
@@ -95,13 +111,15 @@ class PostService {
   //   });
   // }
 
-  async remove(post_id: number): Promise<boolean> {
+  async remove(post_id: number, userId: number): Promise<boolean> {
     const storageService = new FileStorageService(storagePath);
     const post = await Post.findUnique({
       where: { id: post_id },
       include: { images: true }
     });
     if (!post) throw createGraphQLError('Пост не найден');
+    // Удалять можно только свои посты
+    if (post.owner !== userId) throw createGraphQLError('Нет доступа');
     try {
       if (post.images && post.images.length > 0) {
         const removalPromises = post.images.map(async (item) => {

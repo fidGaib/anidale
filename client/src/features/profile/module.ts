@@ -1,7 +1,8 @@
 import { create } from 'zustand'
 
-import { client } from '@/app/providers/with-router'
+import { client } from '@/app/providers/apollo-client'
 import { POSTS, POST_BY_USER } from '@/shared/graphql/schema'
+import { UploadProgressEvent, toPercent } from '@/shared/lib/progress-fetch'
 
 import { Post, PostStore } from './types'
 
@@ -9,6 +10,9 @@ interface RawPost {
   id?: number | null
   description?: string | null
   user?: { id?: number | null; login?: string | null; avatar?: string | null } | null
+  likesCount?: number | null
+  liked?: boolean | null
+  commentsCount?: number | null
   images?: Array<{
     id?: number | null
     small?: string | null
@@ -21,6 +25,9 @@ interface RawPost {
 const toPost = (post: RawPost): Post => ({
   id: post.id ?? 0,
   description: post.description ?? '',
+  likesCount: post.likesCount ?? 0,
+  liked: post.liked ?? false,
+  commentsCount: post.commentsCount ?? 0,
   user: {
     id: post.user?.id ?? 0,
     login: post.user?.login ?? '',
@@ -36,6 +43,11 @@ export const usePostStore = create<PostStore>()((set, get) => ({
   description: '',
   images: [],
   error_create: '',
+  createdPost: null,
+  uploadProgress: null,
+  clearCreatedPost() {
+    set(() => ({ createdPost: null }))
+  },
   setError(message) {
     set(() => ({ error_create: message }))
   },
@@ -76,13 +88,28 @@ export const usePostStore = create<PostStore>()((set, get) => ({
   },
   send: async (schemaFn, owner) => {
     if (!get().description.trim() && get().images.length === 0) return
-    await schemaFn({ variables: { owner, description: get().description, images: get().images } }).then((res: any) => {
+    const hasImages = get().images.length > 0
+    // Прогресс показываем только когда есть что загружать
+    if (hasImages) set({ uploadProgress: 0 })
+    try {
+      const res: any = await schemaFn({
+        variables: { owner, description: get().description, images: get().images },
+        context: hasImages
+          ? { fetchOptions: { onProgress: (event: UploadProgressEvent) => set({ uploadProgress: toPercent(event) }) } }
+          : undefined,
+      })
+      const created = res?.data?.createPost
       set(() => ({
         description: '',
         images: [],
         error: '',
+        createdPost: created ? toPost(created) : null,
       }))
-    })
+    } catch {
+      // Ошибку показывает MakePost из состояния самой мутации
+    } finally {
+      set({ uploadProgress: null })
+    }
   },
   handleHeight: (e) => {
     get().changeText(e.target.value)

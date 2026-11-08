@@ -40,6 +40,26 @@
   height: 25px;
 }
 
+.wrappActions .count {
+  min-width: 14px;
+  margin-left: 4px;
+  font-size: 14px;
+  color: gray;
+}
+
+/* Лайк поставлен: иконка красная (фильтр красит чёрный svg) */
+.wrappActions .liked img {
+  filter: invert(24%) sepia(96%) saturate(5000%) hue-rotate(345deg) brightness(95%);
+}
+
+.wrappActions .liked .count {
+  color: #e0245e;
+}
+
+.wrappActions .iconActive .count {
+  color: var(--accent);
+}
+
 .wrappImages {
   position: relative;
   width: 100%;

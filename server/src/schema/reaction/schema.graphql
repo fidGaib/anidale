@@ -1,0 +1,20 @@
+type Query {
+  getComments(postId: Int!, limit: Int!, page: Int!): [Comment!]
+}
+type Mutation {
+  "Поставить (liked: true) или снять (false) лайк. Повторный вызов безопасен"
+  setLike(id: Int!, liked: Boolean!): LikeState!
+  addComment(postId: Int!, text: String!): Comment!
+  removeComment(id: Int!): Boolean!
+}
+type LikeState {
+  liked: Boolean!
+  likesCount: Int!
+}
+type Comment {
+  id: Int
+  text: String
+  date: Date
+  postId: Int
+  user: Owner
+}

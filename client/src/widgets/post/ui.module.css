@@ -17,6 +17,11 @@
   position: relative;
 }
 
+/* Раскрытые комментарии не должны обрезаться ограничением высоты */
+.wrapperOpen {
+  max-height: none;
+}
+
 @media (min-width: 1600px) and (max-width: 3000px) {
   .wrapper {
     width: 70%;
@@ -89,6 +94,15 @@
 
 .pizdez {
   margin-left: auto;
+}
+
+.newPosts {
+  position: sticky;
+  top: 10px;
+  z-index: 5;
+  display: flex;
+  justify-content: center;
+  padding: 10px 0 0;
 }
 
 .retry {

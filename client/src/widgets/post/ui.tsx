@@ -7,7 +7,8 @@ import { useRefreshStore } from '@/app/providers/routes/model'
 import { PostActionWrapp, PostImages, PostOwner } from '@/entities/post'
 import { Post } from '@/features/profile/types'
 import { assetUrl } from '@/shared/config'
-import { REMOVE_POST } from '@/shared/graphql/schema'
+import { PostComments } from '@/features/comments'
+import { REMOVE_POST, SET_LIKE } from '@/shared/graphql/schema'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { useSocket } from '@/shared/hooks/useSocket'
 import { usePostStore } from '@/shared/store'
@@ -110,28 +111,117 @@ export const Posts = () => {
     void loadPosts()
   }, [inView, hasMore, loading, error, loadPosts])
 
+  // Посты, пришедшие по сокету в ленте: показываем по кнопке, чтобы список не «прыгал».
+  const [pendingPosts, setPendingPosts] = useState<Post[]>([])
+  const topRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    setPendingPosts([])
+  }, [profileUrlId])
+
+  const prependPost = useCallback((post: Post) => {
+    setPosts((prev) => (prev.some((item) => item.id === post.id) ? prev : [post, ...prev]))
+  }, [])
+
   useEffect(() => {
     if (!socket || !isConnected) return
     const handleNewPost = ({ post }: { post: Post }) => {
-      // Добавляем новый пост в начало списка, не создавая дублей.
-      setPosts((prev) => (prev.some((item) => item.id === post.id) ? prev : [post, ...prev]))
+      if (profileUrlId) {
+        // Профиль: интересны только посты его владельца, они появляются сразу.
+        if (post.user?.id === profileUrlId) prependPost(post)
+        return
+      }
+      // Лента: копим новые посты и предлагаем показать.
+      setPendingPosts((prev) => (prev.some((item) => item.id === post.id) ? prev : [post, ...prev]))
     }
     socket.on('newPost', handleNewPost)
     return () => {
       socket.off('newPost', handleNewPost)
     }
-  }, [socket, isConnected])
+  }, [socket, isConnected, profileUrlId, prependPost])
+
+  // Собственный пост, созданный в профиле: добавляем сразу по ответу мутации,
+  // не дожидаясь сокета (дубль по id отсекается).
+  const createdPost = usePostStore((state) => state.createdPost)
+  const clearCreatedPost = usePostStore((state) => state.clearCreatedPost)
+  useEffect(() => {
+    if (!createdPost) return
+    if (profileUrlId && createdPost.user.id === profileUrlId) prependPost(createdPost)
+    clearCreatedPost()
+  }, [createdPost, profileUrlId, prependPost, clearCreatedPost])
+
+  const showNewPosts = () => {
+    setPosts((prev) => {
+      const ids = new Set(prev.map((post) => post.id))
+      return [...pendingPosts.filter((post) => !ids.has(post.id)), ...prev]
+    })
+    setPendingPosts([])
+    topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 
   const [remove] = useMutation(REMOVE_POST)
+  const [setLikeMutation] = useMutation(SET_LIKE)
   const refreshData = useRefreshStore((state) => state.refreshData)
+
+  // Счётчики лайков и комментариев приходят всем клиентам (liked — личное, из события не берём)
+  useEffect(() => {
+    if (!socket || !isConnected) return
+    const handleStats = ({ postId, likesCount, commentsCount }: Partial<Post> & { postId: number }) => {
+      setPosts((prev) =>
+        prev.map((post) =>
+          post.id === postId
+            ? {
+                ...post,
+                likesCount: likesCount ?? post.likesCount,
+                commentsCount: commentsCount ?? post.commentsCount,
+              }
+            : post,
+        ),
+      )
+    }
+    socket.on('postStats', handleStats)
+    return () => {
+      socket.off('postStats', handleStats)
+    }
+  }, [socket, isConnected])
+
+  const patchPost = (postId: number, patch: Partial<Post>) =>
+    setPosts((prev) => prev.map((post) => (post.id === postId ? { ...post, ...patch } : post)))
+
+  const toggleLike = async (post: Post) => {
+    const liked = !post.liked
+    // Оптимистично: интерфейс реагирует сразу, при ошибке возвращаем как было
+    patchPost(post.id, { liked, likesCount: Math.max(post.likesCount + (liked ? 1 : -1), 0) })
+    try {
+      const { data } = await setLikeMutation({ variables: { id: post.id, liked } })
+      if (data?.setLike) patchPost(post.id, { liked: data.setLike.liked, likesCount: data.setLike.likesCount })
+    } catch (err) {
+      console.error('Не удалось поставить лайк', err)
+      patchPost(post.id, { liked: post.liked, likesCount: post.likesCount })
+    }
+  }
+
+  // Какие посты сейчас с раскрытыми комментариями
+  const [openComments, setOpenComments] = useState<number[]>([])
+  const toggleComments = (postId: number) =>
+    setOpenComments((prev) => (prev.includes(postId) ? prev.filter((id) => id !== postId) : [...prev, postId]))
   const deletePost = (postId: number) => {
     setPosts((prev) => prev.filter((post) => post.id !== postId))
   }
   return (
     <>
+      <div ref={topRef} />
+      {pendingPosts.length > 0 && (
+        <div className={cl.newPosts}>
+          <ButtonUI onClick={showNewPosts}>Показать новые посты ({pendingPosts.length})</ButtonUI>
+        </div>
+      )}
       {posts?.map((post: Post) => {
         return (
-          <div key={post.id} className={`playground ${cl.wrapper}`}>
+          <div
+            key={post.id}
+            className={`playground ${cl.wrapper} ${openComments.includes(post.id) ? cl.wrapperOpen : ''}`}
+          >
             <div className={cl.owner}>
               <PostOwner post={post} />
               <Dropdown className={cl.pizdez}>
@@ -168,7 +258,16 @@ export const Posts = () => {
             </div>
             <PostImages images={post.images} />
             {post.description ? <div className={cl.text}>{post.description}</div> : <></>}
-            <PostActionWrapp />
+            <PostActionWrapp
+              liked={post.liked}
+              likesCount={post.likesCount}
+              commentsCount={post.commentsCount}
+              commentsOpen={openComments.includes(post.id)}
+              canLike={!!refreshData.id}
+              onLike={() => void toggleLike(post)}
+              onToggleComments={() => toggleComments(post.id)}
+            />
+            {openComments.includes(post.id) && <PostComments postId={post.id} postOwnerId={post.user.id} />}
           </div>
         )
       })}

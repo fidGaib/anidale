@@ -24,14 +24,42 @@ export const PostOwner = ({ post }: { post: Post }) => {
     </Link>
   )
 }
-export const PostActionWrapp = () => {
+interface ActionProps {
+  liked: boolean
+  likesCount: number
+  commentsCount: number
+  commentsOpen: boolean
+  /** Гость не может ставить лайки: подсказываем и не реагируем на клик. */
+  canLike: boolean
+  onLike: () => void
+  onToggleComments: () => void
+}
+export const PostActionWrapp = ({
+  liked,
+  likesCount,
+  commentsCount,
+  commentsOpen,
+  canLike,
+  onLike,
+  onToggleComments,
+}: ActionProps) => {
   return (
     <div className={cl.wrappActions}>
-      <div className={cl.icon}>
+      <div
+        className={`${cl.icon} ${liked ? cl.liked : ''}`}
+        title={canLike ? (liked ? 'Убрать лайк' : 'Нравится') : 'Войдите, чтобы ставить лайки'}
+        onClick={canLike ? onLike : undefined}
+      >
         <ImageLoading src={assetUrl('icons/like.svg')} alt='anidale like icon' />
+        <span className={cl.count}>{likesCount > 0 ? likesCount : ''}</span>
       </div>
-      <div className={cl.icon}>
+      <div
+        className={`${cl.icon} ${commentsOpen ? cl.iconActive : ''}`}
+        title='Комментарии'
+        onClick={onToggleComments}
+      >
         <ImageLoading src={assetUrl('icons/comm.svg')} alt='anidale comments icon' />
+        <span className={cl.count}>{commentsCount > 0 ? commentsCount : ''}</span>
       </div>
     </div>
   )

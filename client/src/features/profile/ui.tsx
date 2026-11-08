@@ -8,12 +8,14 @@ import { assetUrl } from '@/shared/config'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
 import { usePostStore } from '@/shared/store'
+import { UploadProgress } from '@/shared/ui/progress'
 
 import cl from './ui.module.css'
 
 // Create post
 export const MakePost = () => {
   const id = parseInt(useParams().id || '')
+  const uploadProgress = usePostStore((state) => state.uploadProgress)
   const [error_create, description, images, removeImage, handleHeight, handleKeydown, setFiles, send] = usePostStore(
     (state) => [
       state.error_create,
@@ -55,6 +57,11 @@ export const MakePost = () => {
         />
       </div>
       {images?.length ? <MakePostImages {...{ images, removeImage }} className={loading ? cl.loading : ''} /> : <></>}
+      {uploadProgress !== null && (
+        <div className='playground' style={{ borderRadius: 10, marginTop: 5 }}>
+          <UploadProgress percent={uploadProgress} label='Публикация поста' />
+        </div>
+      )}
     </>
   )
 }

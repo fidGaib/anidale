@@ -14,11 +14,20 @@ export interface Post {
   description: string
   user: User
   images: PostImages[]
+  likesCount: number
+  /** Поставил ли лайк текущий пользователь. */
+  liked: boolean
+  commentsCount: number
 }
 export interface PostStore {
   description: string
   images: File[] | []
   error_create: string
+  /** Последний созданный пользователем пост: профиль добавляет его в список сразу после ответа мутации. */
+  createdPost: Post | null
+  clearCreatedPost: () => void
+  /** Процент отправленных на сервер байт, пока публикуется пост с картинками; иначе null. */
+  uploadProgress: number | null
   setError: (message: string) => void
   fetchPostsFeed: (page: number, limit: number) => Promise<Post[]>
   fetchPostsProfile: (id: number, page: number, limit: number) => Promise<Post[]>
