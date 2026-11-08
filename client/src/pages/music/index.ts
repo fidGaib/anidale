@@ -1,4 +1,4 @@
-import { AudioPlayer, Music, OneMusic } from './ui'
+import { Music } from './ui'
 
-export { Music, AudioPlayer, OneMusic }
+export { Music }
 export default Music

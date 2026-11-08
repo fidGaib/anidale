@@ -1,0 +1,257 @@
+.wrapper {
+  width: 100%;
+  padding: 0 10px 10px;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 10px 10px 0 0;
+}
+
+.head p {
+  font-weight: bold;
+  color: var(--color-text-main);
+  font-family: var(--font-text-main);
+  font-size: var(--size-text-main);
+}
+
+.add {
+  margin-left: auto;
+  width: 30px;
+  height: 30px;
+  padding: 5px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.add:hover {
+  background: rgb(224, 224, 224);
+}
+
+.error {
+  color: red;
+  font-family: var(--font-text-main);
+  font-size: var(--size-text-main);
+  padding: 5px 0;
+}
+
+.player {
+  margin-top: 5px;
+  padding: 10px;
+  text-align: center;
+}
+
+/* Мини-панель поверх страницы, видна на любой странице, пока выбран трек */
+.floating {
+  position: fixed;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  width: min(480px, 92vw);
+  margin-top: 0;
+  z-index: 50;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
+}
+
+.close {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 20px;
+  height: 20px;
+  padding: 3px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.close:hover {
+  background: rgb(224, 224, 224);
+}
+
+.playerTitle {
+  /* место под крестик справа */
+  padding: 0 24px;
+  font-weight: bold;
+  color: var(--color-text-main);
+  font-family: var(--font-text-main);
+  font-size: var(--size-text-main);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playerControls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.timeline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.time {
+  min-width: 36px;
+  color: var(--accent);
+  font-family: var(--font-text-main);
+  font-size: var(--size-text-main);
+}
+
+.range {
+  flex: 1;
+  height: 6px;
+  appearance: none;
+  border-radius: 3px;
+  cursor: pointer;
+  background: linear-gradient(to right, var(--accent) var(--range-pct, 0%), #d0d0d0 var(--range-pct, 0%));
+}
+
+.range::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.range::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.notice {
+  color: #27ae60;
+  font-family: var(--font-text-main);
+  font-size: var(--size-text-main);
+  padding: 5px 0;
+}
+
+.addToMine {
+  margin-left: auto;
+  width: 24px;
+  height: 24px;
+  padding: 4px;
+  border-radius: 50%;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.addToMine:hover {
+  background: rgb(224, 224, 224);
+}
+
+.removeMine {
+  width: 20px;
+  height: 20px;
+  padding: 3px;
+  margin-left: 6px;
+  vertical-align: middle;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.removeMine:hover {
+  background: rgb(224, 224, 224);
+}
+
+.added {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: #27ae60;
+  font-family: var(--font-text-main);
+  font-size: var(--size-text-main);
+}
+
+.status {
+  color: gray;
+  font-family: var(--font-text-main);
+  font-size: var(--size-text-main);
+  padding: 10px 0;
+  text-align: center;
+}
+
+.more {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0 0;
+}
+
+.empty {
+  padding: 15px;
+  margin-top: 5px;
+  text-align: center;
+  color: gray;
+  font-family: var(--font-text-main);
+  font-size: var(--size-text-main);
+}
+
+.track {
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+  margin-top: 5px;
+  border-radius: var(--playground-border);
+  transition: background 0.3s;
+}
+
+.track:hover {
+  background: #ebebeb;
+}
+
+.active .title {
+  color: var(--accent);
+}
+
+.control {
+  width: 40px;
+  height: 40px;
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.info {
+  padding: 5px;
+  margin-left: 10px;
+  min-width: 0;
+}
+
+.title {
+  font-weight: bold;
+  color: var(--color-text-main);
+  font-family: var(--font-text-main);
+  font-size: var(--size-text-main);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.artist {
+  color: gray;
+  font-family: var(--font-text-main);
+  font-size: var(--size-text-main);
+}
+
+.remove {
+  margin-left: auto;
+  width: 24px;
+  height: 24px;
+  padding: 4px;
+  border-radius: 50%;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.remove:hover {
+  background: rgb(224, 224, 224);
+}

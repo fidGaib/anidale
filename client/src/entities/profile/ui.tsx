@@ -1,11 +1,8 @@
 import { HTMLAttributes } from 'react'
 
-import { AudioPlayer, OneMusic } from '@/pages/music'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
-import { useAudioPlayer } from '@/shared/hooks/useAudioPlayer'
 
 import cl from './ui.module.css'
-import memphis from '/memphis.mp3'
 
 interface Props extends HTMLAttributes<HTMLElement> {
   className: string
@@ -32,14 +29,5 @@ export const MakePostImages: React.FC<Props> = ({ className, images, removeImage
         </div>
       ))}
     </div>
-  )
-}
-export const ProfileMusic = () => {
-  const { playingButton } = useAudioPlayer(memphis)
-  return (
-    <>
-      <AudioPlayer />
-      <OneMusic playingButton={playingButton} title={'Неизвестный трек'} artist={'Неизвестный исполнитель'} />
-    </>
   )
 }

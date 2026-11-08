@@ -1,18 +1,27 @@
 type Query {
   getMusic(id: Int!, limit: Int!, page: Int!): [Music!]
+  getAllMusic(limit: Int!, page: Int!): [Music!]
+  "Файлы всех треков текущего пользователя: клиент по ним помечает уже добавленные"
+  myMusicFiles: [String!]!
 }
 type Mutation {
   createMusic(music: CreateMusic!): Music!
+  addMusic(id: Int!): Music!
   removeMusic(id: Int!): Boolean!
+  "Убрать трек с этим файлом из профиля текущего пользователя (свой или добавленную копию)"
+  removeMyMusic(file: String!): Boolean!
 }
 input CreateMusic {
-  owner: Int!
   title: String!
-  image: FILE!
+  artist: String
+  file: FILE!
 }
 type Music {
   id: Int
   title: String
+  artist: String
+  file: String
+  size: Int
   image: String
   date: Date
   user: Owner

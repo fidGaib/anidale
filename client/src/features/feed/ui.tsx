@@ -1,14 +1,11 @@
-import { lazy, Suspense, useState } from 'react'
+import { useState } from 'react'
 
+import { ProfileMusicList } from '@/features/music'
 import { assetUrl } from '@/shared/config'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
-import { Plug } from '@/shared/ui/plug'
 import Posts from '@/widgets/post'
 
 import cl from './ui.module.css'
-
-// Музыкальная вкладка нужна только по клику — не тянем AudioPlayer/Howler в первый экран ленты.
-const ProfileMusic = lazy(() => import('@/entities/profile').then((module) => ({ default: module.ProfileMusic })))
 
 const meshBlock = [
   { icon: assetUrl('icons/note.svg'), text: 'посты', layout: 1 },
@@ -31,13 +28,7 @@ export const MeshBlockFeed = () => {
         })}
       </div>
       {layout === 1 ? <Posts /> : <></>}
-      {layout === 3 ? (
-        <Suspense fallback={<Plug />}>
-          <ProfileMusic />
-        </Suspense>
-      ) : (
-        <></>
-      )}
+      {layout === 3 ? <ProfileMusicList scope='all' canAdd={false} /> : <></>}
     </>
   )
 }

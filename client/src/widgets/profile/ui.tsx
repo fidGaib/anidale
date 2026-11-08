@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 
 import { useRefreshStore } from '@/app/providers/routes/model'
-import { ProfileMusic } from '@/entities/profile'
+import { ProfileMusicList } from '@/features/music'
 import { MakePost } from '@/features/profile'
 import { PROFILE } from '@/shared/graphql/schema'
 import { Modal } from '@/shared/hooks/Modal'
@@ -69,7 +69,7 @@ export const ArtWork = () => {
         </div>
         {refreshData.id !== id ? (
           <div className={cl.wrappSubscribe}>
-            <Link to={'/chat'}>
+            <Link to={`/messages/${id}`}>
               <ButtonUI>Написать</ButtonUI>
             </Link>
             <ButtonUI>Подписаться</ButtonUI>
@@ -87,7 +87,7 @@ export const ArtWork = () => {
             )
           })}
         </div>
-        {layout === 2 ? <ProfileMusic /> : <></>}
+        {layout === 2 ? <ProfileMusicList scope={id} canAdd={refreshData.id === id} /> : <></>}
         {layout === 3 ? <></> : <></>}
       </div>
       {layout === 1 ? (

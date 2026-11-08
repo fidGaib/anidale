@@ -7,19 +7,31 @@ const PostResolvers: Resolvers = {
     async getMusic(_, { id, limit, page }) {
       return await MusicController.getMusic(limit, page, id)
     },
+    async getAllMusic(_, { limit, page }) {
+      return await MusicController.getAllMusic(limit, page)
+    },
+    async myMusicFiles(_, __, { req, res }) {
+      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      return await MusicController.getMyFiles(user.id)
+    },
   },
   Mutation: {
+    async addMusic(_, { id }, { req, res }) {
+      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      return await MusicController.addToProfile(id, user.id)
+    },
     async createMusic(_, { music }, { req, res }) {
       const user = await UserController.refresh(res, req.cookies.refreshToken)
-      const { title, image } = music
-      const data = await MusicController.create(user.id, title, image)
-      return {
-        ...data,
-      }
+      const { title, artist, file } = music
+      return await MusicController.create(user.id, title, artist ?? undefined, file)
     },
-    async removeMusic(_, post, { req, res }) {
-      await UserController.refresh(res, req.cookies.refreshToken)
-      return await MusicController.remove(post.id)
+    async removeMyMusic(_, { file }, { req, res }) {
+      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      return await MusicController.removeMine(file, user.id)
+    },
+    async removeMusic(_, { id }, { req, res }) {
+      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      return await MusicController.remove(id, user.id)
     },
   },
 }
