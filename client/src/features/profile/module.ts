@@ -3,7 +3,7 @@ import { create } from 'zustand'
 import { client } from '@/app/providers/with-router'
 import { POSTS, POST_BY_USER } from '@/shared/graphql/schema'
 
-import { PostStore, Post } from './types'
+import { Post, PostStore } from './types'
 
 interface RawPost {
   id?: number | null
@@ -27,12 +27,9 @@ const toPost = (post: RawPost): Post => ({
     avatar: post.user?.avatar ?? '',
   },
   images: (post.images ?? []).flatMap((image) =>
-    image
-      ? [{ id: image.id ?? 0, small: image.small ?? '', medium: image.medium ?? '', type: image.type ?? '' }]
-      : [],
+    image ? [{ id: image.id ?? 0, small: image.small ?? '', medium: image.medium ?? '', type: image.type ?? '' }] : [],
   ),
 })
-
 
 //post
 export const usePostStore = create<PostStore>()((set, get) => ({
@@ -64,13 +61,13 @@ export const usePostStore = create<PostStore>()((set, get) => ({
 
     return (data.getPostsByUser ?? []).map(toPost)
   },
-  setFiles(fileList) {
+  setFiles: async (fileList) => {
     get().setError('')
     const files = Array.from(fileList)
-    files.map(async (file) => {
-      set(() => ({ images: [...get().images, file] }))
-    })
+    const compressed = await Promise.all(files.map((f) => compress(f)))
+    set((state) => ({ images: [...state.images, ...compressed] }))
   },
+
   removeImage: (image) => {
     const array = get().images.filter((item) => item !== image)
     set(() => ({
@@ -99,3 +96,18 @@ export const usePostStore = create<PostStore>()((set, get) => ({
     if (key === 'Enter' && !shiftKey) return get().send(createPost, owner)
   },
 }))
+async function compress(file: File, maxSide = 1920, quality = 0.8): Promise<File> {
+  if (file.type === 'image/gif') return file // gif не трогаем, анимацию испортим
+
+  const bitmap = await createImageBitmap(file)
+  const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height))
+  const w = Math.round(bitmap.width * scale)
+  const h = Math.round(bitmap.height * scale)
+
+  const canvas = new OffscreenCanvas(w, h)
+  canvas.getContext('2d')!.drawImage(bitmap, 0, 0, w, h)
+  bitmap.close()
+
+  const blob = await canvas.convertToBlob({ type: 'image/webp', quality })
+  return new File([blob], file.name, { type: 'image/webp' })
+}
