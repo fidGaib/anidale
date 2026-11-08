@@ -2,6 +2,7 @@ import 'dotenv/config'
 import http from 'http'
 import { Server as IoServer } from 'socket.io'
 
+import { applyCors, getAllowedOrigins } from './handlers/cors'
 import { parseCookies } from './handlers/cookie-parser'
 import { serveStatic } from './handlers/file-upload'
 import { yoga } from './schema'
@@ -9,7 +10,7 @@ import { yoga } from './schema'
 const server = http.createServer()
 const io = new IoServer(server, {
   cors: {
-    origin: process.env.CLIENT_URL,
+    origin: getAllowedOrigins(),
     methods: ['GET', 'POST', 'OPTIONS'],
     credentials: true,
   },
@@ -17,25 +18,15 @@ const io = new IoServer(server, {
 
 // Единый обработчик запросов
 server.on('request', async (req, res) => {
-  const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173'
-  // CORS-заголовки для всех ответов
-  const setCorsHeaders = () => {
-    if (!res.writableEnded) {
-      res.setHeader('Access-Control-Allow-Origin', clientUrl)
-      res.setHeader('Access-Control-Allow-Credentials', 'true')
-      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-    }
-  }
   try {
     // Обработка preflight-запросов
     if (req.method === 'OPTIONS') {
-      setCorsHeaders()
+      applyCors(req, res)
       res.writeHead(204)
       res.end()
       return
     }
-    setCorsHeaders()
+    applyCors(req, res)
     if (serveStatic(req, res)) {
       return
     }
