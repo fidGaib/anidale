@@ -21,6 +21,8 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     // Создаём соединение при монтировании компонента
     const socket = io(SOCKET_URL, {
+      // Только WebSocket: без рукопожатия через опрос (polling) и без перехода на WebSocket
+      transports: ['websocket'],
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionAttempts: Infinity,

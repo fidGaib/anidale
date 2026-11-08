@@ -65,6 +65,11 @@ pub async fn save_image(
         .unwrap_or(&"webp")
         .to_string();
 
+    // GIF пока не поддерживаем: анимация не сохраняется, а перекодирование теряет кадры
+    if format == image::ImageFormat::Gif {
+        return Err(Error::from_reason("GIF пока не поддерживается"));
+    }
+
     let storage = PathBuf::from(&storage_path);
     let src_for_task = src.clone();
 
@@ -75,28 +80,38 @@ pub async fn save_image(
             .map_err(|e| Error::from_reason(format!("не удалось декодировать изображение: {e}")))?;
 
         let (w, h) = (img.width(), img.height());
+        let vertical = h > w;
+        let is_avatar = src_for_task == "avatars/";
 
-        let medium_img = if src_for_task == "avatars/" {
-            img.resize_to_fill(512, 512, image::imageops::FilterType::CatmullRom)
-        } else if w > 1920 {
+        // Medium: не шире 1920 px. Аватары не обрезаются, только сжимаются.
+        let medium_src: Option<image::DynamicImage> = if w > 1920 {
             let new_h = (h as f64 * (1920.0 / w as f64)).round() as u32;
-            img.resize_exact(1920, new_h, image::imageops::FilterType::CatmullRom)
-        } else {
-            img.clone()
-        };
-
-        let medium = encode_webp(&medium_img, 80.0)?;
-
-        let small = if src_for_task != "avatars/" {
-            Some(encode_webp(
-                &img.resize_to_fill(320, 320, image::imageops::FilterType::CatmullRom),
-                60.0,
-            )?)
+            Some(img.resize_exact(1920, new_h, image::imageops::FilterType::CatmullRom))
         } else {
             None
         };
+        let encode_medium = || encode_webp(medium_src.as_ref().unwrap_or(&img), 80.0);
 
-        Ok((medium, small, h > w))
+        if is_avatar {
+            return Ok((encode_medium()?, None, vertical));
+        }
+
+        // Medium и small кодируем параллельно: small (320 px) спрятан за более долгим medium
+        let (medium, small) = std::thread::scope(|scope| -> napi::Result<(Vec<u8>, Vec<u8>)> {
+            let small_task = scope.spawn(|| {
+                encode_webp(
+                    &img.resize_to_fill(320, 320, image::imageops::FilterType::CatmullRom),
+                    60.0,
+                )
+            });
+            let medium = encode_medium();
+            let small = small_task
+                .join()
+                .map_err(|_| Error::from_reason("паника при кодировании small"))?;
+            Ok((medium?, small?))
+        })?;
+
+        Ok((medium, Some(small), vertical))
     },
 )
 .await

@@ -104,10 +104,20 @@ async function compress(file: File, maxSide = 1920, quality = 0.8): Promise<File
   const w = Math.round(bitmap.width * scale)
   const h = Math.round(bitmap.height * scale)
 
-  const canvas = new OffscreenCanvas(w, h)
-  canvas.getContext('2d')!.drawImage(bitmap, 0, 0, w, h)
+  const canvas = document.createElement('canvas')
+  canvas.width = w
+  canvas.height = h
+  const ctx = canvas.getContext('2d')
+  if (!ctx) throw new Error('canvas 2d недоступен')
+  ctx.drawImage(bitmap, 0, 0, w, h)
   bitmap.close()
 
-  const blob = await canvas.convertToBlob({ type: 'image/webp', quality })
+  const blob = await new Promise<Blob>((resolve, reject) =>
+    canvas.toBlob(
+      (b) => (b ? resolve(b) : reject(new Error('не удалось сжать изображение'))),
+      'image/webp',
+      quality,
+    ),
+  )
   return new File([blob], file.name, { type: 'image/webp' })
 }
