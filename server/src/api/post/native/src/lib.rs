@@ -77,10 +77,10 @@ pub async fn save_image(
         let (w, h) = (img.width(), img.height());
 
         let medium_img = if src_for_task == "avatars/" {
-            img.resize_to_fill(512, 512, image::imageops::FilterType::Lanczos3)
+            img.resize_to_fill(512, 512, image::imageops::FilterType::CatmullRom)
         } else if w > 1920 {
             let new_h = (h as f64 * (1920.0 / w as f64)).round() as u32;
-            img.resize_exact(1920, new_h, image::imageops::FilterType::Lanczos3)
+            img.resize_exact(1920, new_h, image::imageops::FilterType::CatmullRom)
         } else {
             img.clone()
         };
@@ -89,7 +89,7 @@ pub async fn save_image(
 
         let small = if src_for_task != "avatars/" {
             Some(encode_webp(
-                &img.resize_to_fill(320, 320, image::imageops::FilterType::Lanczos3),
+                &img.resize_to_fill(320, 320, image::imageops::FilterType::CatmullRom),
                 60.0,
             )?)
         } else {

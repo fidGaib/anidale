@@ -1,6 +1,14 @@
+import os from 'node:os'
+
 import { createGraphQLError } from 'graphql-yoga'
 
+import { createLimiter } from '@/utils/limiter'
+
 import { load, removeFiles, saveImage } from './native/'
+
+// Обработка картинки занимает ядро процессора и держит декодированный кадр в памяти.
+// Не больше числа логических процессоров одновременно: остальные ждут в очереди.
+const imageLimiter = createLimiter(os.availableParallelism())
 
 export interface SaveImage {
   high: string
@@ -16,7 +24,7 @@ class FileStorageService {
   async saveImage(file: File, src: string): Promise<SaveImage> {
     const buffer = Buffer.from(await file.arrayBuffer())
     try {
-      return await saveImage(buffer, this.storagePath, src)
+      return await imageLimiter(() => saveImage(buffer, this.storagePath, src))
     } catch (error) {
       throw createGraphQLError((error as Error).message)
     }
