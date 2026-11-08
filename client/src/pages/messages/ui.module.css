@@ -1,0 +1,50 @@
+.page {
+  display: flex;
+  gap: 10px;
+  width: 70%;
+  max-width: 1100px;
+  height: calc(100vh - 90px);
+  min-height: 400px;
+  margin: 10px auto;
+}
+
+.list {
+  width: 300px;
+  flex-shrink: 0;
+  min-height: 0;
+}
+
+.chat {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 20px;
+  text-align: center;
+  border-radius: var(--playground-border);
+  color: gray;
+  font-family: var(--font-text-main);
+  font-size: var(--size-text-main);
+}
+
+@media (max-width: 1300px) {
+  .page {
+    width: 92%;
+  }
+}
+
+@media (max-width: 800px) {
+  .list {
+    width: 100%;
+  }
+
+  .hideOnMobile {
+    display: none;
+  }
+}

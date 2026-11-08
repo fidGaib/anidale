@@ -1,0 +1,62 @@
+type Query {
+  "Диалоги текущего пользователя, свежие сверху"
+  getConversations: [ConversationItem!]!
+  "Сообщения диалога с userId порядком «новые сверху»; beforeId — подгрузка более старых"
+  getMessages(userId: Int!, beforeId: Int, limit: Int!): [Message!]!
+  "Закреплённое сообщение диалога с userId (если есть и видно пользователю)"
+  getPinnedMessage(userId: Int!): Message
+}
+type Mutation {
+  "replyTo — id сообщения этого же диалога, на которое отвечаем"
+  sendMessage(to: Int!, text: String, files: [FILE!], replyTo: Int): Message!
+  "Удалить диалог у себя (по умолчанию). С forEveryone: true переписка и файлы стираются у обоих сразу. Когда у себя удалили оба, она тоже стирается окончательно"
+  deleteConversation(userId: Int!, forEveryone: Boolean): Boolean!
+  markRead(userId: Int!): Boolean!
+  "Править можно свои сообщения; вложения не меняются"
+  editMessage(id: Int!, text: String!): Message!
+  "forEveryone: стереть у обоих (только своё). Иначе скрыть у себя"
+  deleteMessage(id: Int!, forEveryone: Boolean): Boolean!
+  "Переслать сообщение нескольким пользователям (до 10). Файлы не копируются"
+  forwardMessage(id: Int!, to: [Int!]!): [Message!]!
+  "Закрепить или открепить сообщение; в диалоге одно закреплённое, видно обоим"
+  pinMessage(id: Int!, pinned: Boolean!): Boolean!
+}
+type ConversationItem {
+  user: Owner!
+  lastMessage: Message
+  unread: Int!
+}
+type Message {
+  id: Int!
+  text: String!
+  date: Date!
+  senderId: Int!
+  recipientId: Int!
+  "Когда сообщение редактировали; null, если не редактировалось"
+  editedAt: Date
+  "Логин и id автора оригинала у пересланного сообщения"
+  forwardedFrom: String
+  forwardedFromId: Int
+  "Id сообщения, на которое это ответ (даже если оригинал уже недоступен)"
+  replyToId: Int
+  "Краткое содержимое оригинала; null, если оригинал удалён или недоступен"
+  replyTo: ReplyPreview
+  attachments: [MessageAttachment!]!
+}
+type ReplyPreview {
+  id: Int!
+  senderId: Int!
+  text: String!
+  "Тип и имя первого вложения оригинала, если есть"
+  attachmentKind: String
+  attachmentName: String
+}
+"kind: image | audio | file. У image file и thumb — пути без расширения (.webp добавляет клиент)"
+type MessageAttachment {
+  id: Int!
+  kind: String!
+  name: String!
+  size: Int!
+  file: String!
+  thumb: String!
+}

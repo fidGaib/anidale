@@ -8,6 +8,7 @@ const Signout = lazy(() => import('@/pages/auth/signout'))
 const Registration = lazy(() => import('@/pages/auth/signup/'))
 const Settings = lazy(() => import('@/pages/settings'))
 const Music = lazy(() => import('@/pages/music'))
+const Messages = lazy(() => import('@/pages/messages'))
 const Anime = lazy(() => import('@/pages/anime'))
 const Watch = lazy(() => import('@/pages/watch'))
 
@@ -19,6 +20,8 @@ export const privateRoutes = [
   { path: '/friends', element: Friends },
   { path: '/settings', element: Settings },
   { path: '/music', element: Music },
+  { path: '/messages', element: Messages },
+  { path: '/messages/:userId', element: Messages },
   { path: '/anime', element: Anime },
   { path: '/watch', element: Watch },
 ]

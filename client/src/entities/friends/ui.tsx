@@ -23,10 +23,7 @@ const CardUser = () => {
               <ImageLoading className={cl.wrapAvatar} src={useSrcAvatar(avatar)} alt='anidale' />
               <div className={cl.login}>{login}</div>
             </Link>
-            <Link
-              className={cl.toChat}
-              to={`/chat?chat_id=${Math.round(Math.random() * 99999999)}&from=${id}&to=${id}`}
-            >
+            <Link className={cl.toChat} to={`/messages/${id}`}>
               <ImageLoading src='/icons/chat.svg' alt='anidale chat icon' className={cl.svg} />
             </Link>
             <ImageLoading src='/icons/close.svg' alt='anidale close icon' className={cl.svg} />

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 
 import { useDarkModeStore } from '@/app/module'
 import { useRefreshStore } from '@/app/providers/routes/model'
+import { useMessagesStore } from '@/features/messages'
 import { assetUrl } from '@/shared/config'
 import { Modal } from '@/shared/hooks/Modal'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
@@ -14,6 +15,7 @@ import cl from './ui.module.css'
 export const MenuHeader = () => {
   const [refreshData] = useRefreshStore((state) => [state.refreshData])
   const setTheme = useDarkModeStore((store) => store.setTheme)
+  const unread = useMessagesStore((s) => s.conversations.reduce((sum, c) => sum + c.unread, 0))
   const linksAuth = [
     { link: `/profile/${refreshData.id}`, text: 'Профиль', icon: 'profile.svg' },
     { link: `/feed`, text: 'Лента', icon: 'feed.svg' },
@@ -41,7 +43,14 @@ export const MenuHeader = () => {
                     src={assetUrl('icons/' + item.icon)}
                     alt={`anidale ${item.text}`}
                   />
-                  <Link to={item.link}>{item.text}</Link>
+                  <Link to={item.link}>
+                    {item.text}
+                    {item.link === '/messages' && unread > 0 ? (
+                      <span style={{ marginLeft: 6, padding: '1px 6px', borderRadius: 10, background: 'brown', color: '#fff', fontSize: 12 }}>
+                        {unread > 99 ? '99+' : unread}
+                      </span>
+                    ) : null}
+                  </Link>
                 </li>
               )
             })}

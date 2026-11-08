@@ -1,0 +1,501 @@
+.hint {
+  padding: 15px;
+  text-align: center;
+  color: gray;
+  font-family: var(--font-text-main);
+  font-size: var(--size-text-main);
+}
+
+.error {
+  padding: 4px 10px;
+  color: red;
+  font-family: var(--font-text-main);
+  font-size: var(--size-text-main);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.login {
+  font-weight: bold;
+  color: var(--color-text-main);
+  font-family: var(--font-text-main);
+  font-size: var(--size-text-main);
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.avatar img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+/* ---------- список диалогов ---------- */
+
+.listBox {
+  height: 100%;
+  overflow-y: auto;
+  border-radius: var(--playground-border);
+}
+
+.listHead {
+  padding: 12px 15px;
+  font-weight: bold;
+  color: var(--color-text-main);
+  font-family: var(--font-text-main);
+  font-size: var(--size-text-main);
+}
+
+.dialog,
+.chatUser,
+.back {
+  text-decoration: none;
+}
+
+.dialog {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 15px;
+  color: inherit;
+  transition: background 0.3s;
+}
+
+.dialog:hover,
+.dialogActive {
+  background: #ebebeb;
+}
+
+.dialogBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.dialogTop,
+.dialogBottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.time {
+  color: gray;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.previewText {
+  color: gray;
+  font-family: var(--font-text-main);
+  font-size: var(--size-text-main);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.badge {
+  min-width: 18px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 12px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.removeDialog {
+  display: none;
+  width: 20px;
+  height: 20px;
+  padding: 3px;
+  border-radius: 50%;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.dialog:hover .removeDialog {
+  display: block;
+}
+
+.removeDialog:hover {
+  background: rgb(210, 210, 210);
+}
+
+/* ---------- чат ---------- */
+
+.chatBox {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-radius: var(--playground-border);
+  overflow: hidden;
+}
+
+.chatHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.chatUser {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: inherit;
+}
+
+.back {
+  display: none;
+  font-size: 22px;
+  color: var(--color-text-main);
+}
+
+.history {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 12px;
+}
+
+.older {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 8px;
+}
+
+.row {
+  display: flex;
+  margin-bottom: 6px;
+}
+
+.rowMine {
+  justify-content: flex-end;
+}
+
+.bubble {
+  max-width: 75%;
+  padding: 6px 10px;
+  border-radius: 12px;
+  background: #ebebeb;
+  color: var(--color-text-main);
+  font-family: var(--font-text-main);
+  font-size: var(--size-text-main);
+}
+
+.bubbleMine {
+  background: #f2dede;
+}
+
+.text {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+}
+
+.stamp {
+  margin-top: 2px;
+  text-align: right;
+  color: gray;
+  font-size: 11px;
+}
+
+.images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.image {
+  max-width: 220px;
+  max-height: 220px;
+  border-radius: 8px;
+  cursor: zoom-in;
+  object-fit: cover;
+}
+
+.file,
+.audio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.06);
+  color: inherit;
+  cursor: pointer;
+}
+
+.fileIcon {
+  flex-shrink: 0;
+}
+
+.audioIcon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.fileName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 220px;
+}
+
+.fileSize {
+  color: gray;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+/* ---------- окно удаления диалога ---------- */
+
+.deleteBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 20px;
+  min-width: 280px;
+  max-width: 360px;
+  text-align: center;
+}
+
+.deleteTitle {
+  margin-bottom: 6px;
+  font-weight: bold;
+  color: var(--color-text-main);
+  font-family: var(--font-text-main);
+  font-size: var(--size-text-main);
+}
+
+.deleteHint {
+  margin-bottom: 8px;
+  color: gray;
+  font-size: 13px;
+}
+
+/* ---------- пересланное, закреп, правка ---------- */
+
+.forwarded {
+  margin-bottom: 4px;
+  padding-left: 8px;
+  border-left: 3px solid var(--accent);
+  color: gray;
+  font-size: 13px;
+}
+
+.forwarded a {
+  color: var(--accent);
+}
+
+/* Цитата сообщения, на которое ответили */
+.quote {
+  margin-bottom: 4px;
+  padding: 2px 8px;
+  border-left: 3px solid var(--accent);
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  max-width: 260px;
+}
+
+.quoteAuthor {
+  color: var(--accent);
+  font-weight: bold;
+  font-size: 13px;
+}
+
+.quoteText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: gray;
+  font-size: 13px;
+}
+
+.quoteGone {
+  color: gray;
+  font-size: 13px;
+  font-style: italic;
+  cursor: default;
+}
+
+.replyText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pinnedBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-bottom: 1px solid #e0e0e0;
+  background: rgba(128, 128, 128, 0.08);
+  font-family: var(--font-text-main);
+  font-size: var(--size-text-main);
+}
+
+.pinnedText {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-text-main);
+  cursor: pointer;
+}
+
+.editBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  padding: 4px 10px;
+  border-left: 3px solid var(--accent);
+  background: rgba(128, 128, 128, 0.1);
+  color: var(--color-text-main);
+  font-size: 13px;
+}
+
+.notice {
+  padding: 4px 12px;
+  color: #27ae60;
+  font-family: var(--font-text-main);
+  font-size: var(--size-text-main);
+}
+
+/* ---------- окно пересылки ---------- */
+
+.forwardBox {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px;
+  width: min(380px, 90vw);
+}
+
+.forwardSearch {
+  padding: 7px 10px;
+  border: 1px solid #d0d0d0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--color-text-main);
+  font-family: var(--font-text-main);
+  font-size: var(--size-text-main);
+  outline: none;
+}
+
+.forwardSearch:focus {
+  border-color: var(--accent);
+}
+
+.forwardList {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.forwardUser {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 4px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.forwardUser:hover {
+  background: rgba(128, 128, 128, 0.15);
+}
+
+/* ---------- поле ввода ---------- */
+
+.composer {
+  border-top: 1px solid #e0e0e0;
+  padding: 8px 12px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  background: #ebebeb;
+  color: var(--color-text-main);
+  font-size: 13px;
+  max-width: 100%;
+}
+
+.chipRemove {
+  width: 16px;
+  height: 16px;
+  padding: 2px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.inputRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.attach {
+  width: 30px;
+  height: 30px;
+  padding: 4px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.attach:hover {
+  background: rgb(224, 224, 224);
+}
+
+.textarea {
+  flex: 1;
+  min-height: 34px;
+  max-height: 120px;
+  padding: 7px 10px;
+  border: 1px solid #d0d0d0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--color-text-main);
+  font-family: var(--font-text-main);
+  font-size: var(--size-text-main);
+  resize: none;
+  outline: none;
+}
+
+.textarea:focus {
+  border-color: var(--accent);
+}
+
+@media (max-width: 800px) {
+  .back {
+    display: block;
+  }
+}
