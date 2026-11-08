@@ -22,13 +22,106 @@ model User {
   posts       Post[]
   tokens      Token[]
   musics      Music[]
+  likes       Like[]
+  comments    Comment[]
+  convsA      Conversation[] @relation("ConversationA")
+  convsB      Conversation[] @relation("ConversationB")
+  messages    Message[]      @relation("MessageSender")
+}
+
+// Личный диалог двух пользователей. userAId всегда меньше userBId, поэтому на пару ровно одна запись.
+model Conversation {
+  id            Int      @id @default(autoincrement())
+  userAId       Int
+  userBId       Int
+  lastMessageId Int      @default(0)
+  lastMessageAt DateTime @default(now())
+  // До какого сообщения (включительно) участник очистил историю: «удалить диалог у себя»
+  clearedA      Int      @default(0)
+  clearedB      Int      @default(0)
+  // Последнее сообщение, до которого участник дочитал
+  readA         Int      @default(0)
+  readB         Int      @default(0)
+  // Закреплённое сообщение: одно на диалог, видно обоим
+  pinnedMessageId Int?
+  userA         User     @relation("ConversationA", fields: [userAId], references: [id])
+  userB         User     @relation("ConversationB", fields: [userBId], references: [id])
+  messages      Message[]
+
+  @@unique([userAId, userBId])
+  @@index([userAId, lastMessageAt])
+  @@index([userBId, lastMessageAt])
+}
+
+model Message {
+  id             Int          @id @default(autoincrement())
+  text           String       @default("")
+  date           DateTime     @default(now())
+  conversationId Int
+  senderId       Int
+  editedAt       DateTime?
+  // Ответ на сообщение: id оригинала. Без внешнего ключа, чтобы удаление оригинала не затрагивало ответы
+  replyToId      Int?
+  // Кто скрыл сообщение у себя («удалить у меня»). Когда скрыли оба, сообщение стирается
+  hiddenBy       Int[]        @default([])
+  // Пересланное сообщение: снимок автора оригинала (id и логин на момент пересылки)
+  fwdUserId      Int?
+  fwdLogin       String       @default("")
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User         @relation("MessageSender", fields: [senderId], references: [id])
+  attachments    Attachment[]
+
+  @@index([conversationId, id])
+}
+
+// kind: image | audio | file. Для image file — путь medium, thumb — small, оба без расширения (.webp добавляет клиент)
+model Attachment {
+  id        Int     @id @default(autoincrement())
+  kind      String
+  name      String
+  size      Int
+  file      String
+  thumb     String  @default("")
+  high      String  @default("")
+  messageId Int
+  message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([messageId])
+}
+
+model Like {
+  id     Int      @id @default(autoincrement())
+  date   DateTime @default(now())
+  userId Int
+  postId Int
+  user   User     @relation(fields: [userId], references: [id])
+  post   Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  // Один пользователь — один лайк на пост
+  @@unique([userId, postId])
+  @@index([postId])
+}
+
+model Comment {
+  id     Int      @id @default(autoincrement())
+  text   String
+  date   DateTime @default(now())
+  userId Int
+  postId Int
+  user   User     @relation(fields: [userId], references: [id])
+  post   Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId, id])
 }
 
 model Music {
   id          Int      @id @default(autoincrement())
   title       String
+  artist      String   @default("Неизвестный исполнитель")
   date        DateTime @default(now())
-  image       String
+  file        String   @default("")
+  size        Int      @default(0)
+  image       String   @default("")
   owner       Int
   user        User     @relation(fields: [owner], references: [id])
 
@@ -39,6 +132,8 @@ model Post {
   description String
   date        DateTime @default(now())
   images      PostImage[]
+  likes       Like[]
+  comments    Comment[]
   owner      Int
   user        User     @relation(fields: [owner], references: [id])
 

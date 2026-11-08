@@ -1,0 +1,42 @@
+.wrapper {
+  width: 100%;
+  padding: 6px 10px;
+}
+
+.info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  color: gray;
+  font-family: var(--font-text-main);
+  font-size: 13px;
+}
+
+.track {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: #d8d8d8;
+}
+
+.bar {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--accent);
+  transition: width 0.2s ease;
+}
+
+/* 100%: файлы доставлены, сервер их обрабатывает */
+.processing {
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}

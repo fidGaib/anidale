@@ -2,6 +2,7 @@ import 'dotenv/config'
 import http from 'http'
 import { Server as IoServer } from 'socket.io'
 
+import { getOptionalUserId } from './api/user/optional-user'
 import { applyCors, getAllowedOrigins } from './handlers/cors'
 import { parseCookies } from './handlers/cookie-parser'
 import { serveStatic } from './handlers/file-upload'
@@ -38,14 +39,25 @@ server.on('request', async (req, res) => {
       await yoga(req, res)
       return
     }
+    // Socket.IO отвечает на /socket.io сам, его запросы не трогаем
+    if (req.url?.startsWith('/socket.io')) return
+    // Всё остальное: явный 404, иначе запрос висит без ответа
+    if (!res.headersSent && !res.writableEnded) {
+      res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' })
+      res.end('Not Found')
+    }
   } catch (error) {
     console.log(error)
   }
 })
 
 // Обработчик Socket.IO
-io.on('connection', (socket) => {
+io.on('connection', async (socket) => {
   console.log('Клиент подключился: ', socket.id)
+  // Вошедший пользователь получает личные события (сообщения) через свою комнату.
+  // Куки читаем из рукопожатия, поэтому после входа клиент переподключает сокет.
+  const userId = await getOptionalUserId({ cookies: parseCookies(socket.request) })
+  if (userId) socket.join(`user:${userId}`)
   socket.on('disconnect', () => {
     console.log('Клиент отключился: ', socket.id)
   })

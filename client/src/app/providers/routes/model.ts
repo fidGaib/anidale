@@ -29,4 +29,4 @@ const RefreshStore = create(
 
 const useRefreshStore = <T>(cb: (store: typeUserStore) => T) => RefreshStore(cb, shallow)
 
-export { useRefreshStore }
+export { RefreshStore, useRefreshStore }
