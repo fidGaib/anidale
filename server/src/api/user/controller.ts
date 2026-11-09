@@ -49,6 +49,9 @@ class UserController {
   async find(id?: number) {
     return id ? await UserService.find(id) : await UserService.find()
   }
+  async list(limit?: number | null, offset?: number | null, search?: string | null) {
+    return await UserService.list(limit, offset, search)
+  }
   async updateUser(id: number, user?: UpdateUser) {
     if (user === undefined) return
     if (user?.email?.trim()) {

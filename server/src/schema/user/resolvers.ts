@@ -4,8 +4,8 @@ import { Resolvers } from '@/schema/resolvers-types'
 const UserResolvers: Resolvers = {
   Query: {
     //@ts-ignore
-    async getUsers() {
-      return await UserController.find()
+    async getUsers(_, { limit, offset, search }) {
+      return await UserController.list(limit, offset, search)
     },
     //@ts-ignore
     async getUser(_, { id }) {

@@ -7,28 +7,40 @@ import Token from '@/db/models/token-model'
 import User from '@/db/models/user-model'
 
 import avatar from '../dtos/avatar-random'
-import FileStorageService, { SaveImage } from '../post/file-service'
+import FileStorageService from '../post/file-service'
 import tokenService from './token-service'
 
 type UpdateUser = {
   avatar?: File
+  backgroundImage?: File
   email?: string
   isActivated?: boolean
   login?: string
   pass?: string
-  activationLink?: String
+  status?: string
+  city?: string
+  birthDate?: Date | null
+  activationLink?: string
 }
 // Поля, которые можно отдавать в публичных запросах (без email, пароля и токенов)
-type PublicUser = {
+export type PublicUser = {
   id: number
   login: string
   avatar: string
+  status: string
+  city: string
+  birthDate: Date | null
+  backgroundImage: string
   createdAt: Date
 }
-const publicUserSelect = {
+export const publicUserSelect = {
   id: true,
   login: true,
   avatar: true,
+  status: true,
+  city: true,
+  birthDate: true,
+  backgroundImage: true,
   createdAt: true,
 } as const
 // | ----------------> UserService <---------------- |
@@ -110,63 +122,107 @@ class UserService {
     })
   }
 
+  /** Список пользователей с постраничной выдачей и поиском по логину. */
+  async list(limit?: number | null, offset?: number | null, search?: string | null) {
+    const take = Math.min(Math.max(limit ?? 50, 1), 100)
+    const skip = Math.max(offset ?? 0, 0)
+    const needle = search?.trim()
+    return await User.findMany({
+      select: publicUserSelect,
+      where: needle ? { login: { contains: needle, mode: 'insensitive' } } : undefined,
+      orderBy: { id: 'asc' },
+      take,
+      skip,
+    })
+  }
+
   // | ----------------> UPDATE USER <---------------- |
 
-  async updateUser(id: number, user: UpdateUser): Promise<{ avatar?: string; login?: string }> {
+  async updateUser(id: number, user: UpdateUser) {
     // Find User
     const candidate = await User.findUnique({ where: { id } })
     if (!candidate) {
       throw createGraphQLError('Пользователь не найден')
     }
-    // Update avatar if provided
-    if (user.avatar) {
-      const storageService = new FileStorageService(storagePath)
-      // Save new avatar
-      const [avatarData] = await Promise.all([storageService.saveImage(user.avatar, 'avatars/')])
 
-      const newAvatarPath = avatarData.medium
-      try {
-        // Check if current avatar is used by other users
-        const otherUsersWithSameAvatar = await User.findMany({
-          where: {
-            avatar: candidate.avatar,
-            id: { not: id }, // exclude current user
-          },
-          select: { id: true },
-        })
-        // Remove old avatar only if no other users are using it
-        if (otherUsersWithSameAvatar.length === 0 && candidate.avatar) {
-          await storageService.removeFiles(candidate.avatar)
-        }
-        // Update user with new avatar
-        return await User.update({
-          where: { id },
-          data: { avatar: newAvatarPath },
-          select: {
-            avatar: true,
-          },
-        })
-      } catch (error) {
-        // In case of error with new avatar, try to remove it to avoid orphaned files
-        try {
-          await storageService.removeFiles(newAvatarPath)
-        } catch (cleanupError) {
-          console.warn('Failed to cleanup new avatar after error:', cleanupError)
-        }
-        throw error
+    const storageService = new FileStorageService(storagePath)
+    const data: {
+      avatar?: string
+      backgroundImage?: string
+      login?: string
+      status?: string
+      city?: string
+      birthDate?: Date | null
+    } = {}
+    let newAvatarPath: string | undefined
+    let newCoverPath: string | undefined
+
+    try {
+      // Аватар
+      if (user.avatar) {
+        const avatarData = await storageService.saveImage(user.avatar, 'avatars/')
+        newAvatarPath = avatarData.medium
+        data.avatar = newAvatarPath
       }
-    }
-    // Update login if provided
-    else if (user.login) {
-      return await User.update({
+      // Обложка профиля
+      if (user.backgroundImage) {
+        const coverData = await storageService.saveImage(user.backgroundImage, 'covers/')
+        // Нативный saveImage не заполняет high: лучшее доступное качество лежит в medium
+        newCoverPath = coverData.medium
+        data.backgroundImage = newCoverPath
+      }
+      // Текстовые поля профиля
+      if (typeof user.login === 'string' && user.login.trim()) data.login = user.login.trim()
+      if (typeof user.status === 'string') data.status = user.status.trim()
+      if (typeof user.city === 'string') data.city = user.city.trim()
+      // Дату рождения можно стереть, передав null
+      const birthDate = user.birthDate as Date | null | undefined
+      if (birthDate === null) data.birthDate = null
+      else if (birthDate) data.birthDate = birthDate instanceof Date ? birthDate : new Date(birthDate)
+
+      if (Object.keys(data).length === 0) {
+        throw createGraphQLError('Не предоставлены данные для обновления')
+      }
+
+      const updated = await User.update({
         where: { id },
-        data: { login: user.login },
+        data,
         select: {
+          id: true,
           login: true,
+          avatar: true,
+          status: true,
+          city: true,
+          birthDate: true,
+          backgroundImage: true,
         },
       })
+
+      // Старые файлы удаляем только после успешного обновления записи
+      if (newAvatarPath && candidate.avatar && candidate.avatar !== newAvatarPath) {
+        // Аватар по умолчанию может использоваться другими пользователями
+        const otherUsersWithSameAvatar = await User.count({
+          where: { avatar: candidate.avatar, id: { not: id } },
+        })
+        if (otherUsersWithSameAvatar === 0) {
+          await storageService.removeFiles(candidate.avatar).catch((cleanupError) => {
+            console.warn('Failed to remove old avatar:', cleanupError)
+          })
+        }
+      }
+      if (newCoverPath && candidate.backgroundImage && candidate.backgroundImage !== newCoverPath) {
+        await storageService.removeFiles(candidate.backgroundImage).catch((cleanupError) => {
+          console.warn('Failed to remove old cover:', cleanupError)
+        })
+      }
+
+      return updated
+    } catch (error) {
+      // Не оставляем осиротевшие файлы, если запись не обновилась
+      if (newAvatarPath) await storageService.removeFiles(newAvatarPath).catch(() => undefined)
+      if (newCoverPath) await storageService.removeFiles(newCoverPath).catch(() => undefined)
+      throw error
     }
-    throw createGraphQLError('Не предоставлены данные для обновления')
   }
 
   // | ----------------> REMOVE USER <---------------- |

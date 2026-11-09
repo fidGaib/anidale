@@ -1,6 +1,6 @@
 type Query {
   getUser(id: Int!): User
-  getUsers: [User!]!
+  getUsers(limit: Int, offset: Int, search: String): [User!]!
   logout: Boolean
   refresh: RefreshUser
 }
@@ -20,6 +20,9 @@ type User {
   email: String!
   login: String!
   avatar: String!
+  status: String
+  city: String
+  birthDate: Date
   activationLink: String
   isActivated: Boolean
   createdAt: Date
@@ -38,6 +41,10 @@ type typeUpdateUser {
   pass: String
   login: String
   avatar: FILE
+  status: String
+  city: String
+  birthDate: Date
+  backgroundImage: String
   activationLink: String
   isActivated: Boolean
 }
@@ -46,6 +53,10 @@ input UpdateUser {
   pass: String
   login: String
   avatar: FILE
+  status: String
+  city: String
+  birthDate: Date
+  backgroundImage: FILE
   activationLink: String
   isActivated: Boolean
 }

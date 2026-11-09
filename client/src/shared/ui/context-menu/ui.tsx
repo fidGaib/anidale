@@ -1,4 +1,7 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { ReactNode, useEffect, useLayoutEffect, useRef, useState } from 'react'
+
+import { assetUrl } from '@/shared/config'
+import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 
 import cl from './ui.module.css'
 
@@ -9,6 +12,7 @@ export interface ContextMenuItem {
   danger?: boolean
   /** Скрыть пункт, не убирая его из списка (удобно строить меню по условиям). */
   hidden?: boolean
+  svg: string
 }
 
 interface Props {
@@ -17,13 +21,15 @@ interface Props {
   y: number
   items: ContextMenuItem[]
   onClose: () => void
+  /** Произвольный блок над пунктами (например, строка быстрых реакций). Закрытие меню — через onClose. */
+  header?: ReactNode
 }
 
 /**
  * Контекстное меню, которое открывается в точке клика (правая кнопка мыши или долгое нажатие).
  * Закрывается кликом вне меню, Escape, прокруткой и изменением размера окна.
  */
-export const ContextMenu = ({ x, y, items, onClose }: Props) => {
+export const ContextMenu = ({ x, y, items, onClose, header }: Props) => {
   const ref = useRef<HTMLUListElement>(null)
   const [position, setPosition] = useState({ left: x, top: y })
 
@@ -56,7 +62,6 @@ export const ContextMenu = ({ x, y, items, onClose }: Props) => {
 
   const visible = items.filter((item) => !item.hidden)
   if (visible.length === 0) return null
-
   return (
     <ul
       ref={ref}
@@ -66,6 +71,7 @@ export const ContextMenu = ({ x, y, items, onClose }: Props) => {
       onMouseDown={(e) => e.stopPropagation()}
       onContextMenu={(e) => e.preventDefault()}
     >
+      {header && <li className={cl.header}>{header}</li>}
       {visible.map((item) => (
         <li
           key={item.label}
@@ -75,7 +81,8 @@ export const ContextMenu = ({ x, y, items, onClose }: Props) => {
             item.onClick()
           }}
         >
-          {item.label}
+          <ImageLoading className={cl.icon} src={assetUrl(item.svg)} />
+          <div className={cl.text}>{item.label}</div>
         </li>
       ))}
     </ul>
