@@ -1,0 +1,23 @@
+.error {
+  margin: 0;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: bold;
+  white-space: pre-line;
+}
+
+.hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-text-main);
+  opacity: 0.6;
+}
+
+.empty {
+  margin: 0;
+  padding: 24px 10px;
+  color: var(--color-text-main);
+  font-family: var(--font-text-main);
+  text-align: center;
+  opacity: 0.65;
+}

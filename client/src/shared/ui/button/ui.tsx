@@ -1,11 +1,9 @@
 import { ButtonHTMLAttributes } from 'react'
 
-import cl from './ui.module.css'
+import { Btn } from '../btn'
 
-export const ButtonUI = (props: ButtonHTMLAttributes<HTMLButtonElement>) => {
-  return (
-    <button className={cl.button} {...props}>
-      {props.children}
-    </button>
-  )
-}
+/**
+ * Прежняя кнопка сайта. Теперь это тот же `Btn` в обычном (серым) варианте,
+ * чтобы все кнопки выглядели одинаково; новые места лучше писать сразу через `Btn`.
+ */
+export const ButtonUI = (props: ButtonHTMLAttributes<HTMLButtonElement>) => <Btn variant='secondary' {...props} />

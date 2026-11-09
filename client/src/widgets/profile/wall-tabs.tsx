@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 import type { WallKind } from '@/features/profile/types'
+import { TabItem, Tabs } from '@/shared/ui/tabs'
 
 import cl from './wall-tabs.module.css'
 
@@ -18,10 +19,10 @@ interface Props {
 
 /** Вкладки стены профиля («Главная», «Мои посты», «Архив постов») и поиск по постам. */
 export const WallTabs = ({ isOwn, kind, onKind, search, onSearch }: Props) => {
-  const tabs: { kind: WallKind; title: string }[] = [
-    { kind: 'all', title: 'Главная' },
-    { kind: 'own', title: 'Мои посты' },
-    ...(isOwn ? [{ kind: 'archive' as const, title: 'Архив постов' }] : []),
+  const tabs: TabItem<WallKind>[] = [
+    { id: 'all', title: 'Главная' },
+    { id: 'own', title: 'Мои посты' },
+    { id: 'archive', title: 'Архив постов', show: isOwn },
   ]
 
   // Поле поиска раскрывается по клику на лупу; текст уходит наружу с задержкой, чтобы не искать на каждую букву
@@ -52,20 +53,7 @@ export const WallTabs = ({ isOwn, kind, onKind, search, onSearch }: Props) => {
 
   return (
     <div className={`playground ${cl.bar}`}>
-      <div className={cl.tabs} role='tablist'>
-        {tabs.map((tab) => (
-          <button
-            key={tab.kind}
-            type='button'
-            role='tab'
-            aria-selected={kind === tab.kind}
-            className={`${cl.tab} ${kind === tab.kind ? cl.tabActive : ''}`}
-            onClick={() => onKind(tab.kind)}
-          >
-            {tab.title}
-          </button>
-        ))}
-      </div>
+      <Tabs className={cl.tabs} items={tabs} value={kind} onChange={onKind} />
 
       {open ? (
         <div className={cl.searchBox}>

@@ -5,7 +5,7 @@ import { useRefreshStore } from '@/app/providers/routes/model'
 import ButtonUI from '@/shared/ui/button'
 import { UploadProgress } from '@/shared/ui/progress'
 
-import { MusicScope, useMusicStore } from './module'
+import { MusicScope, isValidScope, useMusicStore } from './module'
 import cl from './ui.module.css'
 
 interface Props {
@@ -126,7 +126,7 @@ export const ProfileMusicList = ({ scope, canAdd }: Props) => {
   const toggle = useMusicStore((s) => s.toggle)
 
   useEffect(() => {
-    if (scope === 'all' || Number.isFinite(scope)) void load(scope)
+    if (isValidScope(scope)) void load(scope)
   }, [scope, load])
 
   return (
@@ -189,10 +189,10 @@ export const ProfileMusicList = ({ scope, canAdd }: Props) => {
               {myId && scope !== myId ? (
                 myFilesSet.has(track.file) || track.ownerId === myId || addedIds.includes(track.id) ? (
                   <span className={cl.added} title='Этот трек уже есть в вашем профиле'>
-                    ✓ уже у вас
+                    <img className={cl.addedIcon} src='/icons/check.svg' alt='Уже у вас' />
                     <img
                       className={cl.removeMine}
-                      src='/icons/close.svg'
+                      src='/icons/delete.svg'
                       alt='Удалить из моего профиля'
                       title='Удалить из моего профиля'
                       onClick={() => {
@@ -203,7 +203,7 @@ export const ProfileMusicList = ({ scope, canAdd }: Props) => {
                 ) : (
                   <img
                     className={cl.addToMine}
-                    src='/icons/plus.png'
+                    src='/icons/plus.svg'
                     alt='Добавить к себе'
                     title='Добавить к себе'
                     onClick={() => void addToMine(track.id, myId)}
@@ -213,7 +213,7 @@ export const ProfileMusicList = ({ scope, canAdd }: Props) => {
               {canAdd && (
                 <img
                   className={cl.remove}
-                  src='/icons/close.svg'
+                  src='/icons/delete.svg'
                   alt='Удалить'
                   title='Удалить'
                   onClick={() => removeTrack(track.id)}

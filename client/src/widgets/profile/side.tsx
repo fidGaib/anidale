@@ -8,6 +8,7 @@ import { GET_FRIENDS, GET_FRIENDS_ONLINE, GET_SUBSCRIPTIONS, USER_COMMUNITIES } 
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
 import { formatShort } from '@/shared/lib/time'
+import { Btn } from '@/shared/ui/btn'
 
 import cl from './side.module.css'
 
@@ -135,9 +136,9 @@ export const ProfileSide = ({ id, isOwn, friendsCount, subscriptionsCount }: Pro
           {isOwn && (
             <AddStory>
               {(openPicker, uploading) => (
-                <button type='button' className={cl.wideButton} onClick={openPicker} disabled={uploading}>
+                <Btn block onClick={openPicker} disabled={uploading}>
                   {uploading ? 'Загрузка…' : 'Создать момент'}
-                </button>
+                </Btn>
               )}
             </AddStory>
           )}

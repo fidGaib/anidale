@@ -8,15 +8,18 @@ const StoryResolvers: Resolvers = {
     async getStories(_, __, { req }) {
       return await StoryController.feed(await getOptionalUserId(req))
     },
+    async getCommunityStories(_, { id }, { req }) {
+      return await StoryController.communityStories(id, await getOptionalUserId(req))
+    },
     async storyViewers(_, { id }, { req, res }) {
       const user = await UserController.refresh(res, req.cookies.refreshToken)
       return await StoryController.viewers(user.id, id)
     },
   },
   Mutation: {
-    async createStory(_, { image, text }, { req, res }) {
+    async createStory(_, { image, text, communityId }, { req, res }) {
       const user = await UserController.refresh(res, req.cookies.refreshToken)
-      return await StoryController.create(user.id, image, text)
+      return await StoryController.create(user.id, image, text, communityId)
     },
     async viewStory(_, { id }, { req, res }) {
       const user = await UserController.refresh(res, req.cookies.refreshToken)

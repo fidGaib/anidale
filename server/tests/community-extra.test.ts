@@ -200,11 +200,11 @@ describe('чёрный список и приглашения', () => {
     const other = await open('Другое')
     await CommunityService.join(anna.id, other.id)
     await CommunityService.join(boris.id, other.id)
-    await CommunityService.setAdmin(owner.id, other.id, anna.id, true)
+    await CommunityService.setRole(owner.id, other.id, anna.id, 'admin')
     await expect(CommunityService.ban(anna.id, other.id, owner.id)).rejects.toThrow(/создателя/i)
-    await CommunityService.setAdmin(owner.id, other.id, boris.id, true)
-    await expect(CommunityService.ban(anna.id, other.id, boris.id)).rejects.toThrow('только создатель')
-    await expect(CommunityService.ban(boris.id, other.id, anna.id)).rejects.toThrow('только создатель')
+    await CommunityService.setRole(owner.id, other.id, boris.id, 'admin')
+    await expect(CommunityService.ban(anna.id, other.id, boris.id)).rejects.toThrow(/такой же или более высокой/)
+    await expect(CommunityService.ban(boris.id, other.id, anna.id)).rejects.toThrow(/такой же или более высокой/)
     expect(await CommunityService.ban(owner.id, other.id, boris.id)).toBe(true)
   })
 
@@ -294,7 +294,7 @@ describe('статьи, видео и фото сообщества', () => {
   it('администратор сообщества правит его статью', async () => {
     const { id } = await open()
     await CommunityService.join(anna.id, id)
-    await CommunityService.setAdmin(owner.id, id, anna.id, true)
+    await CommunityService.setRole(owner.id, id, anna.id, 'admin')
     const post = await ArticleController.create(owner.id, { communityId: id, title: 'Старое', content: blocks })
     const edited = await ArticleController.edit(anna.id, post?.article?.id ?? 0, { title: 'Новое', content: blocks })
     expect(edited?.article?.title).toBe('Новое')
@@ -348,7 +348,7 @@ describe('статьи, видео и фото сообщества', () => {
     const { id } = await open()
     await CommunityService.join(anna.id, id)
     await CommunityService.join(boris.id, id)
-    await CommunityService.setAdmin(owner.id, id, anna.id, true)
+    await CommunityService.setRole(owner.id, id, anna.id, 'admin')
     const photo = await prisma.photo.create({
       data: { userId: owner.id, communityId: id, medium: 'photos/c', small: 's' },
     })

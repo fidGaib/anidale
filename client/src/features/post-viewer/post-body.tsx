@@ -5,6 +5,7 @@ import { ArticleCard } from '@/entities/article'
 import { CommunityAvatar } from '@/entities/community'
 import { PostActionWrapp, PostImages, PostVideos } from '@/entities/post'
 import { PostComments } from '@/features/comments'
+import { PostTracks } from '@/features/music'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
 import { formatDateTime } from '@/shared/lib/time'
@@ -94,6 +95,7 @@ export const PostBody = ({ postId, withImages = true, onNavigate, onRemoved }: P
           <RichText text={post.description} />
         </div>
       )}
+      {!post.article && <PostTracks tracks={post.music} />}
       <RepostCard source={post.repostOf} deleted={post.repostDeleted} />
       <ViewMark postId={post.id} />
       <PostActionWrapp

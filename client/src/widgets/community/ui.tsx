@@ -1,8 +1,9 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 
 import { CommunityAvatar, communityImageUrl, membersLabel } from '@/entities/community'
+import { ProfileMusicList } from '@/features/music'
 import { PostDialog } from '@/features/profile'
 import { VideoUploadDialog } from '@/features/video-upload'
 import { COMMUNITY, JOIN_COMMUNITY, LEAVE_COMMUNITY, REMOVE_COMMUNITY } from '@/shared/graphql/schema'
@@ -10,17 +11,20 @@ import { formatDateTime, toTimestamp } from '@/shared/lib/time'
 import ButtonUI from '@/shared/ui/button'
 import { ContextMenu, ContextMenuItem } from '@/shared/ui/context-menu'
 import { RichText } from '@/shared/ui/rich-text'
+import { TabItem, Tabs } from '@/shared/ui/tabs'
 
 import Posts from '../post'
 import { BansPanel, RequestsPanel, SuggestedPanel } from './admin-panels'
+import { Discussions } from './discussions'
 import { EditCommunityDialog } from './edit-dialog'
 import { InviteDialog } from './invite-dialog'
 import { CommunityPhotos, CommunityVideos } from './media'
 import { MembersCard } from './members'
 import { membershipButton } from './membership'
+import { CommunityStories } from './stories'
 import cl from './ui.module.css'
 
-type Tab = 'wall' | 'photos' | 'videos' | 'suggested' | 'requests' | 'bans'
+type Tab = 'wall' | 'discussions' | 'photos' | 'music' | 'videos' | 'suggested' | 'requests' | 'bans'
 
 /** Страница сообщества: обложка, подписка, описание, вкладки (стена, фото, видео, управление) и участники. */
 export const CommunityPage = () => {
@@ -39,6 +43,7 @@ export const CommunityPage = () => {
   const [posting, setPosting] = useState(false)
   const [videoDialog, setVideoDialog] = useState(false)
   const [inviting, setInviting] = useState(false)
+  const [membersOpen, setMembersOpen] = useState(false)
   const [notice, setNotice] = useState('')
   const [menu, setMenu] = useState<{ x: number; y: number } | null>(null)
   const [createMenu, setCreateMenu] = useState<{ x: number; y: number } | null>(null)
@@ -67,9 +72,15 @@ export const CommunityPage = () => {
     }
   }
 
-  const canInvite = community.isMember && (!community.isClosed || community.isAdmin)
+  const canInvite = community.isMember && (!community.isClosed || community.canModerate)
   const menuItems: ContextMenuItem[] = [
     { label: 'Управление', svg: '/icons/edit.svg', onClick: () => setEditing(true), hidden: !community.isAdmin },
+    {
+      label: community.isAdmin ? 'Участники и роли' : 'Управление участниками',
+      svg: '/icons/friends.svg',
+      onClick: () => setMembersOpen(true),
+      hidden: !(community.isAdmin || community.canModerate),
+    },
     { label: 'Пригласить друзей', svg: '/icons/friends.svg', onClick: () => setInviting(true), hidden: !canInvite },
     {
       label: 'Скопировать ссылку',
@@ -96,13 +107,20 @@ export const CommunityPage = () => {
     { label: 'Видео', svg: '/icons/video.svg', onClick: () => setVideoDialog(true) },
   ]
 
-  const tabs: { id: Tab; title: string; badge?: number; show: boolean }[] = [
+  const tabs: TabItem<Tab>[] = [
     { id: 'wall', title: 'Стена', show: true },
+    { id: 'discussions', title: 'Обсуждения', show: community.canView },
     { id: 'photos', title: 'Фото', show: community.canView },
+    { id: 'music', title: 'Музыка', show: community.canView },
     { id: 'videos', title: 'Видео', show: community.canView },
-    { id: 'suggested', title: 'Предложенные', badge: community.suggestedCount, show: community.isAdmin },
-    { id: 'requests', title: 'Заявки', badge: community.requestsCount, show: community.isAdmin && community.isClosed },
-    { id: 'bans', title: 'Чёрный список', show: community.isAdmin },
+    { id: 'suggested', title: 'Предложенные', badge: community.suggestedCount, show: community.canModerate },
+    {
+      id: 'requests',
+      title: 'Заявки',
+      badge: community.requestsCount,
+      show: community.canModerate && community.isClosed,
+    },
+    { id: 'bans', title: 'Чёрный список', show: community.canModerate },
   ]
 
   const cover = communityImageUrl(community.cover)
@@ -160,7 +178,10 @@ export const CommunityPage = () => {
 
       <div className={cl.layout}>
         <div className={cl.main}>
-          {(community.description || community.website || community.links.length > 0) && (
+          {(community.description ||
+            community.website ||
+            community.links.length > 0 ||
+            community.contacts.length > 0) && (
             <div className={`playground ${cl.info}`}>
               {community.description && (
                 <p className={cl.description}>
@@ -184,31 +205,28 @@ export const CommunityPage = () => {
                   ))}
                 </div>
               )}
+              {community.contacts.length > 0 && (
+                <div className={cl.contacts}>
+                  <span className={cl.muted}>Контакты</span>
+                  {community.contacts.map((contact) => (
+                    <Link key={contact.user.id} to={`/profile/${contact.user.id}`}>
+                      <b>{contact.user.login}</b>
+                      {contact.position && <span className={cl.muted}> · {contact.position}</span>}
+                    </Link>
+                  ))}
+                </div>
+              )}
               <p className={cl.muted}>Создано {created}</p>
             </div>
           )}
 
-          <nav className={`playground ${cl.tabs}`}>
-            {tabs
-              .filter((t) => t.show)
-              .map((t) => (
-                <button
-                  key={t.id}
-                  type='button'
-                  className={`${cl.tab} ${tab === t.id ? cl.tabActive : ''}`}
-                  onClick={() => setTab(t.id)}
-                >
-                  {t.title}
-                  {!!t.badge && <span className={cl.badge}>{t.badge}</span>}
-                </button>
-              ))}
-          </nav>
+          <Tabs card items={tabs} value={tab} onChange={setTab} />
 
           {notice && <p className={cl.noticeOk}>{notice}</p>}
 
           {tab === 'wall' && (
             <>
-              {community.isAdmin ? (
+              {community.canPublish ? (
                 <button
                   type='button'
                   className={`playground ${cl.compose}`}
@@ -227,7 +245,7 @@ export const CommunityPage = () => {
                 )
               )}
               {community.canView ? (
-                <Posts communityId={id} canManage={community.isAdmin} fill />
+                <Posts communityId={id} canManage={community.canManagePosts} fill />
               ) : (
                 <div className={`playground ${cl.closedBox}`}>
                   <b>🔒 Это закрытое сообщество</b>
@@ -236,21 +254,40 @@ export const CommunityPage = () => {
               )}
             </>
           )}
-          {tab === 'photos' && <CommunityPhotos id={id} isAdmin={community.isAdmin} />}
-          {tab === 'videos' && (
-            <CommunityVideos key={videosKey} id={id} isAdmin={community.isAdmin} onAdd={() => setVideoDialog(true)} />
+          {tab === 'discussions' && (
+            <Discussions
+              communityId={id}
+              canModerate={community.canModerate}
+              canWrite={community.isMember && !community.isBanned}
+            />
           )}
-          {tab === 'suggested' && community.isAdmin && <SuggestedPanel id={id} onChanged={() => void refetch()} />}
-          {tab === 'requests' && community.isAdmin && <RequestsPanel id={id} onChanged={() => void refetch()} />}
-          {tab === 'bans' && community.isAdmin && <BansPanel id={id} />}
+          {tab === 'music' && <ProfileMusicList scope={`community:${id}`} canAdd={community.canPublish} />}
+          {tab === 'photos' && <CommunityPhotos id={id} canAdd={community.canPublish} />}
+          {tab === 'videos' && (
+            <CommunityVideos key={videosKey} id={id} canAdd={community.canPublish} onAdd={() => setVideoDialog(true)} />
+          )}
+          {tab === 'suggested' && community.canModerate && <SuggestedPanel id={id} onChanged={() => void refetch()} />}
+          {tab === 'requests' && community.canModerate && <RequestsPanel id={id} onChanged={() => void refetch()} />}
+          {tab === 'bans' && community.canModerate && <BansPanel id={id} />}
         </div>
         <aside className={cl.aside}>
+          {community.canView && (
+            <CommunityStories
+              id={id}
+              name={community.name}
+              avatar={community.avatar}
+              canPublish={community.canPublish}
+              canManage={community.canManagePosts}
+            />
+          )}
           <MembersCard
             id={id}
             count={community.membersCount}
-            isOwner={community.isOwner}
-            isAdmin={community.isAdmin}
+            viewer={community}
             canView={community.canView}
+            open={membersOpen}
+            onOpen={() => setMembersOpen(true)}
+            onClose={() => setMembersOpen(false)}
             onInvite={canInvite ? () => setInviting(true) : undefined}
           />
         </aside>
@@ -267,7 +304,7 @@ export const CommunityPage = () => {
           communityId={id}
           onClose={() => setPosting(false)}
           onPublished={() => {
-            if (!community.isAdmin) {
+            if (!community.canPublish) {
               setNotice('Запись отправлена администраторам на проверку. После одобрения она появится на стене.')
               setTimeout(() => setNotice(''), 8000)
             }

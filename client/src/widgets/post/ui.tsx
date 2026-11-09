@@ -6,6 +6,7 @@ import { useParams } from 'react-router-dom'
 import { useRefreshStore } from '@/app/providers/routes/model'
 import { ArticleCard } from '@/entities/article'
 import { PostActionWrapp, PostImages, PostOwner, PostVideos } from '@/entities/post'
+import { PostTracks } from '@/features/music'
 import { PostMenu, RepostCard, ViewMark, openShare, useOpenPost, usePostSync } from '@/features/post-viewer'
 import { Post, WallKind } from '@/features/profile/types'
 import { SET_LIKE } from '@/shared/graphql/schema'
@@ -42,7 +43,14 @@ interface PostsProps {
   canManage?: boolean
 }
 
-export const Posts = ({ mode, kind = 'all', search = '', fill = false, communityId, canManage = false }: PostsProps) => {
+export const Posts = ({
+  mode,
+  kind = 'all',
+  search = '',
+  fill = false,
+  communityId,
+  canManage = false,
+}: PostsProps) => {
   // На странице сообщества id в адресе — это сообщество, а не человек
   const urlId = parseInt(useParams().id || '')
   const profileUrlId = communityId ? 0 : urlId
@@ -351,6 +359,7 @@ export const Posts = ({ mode, kind = 'all', search = '', fill = false, community
             ) : (
               <></>
             )}
+            {!post.article && <PostTracks tracks={post.music ?? []} />}
             <RepostCard source={post.repostOf} deleted={post.repostDeleted} />
             <ViewMark postId={post.id} />
             <PostActionWrapp

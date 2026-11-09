@@ -64,7 +64,7 @@ const Comment = ({
     {canRemove && (
       <img
         className={cl.remove}
-        src='/icons/close.svg'
+        src='/icons/delete.svg'
         alt='Удалить комментарий'
         title='Удалить комментарий'
         onClick={onRemove}

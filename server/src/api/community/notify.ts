@@ -1,7 +1,7 @@
 import NotificationController, { NotificationType } from '@/api/notification/controller'
 import prisma from '@/db/db'
 
-/** Уведомляет всех администраторов сообщества (кроме самого автора действия). */
+/** Уведомляет администраторов и модераторов сообщества (кроме самого автора действия). */
 export const notifyAdmins = async (
   communityId: number,
   actorId: number,
@@ -10,7 +10,7 @@ export const notifyAdmins = async (
 ) => {
   const community = await prisma.community.findUnique({ where: { id: communityId }, select: { name: true } })
   const admins = await prisma.communityMember.findMany({
-    where: { communityId, role: 'admin', userId: { not: actorId } },
+    where: { communityId, role: { in: ['admin', 'moderator'] }, userId: { not: actorId } },
     select: { userId: true },
   })
   for (const admin of admins) {

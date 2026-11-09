@@ -8,31 +8,7 @@
 }
 
 .tabs {
-  display: flex;
-  gap: 4px;
   overflow-x: auto;
-}
-
-.tab {
-  flex-shrink: 0;
-  padding: 8px 12px;
-  border: 0;
-  border-bottom: 2px solid transparent;
-  background: transparent;
-  color: gray;
-  font-family: var(--font-text-main);
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.tab:hover {
-  color: var(--color-text-main);
-}
-
-.tabActive {
-  border-bottom-color: var(--accent);
-  color: var(--color-text-main);
-  font-weight: bold;
 }
 
 /* музыка */

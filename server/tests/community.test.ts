@@ -126,7 +126,7 @@ describe('сообщества: участники и права', () => {
     const { id } = await make()
     await CommunityService.join(anna.id, id)
     await CommunityService.join(boris.id, id)
-    await CommunityService.setAdmin(owner.id, id, boris.id, true)
+    await CommunityService.setRole(owner.id, id, boris.id, 'admin')
     const members = await CommunityService.members(id, 10, 0)
     expect(members.map((m) => m.user.id)).toEqual([owner.id, boris.id, anna.id])
     expect(members[0]).toMatchObject({ role: 'admin', isOwner: true })
@@ -136,12 +136,12 @@ describe('сообщества: участники и права', () => {
   it('назначать администраторов может только создатель, и только участников', async () => {
     const { id } = await make()
     await CommunityService.join(anna.id, id)
-    await expect(CommunityService.setAdmin(anna.id, id, anna.id, true)).rejects.toThrow('Нет доступа')
-    await expect(CommunityService.setAdmin(owner.id, id, boris.id, true)).rejects.toThrow('не состоит')
-    await expect(CommunityService.setAdmin(owner.id, id, owner.id, false)).rejects.toThrow('создателя')
-    await CommunityService.setAdmin(owner.id, id, anna.id, true)
+    await expect(CommunityService.setRole(anna.id, id, anna.id, 'admin')).rejects.toThrow('Нет доступа')
+    await expect(CommunityService.setRole(owner.id, id, boris.id, 'admin')).rejects.toThrow('не состоит')
+    await expect(CommunityService.setRole(owner.id, id, owner.id, 'member')).rejects.toThrow('создателя')
+    await CommunityService.setRole(owner.id, id, anna.id, 'admin')
     expect((await CommunityService.find(id, anna.id))?.isAdmin).toBe(true)
-    await CommunityService.setAdmin(owner.id, id, anna.id, false)
+    await CommunityService.setRole(owner.id, id, anna.id, 'member')
     expect((await CommunityService.find(id, anna.id))?.isAdmin).toBe(false)
   })
 
@@ -150,7 +150,7 @@ describe('сообщества: участники и права', () => {
     await CommunityService.join(anna.id, id)
     await CommunityService.join(boris.id, id)
     await expect(CommunityService.update(anna.id, id, { name: 'Взлом' })).rejects.toThrow('Нет доступа')
-    await CommunityService.setAdmin(owner.id, id, boris.id, true)
+    await CommunityService.setRole(owner.id, id, boris.id, 'admin')
     const updated = await CommunityService.update(boris.id, id, {
       name: 'Новое',
       status: ' статус ',
@@ -213,7 +213,7 @@ describe('сообщества: стена', () => {
     const { id } = await make()
     await CommunityService.join(anna.id, id)
     await CommunityService.join(boris.id, id)
-    await CommunityService.setAdmin(owner.id, id, boris.id, true)
+    await CommunityService.setRole(owner.id, id, boris.id, 'admin')
     const post = await PostService.create(owner.id, 'новость', [], [], id)
     await expect(PostService.remove(post.post.id, anna.id)).rejects.toThrow('Нет доступа')
     expect(await PostService.remove(post.post.id, boris.id)).toBe(true)

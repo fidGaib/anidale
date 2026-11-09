@@ -5,7 +5,7 @@ import prisma from '@/db/db'
 import User from '@/db/models/user-model'
 import Video from '@/db/models/video-model'
 
-import { canViewCommunity, isCommunityAdmin } from '../community/access'
+import { canPublish, canViewCommunity } from '../community/access'
 import VideoStorageService from './video-service'
 
 const MAX_PAGE_LIMIT = 100
@@ -103,7 +103,7 @@ class VideoService {
   /** Загрузка видео в свой альбом. Публикации поста при этом не происходит. */
   async create(userId: number, file: File, title?: string | null, communityId?: number | null) {
     if (!file) throw createGraphQLError('Выберите видео')
-    if (communityId && !(await isCommunityAdmin(communityId, userId))) {
+    if (communityId && !(await canPublish(communityId, userId))) {
       throw createGraphQLError('Добавлять видео в сообщество могут только администраторы')
     }
     const storage = new VideoStorageService(storagePath)
@@ -135,20 +135,37 @@ class VideoService {
     if (video.postId !== null) {
       const post = await prisma.post.findUnique({
         where: { id: video.postId },
-        select: { description: true, _count: { select: { images: true, videos: true } } },
+        select: { description: true, _count: { select: { images: true, videos: true, music: true } } },
       })
-      const onlyContent = post && !post.description.trim() && post._count.images === 0 && post._count.videos <= 1
+      const onlyContent =
+        post &&
+        !post.description.trim() &&
+        post._count.images === 0 &&
+        post._count.music === 0 &&
+        post._count.videos <= 1
       if (onlyContent) throw createGraphQLError('Это единственное содержимое поста. Удалите сам пост')
     }
 
     await Video.delete({ where: { id } })
-    try {
-      await new VideoStorageService(storagePath).remove(video.file)
-    } catch (error) {
-      // Файла может уже не быть — запись в БД всё равно должна удалиться
-      console.error('Не удалось удалить файл видео', id, error)
-    }
+    await this.removeFilesIfUnused([video.file])
     return true
+  }
+
+  /**
+   * Удаляет файлы видео, которые больше не нужны ни одной записи: ролик можно прикрепить к постам копиями,
+   * и общий файл живёт, пока есть хоть одна запись о нём.
+   */
+  async removeFilesIfUnused(files: string[]) {
+    const storage = new VideoStorageService(storagePath)
+    for (const file of new Set(files)) {
+      if (await prisma.video.findFirst({ where: { file }, select: { id: true } })) continue
+      try {
+        await storage.remove(file)
+      } catch (error) {
+        // Файла может уже не быть — запись в БД всё равно должна удалиться
+        console.error('Не удалось удалить файл видео', file, error)
+      }
+    }
   }
 
   /** Сохраняет чужое видео в личный альбом или убирает его оттуда. */

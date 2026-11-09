@@ -1,12 +1,17 @@
 import { create } from 'zustand'
 
 import { client } from '@/app/providers/apollo-client'
+import { toTrack } from '@/features/music/module'
 import { BOOKMARKS, POSTS, POSTS_BY_COMMUNITY, POST_BY_USER } from '@/shared/graphql/schema'
 import { UploadProgressEvent, toPercent } from '@/shared/lib/progress-fetch'
 import { toTimestamp } from '@/shared/lib/time'
 import { validateUpload } from '@/shared/lib/upload-limits'
 
-import { Post, PostStore, WallKind } from './types'
+import { PickedTrack, PickedVideo, Post, PostStore, WallKind } from './types'
+
+const MAX_AUDIO_SIZE = 15 * 1024 * 1024
+/** Сколько треков можно прикрепить к записи (как на сервере). */
+export const MAX_POST_TRACKS = 10
 
 interface RawPost {
   id?: number | null
@@ -24,6 +29,7 @@ interface RawPost {
   bookmarked?: boolean | null
   repostDeleted?: boolean | null
   article?: { id: number; title: string; cover: string; excerpt: string } | null
+  music?: RawTrackLike[] | null
   community?: { id: number; name: string; avatar: string } | null
   repostOf?: {
     id?: number | null
@@ -36,6 +42,8 @@ interface RawPost {
   images?: (RawImage | null)[] | null
   videos?: (RawVideo | null)[] | null
 }
+
+type RawTrackLike = Parameters<typeof toTrack>[0]
 
 interface RawImage {
   id?: number | null
@@ -107,6 +115,7 @@ export const toPost = (post: RawPost): Post => ({
   repostDeleted: post.repostDeleted ?? false,
   article: post.article ?? null,
   community: post.community ?? null,
+  music: (post.music ?? []).map(toTrack),
   repostOf: post.repostOf
     ? {
         id: post.repostOf.id ?? 0,
@@ -140,6 +149,9 @@ export const usePostStore = create<PostStore>()((set, get) => ({
   description: '',
   images: [],
   videos: [],
+  music: [],
+  pickedMusic: [],
+  pickedVideos: [],
   error_create: '',
   createdPost: null,
   uploadProgress: null,
@@ -209,27 +221,71 @@ export const usePostStore = create<PostStore>()((set, get) => ({
   removeVideo: (video) => {
     set(() => ({ videos: get().videos.filter((item) => item !== video) }))
   },
+  setMusicFiles: (fileList) => {
+    get().setError('')
+    const files = Array.from(fileList)
+    const notAudio = files.find((file) => !file.type.startsWith('audio/'))
+    if (notAudio) return get().setError(`«${notAudio.name}» — это не аудио`)
+    const tooBig = files.find((file) => file.size > MAX_AUDIO_SIZE)
+    if (tooBig) return get().setError(`«${tooBig.name}» больше ${MAX_AUDIO_SIZE / 1024 / 1024} МБ`)
+    if (get().music.length + get().pickedMusic.length + files.length > MAX_POST_TRACKS) {
+      return get().setError(`К записи можно прикрепить не больше ${MAX_POST_TRACKS} треков`)
+    }
+    const problem = validateUpload(files, [...get().images, ...get().videos, ...get().music])
+    if (problem) return get().setError(problem)
+    set((state) => ({ music: [...state.music, ...files] }))
+  },
+  removeMusic: (file) => {
+    set(() => ({ music: get().music.filter((item) => item !== file) }))
+  },
+  pickMusic: (tracks: PickedTrack[]) => {
+    const rest = MAX_POST_TRACKS - get().music.length
+    set((state) => ({ pickedMusic: tracks.slice(0, Math.max(rest, 0)), music: state.music }))
+  },
+  pickVideos: (videos: PickedVideo[]) => {
+    set(() => ({ pickedVideos: videos }))
+  },
+  unpickVideo: (id) => {
+    set(() => ({ pickedVideos: get().pickedVideos.filter((item) => item.id !== id) }))
+  },
+  unpickMusic: (id) => {
+    set(() => ({ pickedMusic: get().pickedMusic.filter((item) => item.id !== id) }))
+  },
   send: async (schemaFn, owner, communityId) => {
     const hasImages = get().images.length > 0
     const hasVideos = get().videos.length > 0
-    if (!get().description.trim() && !hasImages && !hasVideos) return
+    const hasMusic = get().music.length > 0 || get().pickedMusic.length > 0
+    const hasPicked = get().pickedVideos.length > 0
+    if (!get().description.trim() && !hasImages && !hasVideos && !hasMusic && !hasPicked) return
+    const hasUploads = hasImages || hasVideos || get().music.length > 0
     // Прогресс показываем только когда есть что загружать
-    if (hasImages || hasVideos) set({ uploadProgress: 0 })
+    if (hasUploads) set({ uploadProgress: 0 })
     try {
       const res = await schemaFn({
-        variables: { owner, description: get().description, images: get().images, videos: get().videos, communityId },
-        context:
-          hasImages || hasVideos
-            ? {
-                fetchOptions: { onProgress: (event: UploadProgressEvent) => set({ uploadProgress: toPercent(event) }) },
-              }
-            : undefined,
+        variables: {
+          owner,
+          description: get().description,
+          images: get().images,
+          videos: get().videos,
+          communityId,
+          music: get().music,
+          musicIds: get().pickedMusic.map((track) => track.id),
+          videoIds: get().pickedVideos.map((video) => video.id),
+        },
+        context: hasUploads
+          ? {
+              fetchOptions: { onProgress: (event: UploadProgressEvent) => set({ uploadProgress: toPercent(event) }) },
+            }
+          : undefined,
       })
       const created = res?.data?.createPost as RawPost | null | undefined
       set(() => ({
         description: '',
         images: [],
         videos: [],
+        music: [],
+        pickedMusic: [],
+        pickedVideos: [],
         error: '',
         createdPost: created ? toPost(created) : null,
       }))

@@ -4,7 +4,10 @@ import { useNavigate } from 'react-router-dom'
 
 import { CommunityAvatar } from '@/entities/community'
 import { CREATE_COMMUNITY } from '@/shared/graphql/schema'
+import { Btn } from '@/shared/ui/btn'
 import { Dialog } from '@/shared/ui/dialog'
+import { CheckField, Field } from '@/shared/ui/field'
+import { FormError } from '@/shared/ui/notice'
 
 import cl from './dialogs.module.css'
 import { useFilePreview } from './use-file-preview'
@@ -41,9 +44,9 @@ export const CreateCommunityDialog = ({ onClose }: { onClose: () => void }) => {
       footer={
         <>
           <span className={cl.hint}>Вы станете создателем и администратором</span>
-          <button type='button' className={cl.primary} disabled={!name.trim() || loading} onClick={() => void submit()}>
+          <Btn variant='primary' disabled={!name.trim() || loading} onClick={() => void submit()}>
             {loading ? 'Создание…' : 'Создать'}
-          </button>
+          </Btn>
         </>
       }
     >
@@ -53,9 +56,9 @@ export const CreateCommunityDialog = ({ onClose }: { onClose: () => void }) => {
         ) : (
           <CommunityAvatar name={name || '?'} avatar='' size={64} />
         )}
-        <button type='button' className={cl.secondary} onClick={() => input.current?.click()}>
+        <Btn variant='secondary' onClick={() => input.current?.click()}>
           {avatar ? 'Заменить картинку' : 'Загрузить картинку'}
-        </button>
+        </Btn>
         <input
           ref={input}
           type='file'
@@ -67,34 +70,30 @@ export const CreateCommunityDialog = ({ onClose }: { onClose: () => void }) => {
           }}
         />
       </div>
-      <label className={cl.field}>
-        Название
-        <input
-          value={name}
-          maxLength={60}
-          autoFocus
-          placeholder='Например, Любители аниме'
-          onChange={(e) => setName(e.target.value)}
-        />
-      </label>
-      <label className={cl.field}>
-        Описание
-        <textarea
-          value={description}
-          maxLength={2000}
-          rows={4}
-          placeholder='О чём ваше сообщество'
-          onChange={(e) => setDescription(e.target.value)}
-        />
-      </label>
-      <label className={cl.check}>
-        <input type='checkbox' checked={isClosed} onChange={(e) => setIsClosed(e.target.checked)} />
-        <span>
-          Закрытое сообщество
-          <small>Стену и участников видят только участники, вступить можно по заявке</small>
-        </span>
-      </label>
-      {error && <p className={cl.error}>{error.message}</p>}
+      <Field
+        label='Название'
+        value={name}
+        maxLength={60}
+        autoFocus
+        placeholder='Например, Любители аниме'
+        onChange={(e) => setName(e.target.value)}
+      />
+      <Field.Area
+        label='Описание'
+        value={description}
+        maxLength={2000}
+        rows={4}
+        placeholder='О чём ваше сообщество'
+        onChange={(e) => setDescription(e.target.value)}
+      />
+      <CheckField
+        checked={isClosed}
+        onChange={(e) => setIsClosed(e.target.checked)}
+        hint='Стену и участников видят только участники, вступить можно по заявке'
+      >
+        Закрытое сообщество
+      </CheckField>
+      {error && <FormError>{error.message}</FormError>}
     </Dialog>
   )
 }

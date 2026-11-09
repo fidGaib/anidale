@@ -6,19 +6,22 @@ import UserList, { FriendUser } from '@/entities/friends/ui'
 import Content from '@/shared/content'
 import { GET_FRIENDS, GET_SUBSCRIBERS, GET_USERS, SUBSCRIBE, UNSUBSCRIBE } from '@/shared/graphql/schema'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
+import { Btn } from '@/shared/ui/btn'
 import Input from '@/shared/ui/input'
+import { FormError } from '@/shared/ui/notice'
+import { Tabs } from '@/shared/ui/tabs'
 
 import cl from './ui.module.css'
 
 const PAGE = 30
 
-const tabs = [
-  { id: 'friends', text: 'Мои друзья' },
-  { id: 'subscribers', text: 'Подписчики' },
-  { id: 'all', text: 'Все люди' },
-] as const
+type Tab = 'friends' | 'subscribers' | 'all'
 
-type Tab = (typeof tabs)[number]['id']
+const tabs: { id: Tab; title: string }[] = [
+  { id: 'friends', title: 'Мои друзья' },
+  { id: 'subscribers', title: 'Подписчики' },
+  { id: 'all', title: 'Все люди' },
+]
 
 export const Friends = () => {
   const [refreshData] = useRefreshStore((state) => [state.refreshData])
@@ -128,17 +131,7 @@ export const Friends = () => {
 
   return (
     <Content className={cl.content}>
-      <div className={cl.meshBlock}>
-        {tabs.map((item) => (
-          <div
-            key={item.id}
-            className={`playground ${cl.mesh} ${tab === item.id ? cl.meshActive : ''}`}
-            onClick={() => setTab(item.id)}
-          >
-            <p>{item.text}</p>
-          </div>
-        ))}
-      </div>
+      <Tabs items={tabs} value={tab} onChange={setTab} />
       <div className={cl.wrappSeacrh}>
         <ImageLoading src='/icons/search.svg' className={cl.svg} />
         <Input
@@ -153,7 +146,7 @@ export const Friends = () => {
           }}
         />
       </div>
-      {error && <p className={cl.error}>{error.message}</p>}
+      <FormError>{error?.message}</FormError>
       <UserList
         users={users}
         loading={loading}
@@ -161,35 +154,25 @@ export const Friends = () => {
         renderAction={(user) => {
           if (tab === 'friends') {
             return (
-              <button
-                type='button'
-                className={cl.actionButton}
-                disabled={actionId === user.id}
-                onClick={() => removeFriend(user.id)}
-              >
+              <Btn disabled={actionId === user.id} onClick={() => removeFriend(user.id)}>
                 Удалить
-              </button>
+              </Btn>
             )
           }
           if (tab === 'subscribers') {
             return (
-              <button
-                type='button'
-                className={cl.actionButton}
-                disabled={actionId === user.id}
-                onClick={() => subscribeBack(user.id)}
-              >
+              <Btn disabled={actionId === user.id} onClick={() => subscribeBack(user.id)}>
                 Подписаться
-              </button>
+              </Btn>
             )
           }
           return null
         }}
       />
       {users.length >= PAGE && !done && (
-        <button type='button' className={cl.more} onClick={loadMore} disabled={loadingMore}>
+        <Btn onClick={loadMore} disabled={loadingMore}>
           {loadingMore ? 'Загрузка…' : 'Показать ещё'}
-        </button>
+        </Btn>
       )}
     </Content>
   )

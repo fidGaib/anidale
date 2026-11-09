@@ -50,6 +50,17 @@ export const CREATE_ARTICLE = graphql(`
         name
         avatar
       }
+      music {
+        id
+        title
+        artist
+        file
+        size
+        user {
+          id
+          login
+        }
+      }
       repostOf {
         id
         description
@@ -129,6 +140,17 @@ export const EDIT_ARTICLE = graphql(`
         id
         name
         avatar
+      }
+      music {
+        id
+        title
+        artist
+        file
+        size
+        user {
+          id
+          login
+        }
       }
       repostOf {
         id

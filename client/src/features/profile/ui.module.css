@@ -25,23 +25,6 @@
   font-size: 26px;
 }
 
-.pick,
-.publish {
-  padding: 8px 16px;
-  border: 0;
-  border-radius: 8px;
-  background: var(--accent);
-  color: #fff;
-  font-family: var(--font-text-main);
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.publish:disabled {
-  opacity: 0.45;
-  cursor: default;
-}
-
 .hint {
   font-size: 12px;
   opacity: 0.55;
@@ -145,17 +128,57 @@
   opacity: 0.55;
 }
 
-.error {
-  margin: 0;
-  color: var(--accent);
-  font-size: 13px;
-  font-weight: bold;
-}
-
 /* Панель смайликов открывается вниз и прижата к правому краю окна */
 .emojiWrap > div {
   top: 32px;
   right: 0;
   bottom: auto;
   left: auto;
+}
+
+.attach {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tracks {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.track {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: rgba(128, 128, 128, 0.15);
+  font-size: 13px;
+}
+
+.trackName {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trackName small {
+  margin-left: 6px;
+  opacity: 0.6;
+}
+
+.trackRemove {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.trackRemove:hover {
+  opacity: 1;
 }

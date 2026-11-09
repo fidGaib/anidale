@@ -7,6 +7,8 @@ import { storageUrl } from '@/shared/config'
 import { GET_SAVED_VIDEOS, GET_VIDEOS, REMOVE_VIDEO, SAVE_VIDEO } from '@/shared/graphql/schema'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import ButtonUI from '@/shared/ui/button'
+import { DeleteIcon } from '@/shared/ui/delete-icon'
+import { Tabs } from '@/shared/ui/tabs'
 
 import cl from './videos.module.css'
 
@@ -132,22 +134,15 @@ export const ProfileVideos = ({ id, isOwn, onAdd, onCountChange }: Props) => {
   return (
     <div className={`playground ${cl.wrap}`}>
       {isOwn && (
-        <div className={cl.albums}>
-          <button
-            type='button'
-            className={`${cl.album} ${album === 'all' ? cl.albumActive : ''}`}
-            onClick={() => setAlbum('all')}
-          >
-            Мои видео
-          </button>
-          <button
-            type='button'
-            className={`${cl.album} ${album === 'saved' ? cl.albumActive : ''}`}
-            onClick={() => setAlbum('saved')}
-          >
-            Сохранённые
-          </button>
-        </div>
+        <Tabs
+          className={cl.albumTabs}
+          items={[
+            { id: 'all', title: 'Мои видео' },
+            { id: 'saved', title: 'Сохранённые' },
+          ]}
+          value={album}
+          onChange={setAlbum}
+        />
       )}
 
       {actionMessage && <p className={cl.message}>{actionMessage}</p>}
@@ -198,7 +193,7 @@ export const ProfileVideos = ({ id, isOwn, onAdd, onCountChange }: Props) => {
                     void toggleSaved(video, false)
                   }}
                 >
-                  ×
+                  <DeleteIcon />
                 </button>
               )}
               {isOwn && album === 'all' && (
@@ -211,7 +206,7 @@ export const ProfileVideos = ({ id, isOwn, onAdd, onCountChange }: Props) => {
                     void remove(video)
                   }}
                 >
-                  ×
+                  <DeleteIcon />
                 </button>
               )}
             </div>

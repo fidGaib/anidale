@@ -2,12 +2,17 @@ import { useMutation } from '@apollo/client'
 import { DragEvent, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useRefreshStore } from '@/app/providers/routes/model'
+import { MusicPicker } from '@/features/music'
+import { VideoPicker } from '@/features/video-upload'
 import { CREATE_POST } from '@/shared/graphql/schema'
+import { Btn } from '@/shared/ui/btn'
+import { DeleteIcon } from '@/shared/ui/delete-icon'
 import { Dialog } from '@/shared/ui/dialog'
 import { EmojiPanel } from '@/shared/ui/emoji-panel'
+import { FormError } from '@/shared/ui/notice'
 import { UploadProgress } from '@/shared/ui/progress'
 
-import { usePostStore } from './module'
+import { MAX_POST_TRACKS, usePostStore } from './module'
 import cl from './ui.module.css'
 
 const MAX_LENGTH = 255
@@ -49,13 +54,28 @@ export const PostDialog = ({
 
   const imageUrls = usePreviews(images)
   const videoUrls = usePreviews(videos)
+  const music = usePostStore((s) => s.music)
+  const pickedMusic = usePostStore((s) => s.pickedMusic)
+  const pickedVideos = usePostStore((s) => s.pickedVideos)
+  const pickVideos = usePostStore((s) => s.pickVideos)
+  const unpickVideo = usePostStore((s) => s.unpickVideo)
+  const [pickingVideo, setPickingVideo] = useState(false)
+  const setMusicFiles = usePostStore((s) => s.setMusicFiles)
+  const removeMusic = usePostStore((s) => s.removeMusic)
+  const pickMusic = usePostStore((s) => s.pickMusic)
+  const unpickMusic = usePostStore((s) => s.unpickMusic)
+  const audioInput = useRef<HTMLInputElement>(null)
+  const [picking, setPicking] = useState(false)
   const input = useRef<HTMLInputElement>(null)
   const textarea = useRef<HTMLTextAreaElement>(null)
   const [dragging, setDragging] = useState(false)
   const [emojiOpen, setEmojiOpen] = useState(false)
 
   const hasMedia = images.length + videos.length > 0
-  const canSend = (description.trim().length > 0 || hasMedia) && !loading && uploadProgress === null
+  const hasMusic = music.length + pickedMusic.length > 0
+  const hasPicked = pickedVideos.length > 0
+  const canSend =
+    (description.trim().length > 0 || hasMedia || hasMusic || hasPicked) && !loading && uploadProgress === null
 
   const addFiles = (list: FileList | File[]) => {
     const files = Array.from(list)
@@ -106,9 +126,9 @@ export const PostDialog = ({
           <span className={cl.counter}>
             {description.length}/{MAX_LENGTH}
           </span>
-          <button type='button' className={cl.publish} disabled={!canSend} onClick={() => void publish()}>
+          <Btn variant='primary' disabled={!canSend} onClick={() => void publish()}>
             {loading ? 'Публикация…' : 'Опубликовать'}
-          </button>
+          </Btn>
         </>
       }
     >
@@ -130,7 +150,7 @@ export const PostDialog = ({
             <div key={`${image.name}-${index}`} className={cl.tile}>
               <img src={imageUrls[index]} alt='' className={cl.tileMedia} />
               <button type='button' className={cl.tileRemove} title='Убрать' onClick={() => removeImage(image)}>
-                ×
+                <DeleteIcon />
               </button>
             </div>
           ))}
@@ -139,7 +159,7 @@ export const PostDialog = ({
               <video src={videoUrls[index]} className={cl.tileMedia} muted preload='metadata' />
               <span className={cl.tileBadge}>▶ {video.name}</span>
               <button type='button' className={cl.tileRemove} title='Убрать' onClick={() => removeVideo(video)}>
-                ×
+                <DeleteIcon />
               </button>
             </div>
           ))}
@@ -159,12 +179,65 @@ export const PostDialog = ({
         >
           <span className={cl.dropIcon}>⭡</span>
           <b>Добавьте фото или видео</b>
-          <button type='button' className={cl.pick} onClick={() => input.current?.click()}>
+          <Btn variant='primary' onClick={() => input.current?.click()}>
             Загрузить с устройства
-          </button>
+          </Btn>
           <span className={cl.hint}>или перетащите файлы сюда</span>
         </div>
       )}
+
+      {(hasMusic || hasPicked) && (
+        <div className={cl.tracks}>
+          {pickedVideos.map((video) => (
+            <div key={`video-${video.id}`} className={cl.track}>
+              <span className={cl.trackName}>🎬 {video.title}</span>
+              <button type='button' className={cl.trackRemove} title='Убрать' onClick={() => unpickVideo(video.id)}>
+                <DeleteIcon />
+              </button>
+            </div>
+          ))}
+          {pickedMusic.map((track) => (
+            <div key={`picked-${track.id}`} className={cl.track}>
+              <span className={cl.trackName}>
+                🎵 {track.title} <small>{track.artist}</small>
+              </span>
+              <button type='button' className={cl.trackRemove} title='Убрать' onClick={() => unpickMusic(track.id)}>
+                <DeleteIcon />
+              </button>
+            </div>
+          ))}
+          {music.map((file, index) => (
+            <div key={`${file.name}-${index}`} className={cl.track}>
+              <span className={cl.trackName}>🎵 {file.name}</span>
+              <button type='button' className={cl.trackRemove} title='Убрать' onClick={() => removeMusic(file)}>
+                <DeleteIcon />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+      <div className={cl.attach}>
+        <input
+          ref={audioInput}
+          type='file'
+          multiple
+          hidden
+          accept='audio/*'
+          onChange={(e) => {
+            if (e.target.files) setMusicFiles(e.target.files)
+            e.target.value = ''
+          }}
+        />
+        <Btn variant='ghost' onClick={() => audioInput.current?.click()}>
+          🎵 Загрузить музыку
+        </Btn>
+        <Btn variant='ghost' onClick={() => setPicking(true)}>
+          🎧 Из моей музыки
+        </Btn>
+        <Btn variant='ghost' onClick={() => setPickingVideo(true)}>
+          🎬 Из моих видео
+        </Btn>
+      </div>
 
       <div className={cl.textWrap}>
         <textarea
@@ -184,8 +257,29 @@ export const PostDialog = ({
         </span>
       </div>
 
-      {message && <p className={cl.error}>{message}</p>}
+      {message && <FormError>{message}</FormError>}
       {uploadProgress !== null && <UploadProgress percent={uploadProgress} label='Публикация поста' />}
+      {pickingVideo && (
+        <VideoPicker
+          selected={pickedVideos}
+          onClose={() => setPickingVideo(false)}
+          onDone={(videos) => {
+            pickVideos(videos)
+            setPickingVideo(false)
+          }}
+        />
+      )}
+      {picking && (
+        <MusicPicker
+          selected={pickedMusic}
+          limit={MAX_POST_TRACKS - music.length}
+          onClose={() => setPicking(false)}
+          onDone={(tracks) => {
+            pickMusic(tracks)
+            setPicking(false)
+          }}
+        />
+      )}
     </Dialog>
   )
 }

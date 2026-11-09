@@ -4,6 +4,8 @@ import { useRef, useState } from 'react'
 import { storageUrl } from '@/shared/config'
 import { COMMUNITY_PHOTOS, COMMUNITY_VIDEOS, CREATE_COMMUNITY_PHOTO } from '@/shared/graphql/schema'
 import { ViewerPhoto, openPhotos } from '@/shared/lib/photo-viewer'
+import { Btn } from '@/shared/ui/btn'
+import { Empty, FormError } from '@/shared/ui/notice'
 
 import cl from './media.module.css'
 
@@ -21,7 +23,7 @@ interface Photo {
 const photoSrc = (photo: Photo) => storageUrl(`${photo.medium || photo.small || photo.high}.webp`)
 
 /** Вкладка «Фото» сообщества: снимки из записей и альбом; администратор добавляет фото в альбом. */
-export const CommunityPhotos = ({ id, isAdmin }: { id: number; isAdmin: boolean }) => {
+export const CommunityPhotos = ({ id, canAdd }: { id: number; canAdd: boolean }) => {
   const { data, loading, error, fetchMore, refetch } = useQuery(COMMUNITY_PHOTOS, {
     variables: { id, limit: PAGE, offset: 0 },
     fetchPolicy: 'network-only',
@@ -52,16 +54,11 @@ export const CommunityPhotos = ({ id, isAdmin }: { id: number; isAdmin: boolean 
 
   return (
     <div className={`playground ${cl.wrap}`}>
-      {isAdmin && (
+      {canAdd && (
         <div className={cl.toolbar}>
-          <button
-            type='button'
-            className={cl.primary}
-            disabled={uploadState.loading}
-            onClick={() => input.current?.click()}
-          >
+          <Btn variant='primary' disabled={uploadState.loading} onClick={() => input.current?.click()}>
             {uploadState.loading ? 'Загрузка…' : '＋ Добавить фото'}
-          </button>
+          </Btn>
           <input
             ref={input}
             type='file'
@@ -75,8 +72,8 @@ export const CommunityPhotos = ({ id, isAdmin }: { id: number; isAdmin: boolean 
           />
         </div>
       )}
-      {(error || uploadState.error) && <p className={cl.error}>{(error || uploadState.error)?.message}</p>}
-      {!loading && photos.length === 0 && <p className={cl.empty}>Фотографий пока нет</p>}
+      {(error || uploadState.error) && <FormError>{(error || uploadState.error)?.message}</FormError>}
+      {!loading && photos.length === 0 && <Empty>Фотографий пока нет</Empty>}
       <div className={cl.photoGrid}>
         {photos.map((photo, index) => (
           <button key={`${photo.source}-${photo.id}`} type='button' className={cl.photo} onClick={() => open(index)}>
@@ -101,7 +98,7 @@ export const CommunityPhotos = ({ id, isAdmin }: { id: number; isAdmin: boolean 
 }
 
 /** Вкладка «Видео» сообщества: альбом и ролики из записей. Добавляет администратор через окно загрузки. */
-export const CommunityVideos = ({ id, isAdmin, onAdd }: { id: number; isAdmin: boolean; onAdd: () => void }) => {
+export const CommunityVideos = ({ id, canAdd, onAdd }: { id: number; canAdd: boolean; onAdd: () => void }) => {
   const { data, loading, error, fetchMore } = useQuery(COMMUNITY_VIDEOS, {
     variables: { id, limit: PAGE, offset: 0 },
     fetchPolicy: 'network-only',
@@ -111,15 +108,15 @@ export const CommunityVideos = ({ id, isAdmin, onAdd }: { id: number; isAdmin: b
 
   return (
     <div className={`playground ${cl.wrap}`}>
-      {isAdmin && (
+      {canAdd && (
         <div className={cl.toolbar}>
-          <button type='button' className={cl.primary} onClick={onAdd}>
+          <Btn variant='primary' onClick={onAdd}>
             ＋ Добавить видео
-          </button>
+          </Btn>
         </div>
       )}
-      {error && <p className={cl.error}>{error.message}</p>}
-      {!loading && videos.length === 0 && <p className={cl.empty}>Видео пока нет</p>}
+      {error && <FormError>{error.message}</FormError>}
+      {!loading && videos.length === 0 && <Empty>Видео пока нет</Empty>}
       <div className={cl.videoGrid}>
         {videos.map((video) => (
           <figure key={video.id} className={cl.video}>

@@ -6,6 +6,7 @@ import { storageUrl } from '@/shared/config'
 import { GET_PHOTOS, GET_VIDEOS, MUSIC_BY_USER } from '@/shared/graphql/schema'
 import { openPhotos } from '@/shared/lib/photo-viewer'
 import { formatFileSize } from '@/shared/lib/time'
+import { Tabs } from '@/shared/ui/tabs'
 
 import cl from './media-preview.module.css'
 import { PreviewTab, pickPreviewTab } from './preview-tabs'
@@ -53,20 +54,12 @@ export const MediaPreview = ({ id, onShowAll }: Props) => {
 
   return (
     <section className={`playground ${cl.card}`}>
-      <div className={cl.tabs} role='tablist'>
-        {available.map((t) => (
-          <button
-            key={t}
-            type='button'
-            role='tab'
-            aria-selected={tab === t}
-            className={`${cl.tab} ${tab === t ? cl.tabActive : ''}`}
-            onClick={() => setChosen(t)}
-          >
-            {TITLES[t]}
-          </button>
-        ))}
-      </div>
+      <Tabs
+        className={cl.tabs}
+        items={available.map((t) => ({ id: t, title: TITLES[t] }))}
+        value={tab}
+        onChange={setChosen}
+      />
 
       {tab === 'music' && (
         <div className={cl.tracks}>

@@ -6,7 +6,7 @@ import Photo from '@/db/models/photo-model'
 import { PostImage } from '@/db/models/post-model'
 import User from '@/db/models/user-model'
 
-import { canViewCommunity, isCommunityAdmin } from '../community/access'
+import { canManageContent, canPublish, canViewCommunity } from '../community/access'
 import FileStorageService from '../post/file-service'
 
 const MAX_PAGE_LIMIT = 100
@@ -224,7 +224,7 @@ class PhotoService {
 
   async create(userId: number, image: File, communityId?: number | null) {
     if (!image) throw createGraphQLError('Выберите фотографию')
-    if (communityId && !(await isCommunityAdmin(communityId, userId))) {
+    if (communityId && !(await canPublish(communityId, userId))) {
       throw createGraphQLError('Добавлять фото в сообщество могут только администраторы')
     }
     if (!image.type.startsWith('image/')) throw createGraphQLError('Можно загрузить только изображение')
@@ -256,7 +256,7 @@ class PhotoService {
     const photo = await Photo.findUnique({ where: { id } })
     if (!photo) throw createGraphQLError('Фотография не найдена')
     const allowed =
-      photo.userId === userId || (!!photo.communityId && (await isCommunityAdmin(photo.communityId, userId)))
+      photo.userId === userId || (!!photo.communityId && (await canManageContent(photo.communityId, userId)))
     if (!allowed) throw createGraphQLError('Нет доступа')
 
     await Photo.delete({ where: { id } })

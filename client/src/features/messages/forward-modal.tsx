@@ -3,8 +3,9 @@ import { useEffect, useMemo, useState } from 'react'
 
 import { useRefreshStore } from '@/app/providers/routes/model'
 import { GET_USERS } from '@/shared/graphql/schema'
-import { Modal } from '@/shared/hooks/Modal'
-import ButtonUI from '@/shared/ui/button'
+import { Btn } from '@/shared/ui/btn'
+import { Dialog } from '@/shared/ui/dialog'
+import { Hint } from '@/shared/ui/notice'
 
 import { Avatar } from './avatar'
 import { useMessagesStore } from './module'
@@ -52,9 +53,8 @@ export const ForwardModal = ({ messageIds, onClose }: { messageIds: number[]; on
   }
 
   return (
-    <Modal active setActive={(open) => !open && !busy && onClose()}>
+    <Dialog title='Переслать сообщение' width={420} busy={busy} onClose={onClose}>
       <div className={cl.forwardBox}>
-        <p className={cl.deleteTitle}>Переслать сообщение</p>
         <input
           className={cl.forwardSearch}
           placeholder='Найти человека…'
@@ -72,13 +72,13 @@ export const ForwardModal = ({ messageIds, onClose }: { messageIds: number[]; on
             </label>
           ))}
         </div>
-        <p className={cl.deleteHint}>
+        <Hint>
           Выбрано: {selected.length} из {MAX_FORWARD}
-        </p>
-        <ButtonUI disabled={!selected.length || busy} onClick={() => void submit()}>
+        </Hint>
+        <Btn variant='primary' disabled={!selected.length || busy} onClick={() => void submit()}>
           {busy ? 'Пересылка…' : 'Переслать'}
-        </ButtonUI>
+        </Btn>
       </div>
-    </Modal>
+    </Dialog>
   )
 }

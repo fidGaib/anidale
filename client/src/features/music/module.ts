@@ -6,6 +6,7 @@ import { storageUrl } from '@/shared/config'
 import {
   ADD_MUSIC,
   ALL_MUSIC,
+  COMMUNITY_MUSIC,
   CREATE_MUSIC,
   MUSIC_BY_USER,
   MY_MUSIC_FILES,
@@ -18,7 +19,20 @@ export const MAX_AUDIO_SIZE = 15 * 1024 * 1024
 export const MUSIC_PAGE_SIZE = 20
 
 /** Что показываем: музыку конкретного профиля (id) или всю музыку сайта для ленты. */
-export type MusicScope = number | 'all'
+export type MusicScope = number | 'all' | CommunityScope
+
+/** Музыка сообщества: `community:<id>`. */
+export type CommunityScope = `community:${number}`
+
+/** id сообщества, если список — музыка сообщества. */
+export const communityOf = (scope: MusicScope | null): number | null => {
+  if (typeof scope !== 'string' || !scope.startsWith('community:')) return null
+  const id = Number(scope.slice('community:'.length))
+  return Number.isInteger(id) && id > 0 ? id : null
+}
+
+export const isValidScope = (scope: MusicScope): boolean =>
+  scope === 'all' || communityOf(scope) !== null || (typeof scope === 'number' && Number.isFinite(scope))
 
 export interface Track {
   id: number
@@ -174,6 +188,16 @@ export const useMusicStore = create<MusicStore>()((set, get) => {
       })
       return (data.getAllMusic ?? []).map(toTrack)
     }
+    const communityId = communityOf(scope)
+    if (communityId !== null) {
+      const { data } = await client.query({
+        query: COMMUNITY_MUSIC,
+        variables: { id: communityId, limit: MUSIC_PAGE_SIZE, page },
+        fetchPolicy: 'network-only',
+      })
+      return (data.getCommunityMusic ?? []).map(toTrack)
+    }
+    if (typeof scope !== 'number') return []
     const { data } = await client.query({
       query: MUSIC_BY_USER,
       variables: { id: scope, limit: MUSIC_PAGE_SIZE, page },
@@ -279,7 +303,7 @@ export const useMusicStore = create<MusicStore>()((set, get) => {
         try {
           const { data } = await client.mutate({
             mutation: CREATE_MUSIC,
-            variables: { title: titleFromFile(file.name), file },
+            variables: { title: titleFromFile(file.name), file, communityId: communityOf(get().scope) ?? undefined },
             context: {
               fetchOptions: { onProgress: (event: UploadProgressEvent) => set({ uploadPercent: toPercent(event) }) },
             },

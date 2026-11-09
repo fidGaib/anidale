@@ -7,6 +7,8 @@ import { CREATE_PHOTO, GET_PHOTOS, GET_SAVED_PHOTOS, REMOVE_PHOTO, SAVE_PHOTO } 
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { ViewerPhoto, openPhotos } from '@/shared/lib/photo-viewer'
 import ButtonUI from '@/shared/ui/button'
+import { DeleteIcon } from '@/shared/ui/delete-icon'
+import { Tabs } from '@/shared/ui/tabs'
 
 import cl from './photos.module.css'
 
@@ -147,22 +149,15 @@ export const ProfilePhotos = ({ id, isOwn, onCountChange }: Props) => {
   return (
     <div className={`playground ${cl.wrap}`}>
       {isOwn && (
-        <div className={cl.albums}>
-          <button
-            type='button'
-            className={`${cl.album} ${album === 'all' ? cl.albumActive : ''}`}
-            onClick={() => setAlbum('all')}
-          >
-            Фото
-          </button>
-          <button
-            type='button'
-            className={`${cl.album} ${album === 'saved' ? cl.albumActive : ''}`}
-            onClick={() => setAlbum('saved')}
-          >
-            Сохранённые
-          </button>
-        </div>
+        <Tabs
+          className={cl.albumTabs}
+          items={[
+            { id: 'all', title: 'Фото' },
+            { id: 'saved', title: 'Сохранённые' },
+          ]}
+          value={album}
+          onChange={setAlbum}
+        />
       )}
 
       {actionMessage && <p className={cl.message}>{actionMessage}</p>}
@@ -220,7 +215,7 @@ export const ProfilePhotos = ({ id, isOwn, onCountChange }: Props) => {
                     void unsave(photo)
                   }}
                 >
-                  ×
+                  <DeleteIcon />
                 </button>
               )}
               {isOwn && album === 'all' && photo.source === 'ALBUM' && (
@@ -233,7 +228,7 @@ export const ProfilePhotos = ({ id, isOwn, onCountChange }: Props) => {
                     void remove(photo.id)
                   }}
                 >
-                  ×
+                  <DeleteIcon />
                 </button>
               )}
             </div>

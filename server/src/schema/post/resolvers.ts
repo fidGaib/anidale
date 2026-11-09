@@ -25,8 +25,17 @@ const PostResolvers: Resolvers = {
     async createPost(_, { post }, ctx) {
       const { req, res } = ctx
       const user = await UserController.refresh(res, req.cookies.refreshToken)
-      const { description, images, videos, communityId } = post
-      const postData = await postController.create(user.id, description, images, videos, communityId)
+      const { description, images, videos, communityId, music, musicIds, videoIds } = post
+      const postData = await postController.create(
+        user.id,
+        description,
+        images,
+        videos,
+        communityId,
+        music,
+        musicIds,
+        videoIds,
+      )
 
       return {
         ...postData.post,

@@ -1,11 +1,15 @@
 import MusicController from '@/api/music/controller'
 import UserController from '@/api/user/controller'
+import { getOptionalUserId } from '@/api/user/optional-user'
 import { Resolvers } from '@/schema/resolvers-types'
 
 const PostResolvers: Resolvers = {
   Query: {
     async getMusic(_, { id, limit, page }) {
       return await MusicController.getMusic(limit, page, id)
+    },
+    async getCommunityMusic(_, { id, limit, page }, { req }) {
+      return await MusicController.getCommunityMusic(id, limit, page, await getOptionalUserId(req))
     },
     async getAllMusic(_, { limit, page }) {
       return await MusicController.getAllMusic(limit, page)
@@ -22,8 +26,8 @@ const PostResolvers: Resolvers = {
     },
     async createMusic(_, { music }, { req, res }) {
       const user = await UserController.refresh(res, req.cookies.refreshToken)
-      const { title, artist, file } = music
-      return await MusicController.create(user.id, title, artist ?? undefined, file)
+      const { title, artist, file, communityId } = music
+      return await MusicController.create(user.id, title, artist ?? undefined, file, communityId)
     },
     async removeMyMusic(_, { file }, { req, res }) {
       const user = await UserController.refresh(res, req.cookies.refreshToken)

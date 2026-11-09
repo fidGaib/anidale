@@ -2,9 +2,11 @@ import { createGraphQLError } from 'graphql-yoga'
 
 import NotificationController from '@/api/notification/controller'
 import { storagePath } from '@/config'
+import prisma from '@/db/db'
 import { Music } from '@/db/models/music-model'
 import { io } from '@/index'
 
+import { canManageContent, canPublish, canViewCommunity } from '../community/access'
 import AudioStorageService from './audio-service'
 
 const MAX_PAGE_LIMIT = 50
@@ -13,7 +15,10 @@ const MAX_TEXT_LENGTH = 100
 const userSelect = { select: { id: true, avatar: true, login: true } }
 
 class MusicController {
-  async create(owner: number, title: string, artist: string | undefined, file: File) {
+  async create(owner: number, title: string, artist: string | undefined, file: File, communityId?: number | null) {
+    if (communityId && !(await canPublish(communityId, owner))) {
+      throw createGraphQLError('Добавлять музыку в сообщество могут только администраторы и редакторы')
+    }
     const cleanTitle = title?.trim().slice(0, MAX_TEXT_LENGTH)
     if (!cleanTitle) throw createGraphQLError('Укажите название трека')
     if (!file) throw createGraphQLError('Загрузите аудиофайл')
@@ -24,10 +29,18 @@ class MusicController {
     const saved = await storage.save(file)
     try {
       const music = await Music.create({
-        data: { title: cleanTitle, artist: cleanArtist, file: saved.file, size: saved.size, owner },
+        data: {
+          title: cleanTitle,
+          artist: cleanArtist,
+          file: saved.file,
+          size: saved.size,
+          owner,
+          communityId: communityId || null,
+        },
         include: { user: userSelect },
       })
-      io.emit('newMusic', { music })
+      // Музыка сообщества в общую ленту не попадает
+      if (!communityId) io.emit('newMusic', { music })
       return music
     } catch (error) {
       await storage.remove(saved.file).catch(() => undefined)
@@ -42,7 +55,22 @@ class MusicController {
     return await Music.findMany({
       take,
       skip,
-      where: user_id ? { owner: user_id } : undefined,
+      // Личная страница: без треков сообществ, которые загрузил этот человек
+      where: user_id ? { owner: user_id, communityId: null, postId: null } : { communityId: null, postId: null },
+      orderBy: { id: 'desc' },
+      include: { user: userSelect },
+    })
+  }
+
+  /** Музыка сообщества: новые сверху. Закрытое сообщество показывает её только участникам. */
+  async getCommunityMusic(communityId: number, limit: number, page: number, viewerId?: number) {
+    if (!(await canViewCommunity(communityId, viewerId))) return []
+    const take = Math.min(Math.max(Math.trunc(limit) || 1, 1), MAX_PAGE_LIMIT)
+    const skip = Math.max(Math.trunc(page) || 0, 0) * take
+    return await Music.findMany({
+      take,
+      skip,
+      where: { communityId, postId: null },
       orderBy: { id: 'desc' },
       include: { user: userSelect },
     })
@@ -52,6 +80,8 @@ class MusicController {
   private searchWhere(search?: string) {
     return {
       file: { not: '' },
+      communityId: null,
+      postId: null,
       ...(search
         ? {
             OR: [
@@ -100,7 +130,7 @@ class MusicController {
   /** Файлы треков пользователя (без пустых). Потолок защищает от огромного ответа. */
   async getMyFiles(userId: number) {
     const rows = await Music.findMany({
-      where: { owner: userId, file: { not: '' } },
+      where: { owner: userId, communityId: null, postId: null, file: { not: '' } },
       select: { file: true },
       take: 5000,
     })
@@ -111,8 +141,18 @@ class MusicController {
   async addToProfile(id: number, userId: number) {
     const source = await Music.findUnique({ where: { id } })
     if (!source || !source.file) throw createGraphQLError('Трек не найден')
-    if (source.owner === userId) throw createGraphQLError('Этот трек уже в вашем профиле')
-    const exists = await Music.findFirst({ where: { owner: userId, file: source.file } })
+    // Трек сообщества можно взять к себе, если сообщество вам видно
+    if (source.communityId && !(await canViewCommunity(source.communityId, userId))) {
+      throw createGraphQLError('Трек не найден')
+    }
+    // Трек из записи можно взять к себе, если запись вам видна
+    if (source.postId && !(await this.canSeePost(source.postId, userId))) throw createGraphQLError('Трек не найден')
+    if (source.owner === userId && !source.communityId && !source.postId) {
+      throw createGraphQLError('Этот трек уже в вашем профиле')
+    }
+    const exists = await Music.findFirst({
+      where: { owner: userId, communityId: null, postId: null, file: source.file },
+    })
     if (exists) throw createGraphQLError('Этот трек уже в вашем профиле')
 
     const added = await Music.create({
@@ -125,15 +165,20 @@ class MusicController {
       },
       include: { user: userSelect },
     })
-    await NotificationController.notify(source.owner, userId, 'track', { text: source.title })
+    if (!source.communityId && !source.postId)
+      await NotificationController.notify(source.owner, userId, 'track', { text: source.title })
     return added
   }
 
   async remove(id: number, userId: number) {
     const music = await Music.findUnique({ where: { id } })
     if (!music) throw createGraphQLError('Трек не найден')
-    // Удалять можно только свои треки
-    if (music.owner !== userId) throw createGraphQLError('Нет доступа')
+    // Удалять можно свои треки, а трек сообщества — ещё и тем, кто ведёт его содержимое
+    const allowed =
+      music.owner === userId || (!!music.communityId && (await canManageContent(music.communityId, userId)))
+    // Трек записи удаляется вместе с записью
+    if (music.postId) throw createGraphQLError('Трек прикреплён к записи: удалите запись')
+    if (!allowed) throw createGraphQLError('Нет доступа')
 
     await Music.delete({ where: { id } })
     await this.removeFileIfUnused(music.file)
@@ -143,10 +188,33 @@ class MusicController {
   /** Убирает из профиля пользователя все записи с этим файлом: и загруженную им, и добавленную копию. */
   async removeMine(file: string, userId: number) {
     if (!file) throw createGraphQLError('Трек не найден')
-    const { count } = await Music.deleteMany({ where: { owner: userId, file } })
+    const { count } = await Music.deleteMany({ where: { owner: userId, communityId: null, postId: null, file } })
     if (count === 0) throw createGraphQLError('Трека нет в вашем профиле')
     await this.removeFileIfUnused(file)
     return true
+  }
+
+  /** Удаляет все треки сообщества вместе с файлами, которые больше нигде не нужны. */
+  async removeCommunityTracks(communityId: number) {
+    const tracks = await Music.findMany({ where: { communityId }, select: { id: true, file: true } })
+    await Music.deleteMany({ where: { communityId } })
+    for (const track of tracks) await this.removeFileIfUnused(track.file)
+  }
+
+  /** Запись с треком видна просматривающему: не в архиве чужого, не предложка, не закрытое сообщество. */
+  private async canSeePost(postId: number, viewerId: number) {
+    const post = await prisma.post.findUnique({
+      where: { id: postId },
+      select: { owner: true, archived: true, suggested: true, communityId: true },
+    })
+    if (!post) return false
+    if ((post.archived || post.suggested) && post.owner !== viewerId) return false
+    return post.communityId ? await canViewCommunity(post.communityId, viewerId) : true
+  }
+
+  /** Удаляет файлы, которые после удаления записи или сообщества больше никому не нужны. */
+  async removeFilesIfUnused(files: string[]) {
+    for (const file of new Set(files)) await this.removeFileIfUnused(file)
   }
 
   /** Файл могут использовать копии в других профилях: удаляем его только вместе с последней записью. */

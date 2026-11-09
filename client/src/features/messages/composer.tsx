@@ -169,7 +169,7 @@ export const Composer = ({ userId }: { userId: number }) => {
               {file.name} · {formatFileSize(file.size)}
               <img
                 className={cl.chipRemove}
-                src='/icons/close.svg'
+                src='/icons/delete.svg'
                 alt='Убрать'
                 onClick={() => setFiles((prev) => prev.filter((_, i) => i !== index))}
               />

@@ -6,11 +6,23 @@ import prisma from '@/db/db'
 import { Post, PostImage } from '@/db/models/post-model'
 
 import { articleFiles } from '../article/content'
-import { canViewCommunity, isBanned, isCommunityAdmin, isCommunityMember } from '../community/access'
+import {
+  canManageContent,
+  canModerate,
+  canPublish,
+  canViewCommunity,
+  isBanned,
+  isCommunityMember,
+} from '../community/access'
+import AudioStorageService from '../music/audio-service'
+import MusicController from '../music/controller'
+import VideoService from '../video/service'
 import VideoStorageService from '../video/video-service'
 import FileStorageService, { SaveImage } from './file-service'
 
 const MAX_PAGE_LIMIT = 50
+/** Сколько треков можно прикрепить к одной записи. */
+export const MAX_POST_TRACKS = 10
 
 const userSel = { select: { id: true, avatar: true, login: true } }
 const MAX_DESCRIPTION = 2000
@@ -27,6 +39,7 @@ const postInclude = (viewerId?: number) => ({
   videos: { include: { user: userSel, ...savedBy(viewerId) } },
   user: userSel,
   article: { select: { id: true, title: true, cover: true, excerpt: true } },
+  music: { include: { user: userSel }, orderBy: { id: 'asc' as const } },
   community: { select: { id: true, name: true, avatar: true } },
   _count: { select: { likes: true, comments: true, reposts: true } },
   repostOf: {
@@ -134,7 +147,7 @@ class PostService {
 
   /** Предложенные записи, ожидающие решения администратора (старые первыми). */
   async findSuggested(communityId: number, adminId: number, limit: number, page: number) {
-    if (!(await isCommunityAdmin(communityId, adminId))) throw createGraphQLError('Нет доступа')
+    if (!(await canModerate(communityId, adminId))) throw createGraphQLError('Нет доступа')
     const take = Math.min(Math.max(Math.trunc(limit) || 1, 1), MAX_PAGE_LIMIT)
     const skip = Math.max(Math.trunc(page) || 0, 0) * take
     const posts = await Post.findMany({
@@ -151,7 +164,7 @@ class PostService {
   async reviewSuggested(adminId: number, postId: number, approve: boolean) {
     const post = await Post.findUnique({ where: { id: postId } })
     if (!post || !post.suggested || !post.communityId) throw createGraphQLError('Предложенная запись не найдена')
-    if (!(await isCommunityAdmin(post.communityId, adminId))) throw createGraphQLError('Нет доступа')
+    if (!(await canModerate(post.communityId, adminId))) throw createGraphQLError('Нет доступа')
     if (approve) {
       // Дата обновляется: запись появляется на стене в момент одобрения
       await Post.update({ where: { id: postId }, data: { suggested: false, date: new Date() } })
@@ -167,7 +180,7 @@ class PostService {
     if (!post || (post.archived && post.owner !== viewerId)) return null
     // Предложенную запись видят только автор и администраторы сообщества
     if (post.suggested && post.owner !== viewerId) {
-      if (!viewerId || !post.communityId || !(await isCommunityAdmin(post.communityId, viewerId))) return null
+      if (!viewerId || !post.communityId || !(await canModerate(post.communityId, viewerId))) return null
     }
     // Запись закрытого сообщества — только его участникам
     if (post.communityId && !(await canViewCommunity(post.communityId, viewerId))) return null
@@ -191,7 +204,7 @@ class PostService {
   /** Править запись может автор; запись на стене сообщества — ещё и любой администратор сообщества. */
   private async canManage(post: { owner: number; communityId: number | null }, userId: number) {
     if (post.owner === userId) return true
-    return post.communityId !== null && (await isCommunityAdmin(post.communityId, userId))
+    return post.communityId !== null && (await canManageContent(post.communityId, userId))
   }
 
   private async own(userId: number, id: number) {
@@ -304,10 +317,22 @@ class PostService {
     return await Post.findMany({ where: { id: { in: posts.map((p) => p.id) } }, select: { id: true, views: true } })
   }
 
-  async create(owner: number, description: string, images?: File[], videos?: File[], communityId?: number | null) {
+  async create(
+    owner: number,
+    description: string,
+    images?: File[],
+    videos?: File[],
+    communityId?: number | null,
+    music?: File[],
+    musicIds?: number[],
+    videoIds?: number[],
+  ) {
+    const trackCount = (music?.length ?? 0) + (musicIds?.length ?? 0)
+    if (trackCount > MAX_POST_TRACKS)
+      throw createGraphQLError(`К записи можно прикрепить не больше ${MAX_POST_TRACKS} треков`)
     // Администратор публикует сразу, участник предлагает запись на модерацию
     let suggested = false
-    if (communityId && !(await isCommunityAdmin(communityId, owner))) {
+    if (communityId && !(await canPublish(communityId, owner))) {
       if (await isBanned(communityId, owner)) throw createGraphQLError('Вы в чёрном списке сообщества')
       if (!(await isCommunityMember(communityId, owner))) {
         throw createGraphQLError('Предлагать записи могут только участники сообщества')
@@ -319,10 +344,44 @@ class PostService {
     // Файлы сохраняем до записи в БД; если запись не удалась, удаляем их, чтобы не копить мусор
     let postImages: SaveImage[] = []
     let postVideos: Awaited<ReturnType<VideoStorageService['save']>>[] = []
+    const audioStorage = new AudioStorageService(storagePath)
+    let pickedVideos: { title: string; file: string; size: number; type: string }[] = []
+    const postTracks: { title: string; artist: string; file: string; size: number }[] = []
+    const uploadedTracks: string[] = []
     try {
       postImages = images?.length ? await Promise.all(images.map((image) => storage.saveImage(image, 'posts/'))) : []
       postVideos = videos?.length ? await Promise.all(videos.map((video) => videoStorage.save(video))) : []
-      // Пост, картинки и видео создаются одним вложенным запросом, Prisma выполняет его атомарно
+      // Треки: загруженные файлы и копии из своей музыки (файл общий, в хранилище не дублируется)
+      for (const file of music ?? []) {
+        const saved = await audioStorage.save(file)
+        uploadedTracks.push(saved.file)
+        postTracks.push({
+          title:
+            file.name
+              .replace(/\.[^.]+$/, '')
+              .trim()
+              .slice(0, 100) || 'Без названия',
+          artist: 'Неизвестный исполнитель',
+          file: saved.file,
+          size: saved.size,
+        })
+      }
+      if (musicIds?.length) {
+        const own = await prisma.music.findMany({
+          where: { id: { in: musicIds }, owner, communityId: null, postId: null, file: { not: '' } },
+        })
+        if (own.length !== new Set(musicIds).size) throw createGraphQLError('Выберите треки из своей музыки')
+        postTracks.push(...own.map((t) => ({ title: t.title, artist: t.artist, file: t.file, size: t.size })))
+      }
+      // Видео из своей коллекции прикрепляются копиями записи: файл общий
+      if (videoIds?.length) {
+        const own = await prisma.video.findMany({
+          where: { id: { in: videoIds }, ownerId: owner, postId: null, communityId: null },
+        })
+        if (own.length !== new Set(videoIds).size) throw createGraphQLError('Выберите видео из своей коллекции')
+        pickedVideos = own.map((v) => ({ title: v.title, file: v.file, size: v.size, type: v.type }))
+      }
+      // Пост, картинки, видео и треки создаются одним вложенным запросом, Prisma выполняет его атомарно
       const post = await Post.create({
         data: {
           owner,
@@ -338,8 +397,9 @@ class PostService {
               type: info.type,
             })),
           },
+          music: { create: postTracks.map((track) => ({ ...track, owner })) },
           videos: {
-            create: postVideos.map((info) => ({
+            create: [...postVideos, ...pickedVideos].map((info) => ({
               ownerId: owner,
               title: info.title,
               file: info.file,
@@ -351,6 +411,7 @@ class PostService {
         include: {
           images: true,
           videos: { include: { user: userSel } },
+          music: { include: { user: userSel }, orderBy: { id: 'asc' as const } },
           community: { select: { id: true, name: true, avatar: true } },
           user: {
             select: {
@@ -365,6 +426,7 @@ class PostService {
     } catch (error) {
       if (postImages.length) await storage.removeFiles(postImages)
       await Promise.all(postVideos.map((video) => videoStorage.remove(video.file)))
+      await Promise.all(uploadedTracks.map((file) => audioStorage.remove(file).catch(() => undefined)))
       throw error
     }
   }
@@ -397,14 +459,12 @@ class PostService {
     // Удалять можно свои посты, а на стене сообщества — любому его администратору
     if (!(await this.canManage(post, userId))) throw createGraphQLError('Нет доступа')
     // Файлы статьи нужно собрать до удаления записи: вместе с постом удалится и она
+    const trackFiles = (await prisma.music.findMany({ where: { postId: post_id }, select: { file: true } })).map(
+      (t) => t.file,
+    )
     const articleToClean = await prisma.article.findUnique({ where: { postId: post_id } })
     const filesToRemove = articleToClean ? articleFiles(articleToClean) : []
     try {
-      // Видео из поста не переиспользуются, поэтому удаляем файлы вместе с записью
-      if (post.videos && post.videos.length > 0) {
-        const videoStorage = new VideoStorageService(storagePath)
-        await Promise.all(post.videos.map((video) => videoStorage.remove(video.file)))
-      }
       if (post.images && post.images.length > 0) {
         const removalPromises = post.images.map(async (item) => {
           const otherPostsWithImage = await PostImage.findMany({
@@ -425,6 +485,10 @@ class PostService {
       await Post.delete({
         where: { id: post_id },
       })
+      // Файлы видео записи: удаляются, если ролик не прикреплён к другим записям или не лежит в коллекции
+      await VideoService.removeFilesIfUnused(post.videos.map((video) => video.file))
+      // Треки записи удалились вместе с ней: их файлы нужны, только если трек есть в чьём-то профиле
+      await MusicController.removeFilesIfUnused(trackFiles)
       if (filesToRemove.length) {
         await storageService
           .removeFiles(filesToRemove)

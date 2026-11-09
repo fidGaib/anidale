@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { client } from '@/app/providers/apollo-client'
+
 import { Story, StoryGroup, useStoriesStore } from './module'
 
 // Сеть и вход заменены заглушками: проверяется только логика стора
@@ -30,7 +32,7 @@ const group = (userId: number, stories: Story[]): StoryGroup => ({
 })
 
 beforeEach(() => {
-  store.setState({ groups: [], viewer: null })
+  store.setState({ groups: [], viewer: null, source: null })
 })
 
 describe('открытие историй', () => {
@@ -97,5 +99,61 @@ describe('переход между историями', () => {
     store.setState({ viewer: { group: 1, story: 1 } })
     store.getState().step(1)
     expect(store.getState().viewer).toBeNull()
+  })
+})
+
+describe('истории сообщества', () => {
+  const query = vi.mocked(client.query)
+  const raw = (id: number, seen = false) => ({
+    id,
+    high: '',
+    medium: `stories/${id}`,
+    small: '',
+    text: '',
+    date: id,
+    expiresAt: id + 1000,
+    seen,
+    viewsCount: null,
+  })
+  const source = { id: 7, name: 'Клуб', avatar: 'communities/a/b', canManage: true }
+
+  it('загружаются одной группой: сообщество с отрицательным id и признаком прав', async () => {
+    query.mockResolvedValueOnce({ data: { getCommunityStories: [raw(1, true), raw(2)] } } as never)
+    await store.getState().loadCommunity(source)
+    const [g] = store.getState().groups
+    expect(g.user).toEqual({ id: -7, login: 'Клуб', avatar: 'communities/a/b' })
+    expect(g.community).toEqual({ id: 7, canManage: true })
+    expect(g.stories.map((s) => s.id)).toEqual([1, 2])
+    expect(g.allSeen).toBe(false)
+    expect(store.getState().source).toEqual(source)
+  })
+
+  it('без историй групп нет, а открыть чужое ничего не даёт', async () => {
+    query.mockResolvedValueOnce({ data: { getCommunityStories: [] } } as never)
+    await store.getState().loadCommunity(source)
+    expect(store.getState().groups).toEqual([])
+    store.getState().open(-7)
+    expect(store.getState().viewer).toBeNull()
+  })
+
+  it('история сообщества открывается по отрицательному id', async () => {
+    query.mockResolvedValueOnce({ data: { getCommunityStories: [raw(1, true), raw(2)] } } as never)
+    await store.getState().loadCommunity(source)
+    store.getState().open(-7)
+    expect(store.getState().viewer).toEqual({ group: 0, story: 1 })
+  })
+
+  it('reload обновляет то, что загружено: сообщество или общую ленту', async () => {
+    query.mockResolvedValueOnce({ data: { getCommunityStories: [raw(1)] } } as never)
+    await store.getState().loadCommunity(source)
+    query.mockResolvedValueOnce({ data: { getCommunityStories: [raw(1), raw(3)] } } as never)
+    await store.getState().reload()
+    expect(store.getState().groups[0].stories).toHaveLength(2)
+    query.mockResolvedValueOnce({ data: { getStories: [] } } as never)
+    await store.getState().load()
+    expect(store.getState().source).toBeNull()
+    query.mockResolvedValueOnce({ data: { getStories: [] } } as never)
+    await store.getState().reload()
+    expect(query).toHaveBeenLastCalledWith(expect.objectContaining({ fetchPolicy: 'network-only' }))
   })
 })

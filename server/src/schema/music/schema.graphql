@@ -1,6 +1,8 @@
 type Query {
   getMusic(id: Int!, limit: Int!, page: Int!): [Music!]
   getAllMusic(limit: Int!, page: Int!): [Music!]
+  "Музыка сообщества, новые сверху"
+  getCommunityMusic(id: Int!, limit: Int!, page: Int!): [Music!]!
   "Файлы всех треков текущего пользователя: клиент по ним помечает уже добавленные"
   myMusicFiles: [String!]!
 }
@@ -15,6 +17,8 @@ input CreateMusic {
   title: String!
   artist: String
   file: FILE!
+  "Добавить в музыку сообщества (администратор или редактор)"
+  communityId: Int
 }
 type Music {
   id: Int

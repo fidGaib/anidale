@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { useRefreshStore } from '@/app/providers/routes/model'
@@ -6,6 +6,7 @@ import { assetUrl } from '@/shared/config'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { copyText } from '@/shared/lib/clipboard'
 import ButtonUI from '@/shared/ui/button'
+import { Dialog } from '@/shared/ui/dialog'
 import Dropdown from '@/shared/ui/dropdown'
 
 import { REPORT_REASONS, postActions } from './post-actions'
@@ -26,28 +27,6 @@ export interface MenuPost {
   articleId?: number
   /** Просматривающий управляет записью как администратор сообщества. */
   canManage?: boolean
-}
-
-/** Окно поверх всего, включая окно поста (у общего Modal z-index ниже). */
-export const Dialog = ({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) => {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.stopPropagation()
-        onClose()
-      }
-    }
-    window.addEventListener('keydown', onKey, true)
-    return () => window.removeEventListener('keydown', onKey, true)
-  }, [onClose])
-  return (
-    <div className={cl.dialogOverlay} onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className={`playground ${cl.dialog}`} role='dialog' aria-label={title}>
-        <p className={cl.dialogTitle}>{title}</p>
-        {children}
-      </div>
-    </div>
-  )
 }
 
 const EditDialog = ({ post, onClose }: { post: MenuPost; onClose: () => void }) => {

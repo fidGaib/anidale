@@ -50,6 +50,17 @@ export const POST_BY_USER = graphql(`
         name
         avatar
       }
+      music {
+        id
+        title
+        artist
+        file
+        size
+        user {
+          id
+          login
+        }
+      }
       repostOf {
         id
         description
@@ -129,6 +140,17 @@ export const POSTS = graphql(`
         id
         name
         avatar
+      }
+      music {
+        id
+        title
+        artist
+        file
+        size
+        user {
+          id
+          login
+        }
       }
       repostOf {
         id
@@ -210,6 +232,17 @@ export const GET_POST = graphql(`
         name
         avatar
       }
+      music {
+        id
+        title
+        artist
+        file
+        size
+        user {
+          id
+          login
+        }
+      }
       repostOf {
         id
         description
@@ -241,9 +274,27 @@ export const GET_POST = graphql(`
 `)
 
 export const CREATE_POST = graphql(`
-  mutation CREATE_POST($owner: Int!, $description: String, $images: [File!], $videos: [File!], $communityId: Int) {
+  mutation CREATE_POST(
+    $owner: Int!
+    $description: String
+    $images: [File!]
+    $videos: [File!]
+    $communityId: Int
+    $music: [File]
+    $musicIds: [Int!]
+    $videoIds: [Int!]
+  ) {
     createPost(
-      post: { owner: $owner, description: $description, images: $images, videos: $videos, communityId: $communityId }
+      post: {
+        owner: $owner
+        description: $description
+        images: $images
+        videos: $videos
+        communityId: $communityId
+        music: $music
+        musicIds: $musicIds
+        videoIds: $videoIds
+      }
     ) {
       id
       description
@@ -291,6 +342,17 @@ export const CREATE_POST = graphql(`
         id
         name
         avatar
+      }
+      music {
+        id
+        title
+        artist
+        file
+        size
+        user {
+          id
+          login
+        }
       }
       repostOf {
         id
@@ -412,6 +474,17 @@ export const BOOKMARKS = graphql(`
         name
         avatar
       }
+      music {
+        id
+        title
+        artist
+        file
+        size
+        user {
+          id
+          login
+        }
+      }
       repostOf {
         id
         description
@@ -491,6 +564,17 @@ export const REPOST_POST = graphql(`
         id
         name
         avatar
+      }
+      music {
+        id
+        title
+        artist
+        file
+        size
+        user {
+          id
+          login
+        }
       }
       repostOf {
         id
@@ -628,6 +712,17 @@ export const POSTS_BY_COMMUNITY = graphql(`
         name
         avatar
       }
+      music {
+        id
+        title
+        artist
+        file
+        size
+        user {
+          id
+          login
+        }
+      }
       repostOf {
         id
         description
@@ -707,6 +802,17 @@ export const SUGGESTED_POSTS = graphql(`
         id
         name
         avatar
+      }
+      music {
+        id
+        title
+        artist
+        file
+        size
+        user {
+          id
+          login
+        }
       }
       repostOf {
         id

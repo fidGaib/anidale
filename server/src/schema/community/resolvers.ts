@@ -1,3 +1,4 @@
+import DiscussionService from '@/api/community/discussions'
 import CommunityService from '@/api/community/service'
 import PhotoService from '@/api/photo/service'
 import UserController from '@/api/user/controller'
@@ -7,6 +8,15 @@ import { Resolvers } from '@/schema/resolvers-types'
 
 const CommunityResolvers: Resolvers = {
   Query: {
+    async getDiscussionTopics(_, { id, limit, offset }, { req }) {
+      return await DiscussionService.topics(id, limit, offset, await getOptionalUserId(req))
+    },
+    async getDiscussionTopic(_, { topicId }, { req }) {
+      return await DiscussionService.topic(topicId, await getOptionalUserId(req))
+    },
+    async getDiscussionMessages(_, { topicId, limit, offset }, { req }) {
+      return await DiscussionService.messages(topicId, limit, offset, await getOptionalUserId(req))
+    },
     async getCommunities(_, args, { req }) {
       return await CommunityService.list(await getOptionalUserId(req), args)
     },
@@ -42,6 +52,30 @@ const CommunityResolvers: Resolvers = {
     },
   },
   Mutation: {
+    async createDiscussionTopic(_, { id, title, text }, { req, res }) {
+      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      return await DiscussionService.createTopic(user.id, id, title, text)
+    },
+    async addDiscussionMessage(_, { topicId, text }, { req, res }) {
+      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      return await DiscussionService.addMessage(user.id, topicId, text)
+    },
+    async removeDiscussionMessage(_, { messageId }, { req, res }) {
+      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      return await DiscussionService.removeMessage(user.id, messageId)
+    },
+    async removeDiscussionTopic(_, { topicId }, { req, res }) {
+      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      return await DiscussionService.removeTopic(user.id, topicId)
+    },
+    async setDiscussionTopicFlags(_, { topicId, pinned, closed }, { req, res }) {
+      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      return await DiscussionService.setFlags(user.id, topicId, { pinned, closed })
+    },
+    async setCommunityContacts(_, { id, contacts }, { req, res }) {
+      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      return await CommunityService.setContacts(user.id, id, contacts)
+    },
     async createCommunity(_, { name, description, avatar, isClosed }, { req, res }) {
       const user = await UserController.refresh(res, req.cookies.refreshToken)
       return await CommunityService.create(user.id, { name, description, avatar, isClosed })
@@ -82,9 +116,9 @@ const CommunityResolvers: Resolvers = {
       const user = await UserController.refresh(res, req.cookies.refreshToken)
       return await CommunityService.review(user.id, postId, approve)
     },
-    async setCommunityAdmin(_, { id, userId, admin }, { req, res }) {
+    async setCommunityRole(_, { id, userId, role }, { req, res }) {
       const user = await UserController.refresh(res, req.cookies.refreshToken)
-      return await CommunityService.setAdmin(user.id, id, userId, admin)
+      return await CommunityService.setRole(user.id, id, userId, role)
     },
     async removeCommunity(_, { id }, { req, res }) {
       const user = await UserController.refresh(res, req.cookies.refreshToken)

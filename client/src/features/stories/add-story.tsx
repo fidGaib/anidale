@@ -6,6 +6,8 @@ import { useStoriesStore } from './module'
 interface Props {
   /** Рисует кнопку-вызов: open открывает редактор, uploading — идёт загрузка. */
   children?: (open: () => void, uploading: boolean) => ReactNode
+  /** Опубликовать историю от имени сообщества (нужны права администратора или редактора). */
+  communityId?: number
   /** Сюда кладётся функция открытия редактора: так историю можно начать из чужого меню без своей кнопки. */
   openRef?: MutableRefObject<(() => void) | null>
 }
@@ -14,7 +16,7 @@ interface Props {
  * Добавление истории: окно-редактор (фото или фон, текст, стикеры, рисунок, фильтры) и публикация.
  * Кнопку, которая запускает редактор, рисует вызывающий компонент (в ленте это «+», в профиле «Создать момент»).
  */
-export const AddStory = ({ children, openRef }: Props) => {
+export const AddStory = ({ children, openRef, communityId }: Props) => {
   const uploading = useStoriesStore((s) => s.uploading)
   const create = useStoriesStore((s) => s.create)
   const [open, setOpen] = useState(false)
@@ -31,7 +33,11 @@ export const AddStory = ({ children, openRef }: Props) => {
     <>
       {children?.(() => setOpen(true), uploading)}
       {open && (
-        <StoryEditor onClose={() => setOpen(false)} onPublish={(image) => create(image)} publishing={uploading} />
+        <StoryEditor
+          onClose={() => setOpen(false)}
+          onPublish={(image) => create(image, undefined, communityId)}
+          publishing={uploading}
+        />
       )}
     </>
   )

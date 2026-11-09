@@ -1,7 +1,8 @@
 import { useState } from 'react'
 
-import { Modal } from '@/shared/hooks/Modal'
-import ButtonUI from '@/shared/ui/button'
+import { Btn } from '@/shared/ui/btn'
+import { Dialog } from '@/shared/ui/dialog'
+import { Hint } from '@/shared/ui/notice'
 
 import { useMessagesStore } from './module'
 import cl from './ui.module.css'
@@ -26,23 +27,27 @@ export const useDeleteDialog = (onDeleted: (userId: number) => void) => {
     }
   }
 
-  const modal = (
-    <Modal active={target !== null} setActive={(open) => !open && !busy && setTarget(null)}>
+  const modal = target && (
+    <Dialog
+      title={`Удалить диалог с ${target.login || 'пользователем'}?`}
+      width={400}
+      busy={busy}
+      onClose={() => setTarget(null)}
+    >
       <div className={cl.deleteBox}>
-        <p className={cl.deleteTitle}>Удалить диалог с {target?.login || 'пользователем'}?</p>
-        <ButtonUI disabled={busy} onClick={() => void choose(false)}>
+        <Btn disabled={busy} onClick={() => void choose(false)}>
           Только у меня
-        </ButtonUI>
-        <p className={cl.deleteHint}>Собеседник сохранит переписку и файлы.</p>
-        <ButtonUI disabled={busy} onClick={() => void choose(true)}>
+        </Btn>
+        <Hint>Собеседник сохранит переписку и файлы.</Hint>
+        <Btn variant='danger' disabled={busy} onClick={() => void choose(true)}>
           У всех
-        </ButtonUI>
-        <p className={cl.deleteHint}>Переписка и файлы удалятся у обоих без возможности восстановления.</p>
-        <ButtonUI disabled={busy} onClick={() => setTarget(null)}>
+        </Btn>
+        <Hint>Переписка и файлы удалятся у обоих без возможности восстановления.</Hint>
+        <Btn variant='ghost' disabled={busy} onClick={() => setTarget(null)}>
           Отмена
-        </ButtonUI>
+        </Btn>
       </div>
-    </Modal>
+    </Dialog>
   )
 
   return { ask: setTarget, modal }

@@ -7,9 +7,36 @@ import { notifyAdmins } from '../community/notify'
 import PostService, { WALL_KINDS } from './service'
 
 class PostController {
-  async create(owner: number, description?: string, images?: File[], videos?: File[], communityId?: number | null) {
-    if (!description?.trim() && !images?.length && !videos?.length) throw createGraphQLError('У вас пустые поля')
-    const postData = await PostService.create(owner, description || '', images, videos, communityId)
+  async create(
+    owner: number,
+    description?: string,
+    images?: File[],
+    videos?: File[],
+    communityId?: number | null,
+    music?: File[],
+    musicIds?: number[],
+    videoIds?: number[],
+  ) {
+    if (
+      !description?.trim() &&
+      !images?.length &&
+      !videos?.length &&
+      !music?.length &&
+      !musicIds?.length &&
+      !videoIds?.length
+    ) {
+      throw createGraphQLError('У вас пустые поля')
+    }
+    const postData = await PostService.create(
+      owner,
+      description || '',
+      images,
+      videos,
+      communityId,
+      music,
+      musicIds,
+      videoIds,
+    )
     if (postData.post.suggested && postData.post.communityId) {
       // Предложка: пост видят только администраторы, и им приходит уведомление
       await notifyAdmins(postData.post.communityId, owner, 'community_suggest', { postId: postData.post.id })

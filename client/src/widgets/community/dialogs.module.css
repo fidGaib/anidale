@@ -1,28 +1,3 @@
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 13px;
-}
-
-.field input,
-.field textarea {
-  padding: 9px 10px;
-  border: 1px solid rgba(128, 128, 128, 0.4);
-  border-radius: 8px;
-  background: transparent;
-  color: inherit;
-  font-family: var(--font-text-main);
-  font-size: 14px;
-  outline: none;
-  resize: vertical;
-}
-
-.field input:focus,
-.field textarea:focus {
-  border-color: var(--accent);
-}
-
 .avatarRow {
   display: flex;
   align-items: center;
@@ -43,48 +18,9 @@
   object-fit: cover;
 }
 
-.primary,
-.secondary,
-.danger {
-  padding: 8px 16px;
-  border: 0;
-  border-radius: 8px;
-  font-family: var(--font-text-main);
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.primary {
-  background: var(--accent);
-  color: #fff;
-}
-
-.secondary {
-  background: rgba(128, 128, 128, 0.2);
-  color: inherit;
-}
-
-.danger {
-  background: transparent;
-  color: #ff6b6b;
-}
-
-.primary:disabled,
-.secondary:disabled {
-  opacity: 0.45;
-  cursor: default;
-}
-
 .hint {
   font-size: 12px;
   opacity: 0.6;
-}
-
-.error {
-  margin: 0;
-  color: var(--accent);
-  font-size: 13px;
-  font-weight: bold;
 }
 
 .row {
@@ -125,20 +61,6 @@
 
 .badge {
   font-size: 11px;
-  opacity: 0.6;
-}
-
-.check {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.check small {
-  display: block;
-  font-size: 12px;
   opacity: 0.6;
 }
 
@@ -193,4 +115,19 @@
   display: block;
   font-size: 12px;
   opacity: 0.6;
+}
+
+.select {
+  padding: 7px 9px;
+  border: 1px solid rgba(128, 128, 128, 0.4);
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font-family: var(--font-text-main);
+  font-size: 13px;
+  outline: none;
+}
+
+.select option {
+  color: #000;
 }

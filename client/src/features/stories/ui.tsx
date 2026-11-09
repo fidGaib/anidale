@@ -184,7 +184,10 @@ export const StoryViewerHost = () => {
   )
 
   if (!viewer || !group || !story) return null
-  const mine = group.user.id === myId
+  // У истории сообщества хозяин — тот, кто ведёт его содержимое; писать «от имени» сообществу личные ответы нельзя
+  const isCommunity = !!group.community
+  const mine = group.community ? group.community.canManage : group.user.id === myId
+  const profileLink = group.community ? `/community/${group.community.id}` : `/profile/${group.user.id}`
 
   const showViewers = async () => {
     paused.current = true
@@ -248,7 +251,7 @@ export const StoryViewerHost = () => {
           ))}
         </div>
         <div className={cl.head}>
-          <Link to={`/profile/${group.user.id}`} className={cl.author} onClick={close}>
+          <Link to={profileLink} className={cl.author} onClick={close}>
             <ImageLoading className={cl.headAvatar} src={useSrcAvatar(group.user.avatar)} />
             <span>
               <span className={cl.login}>{group.user.login}</span>
@@ -300,7 +303,7 @@ export const StoryViewerHost = () => {
             👁 {story.viewsCount ?? 0}
           </button>
         )}
-        {!mine && myId > 0 && (
+        {!mine && !isCommunity && myId > 0 && (
           <div className={cl.replyBar}>
             <input
               className={cl.replyInput}

@@ -11,6 +11,8 @@ import {
 } from '@/shared/graphql/schema'
 import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
 import { formatDateTime, toTimestamp } from '@/shared/lib/time'
+import { Btn } from '@/shared/ui/btn'
+import { Empty, FormError, Hint } from '@/shared/ui/notice'
 import { RichText } from '@/shared/ui/rich-text'
 
 import cl from './dialogs.module.css'
@@ -55,27 +57,17 @@ export const RequestsPanel = ({ id, onChanged }: { id: number; onChanged: () => 
 
   return (
     <div className={`playground ${media.wrap}`}>
-      {(error || state.error) && <p className={media.error}>{(error || state.error)?.message}</p>}
-      {!loading && requests.length === 0 && <p className={media.empty}>Новых заявок нет</p>}
+      {(error || state.error) && <FormError>{(error || state.error)?.message}</FormError>}
+      {!loading && requests.length === 0 && <Empty>Новых заявок нет</Empty>}
       {requests.map((request) => (
         <div key={request.user.id} className={cl.requestRow}>
           <Person user={request.user} />
-          <button
-            type='button'
-            className={cl.primary}
-            disabled={state.loading}
-            onClick={() => void decide(request.user.id ?? 0, true)}
-          >
+          <Btn variant='primary' disabled={state.loading} onClick={() => void decide(request.user.id ?? 0, true)}>
             Принять
-          </button>
-          <button
-            type='button'
-            className={cl.secondary}
-            disabled={state.loading}
-            onClick={() => void decide(request.user.id ?? 0, false)}
-          >
+          </Btn>
+          <Btn variant='secondary' disabled={state.loading} onClick={() => void decide(request.user.id ?? 0, false)}>
             Отклонить
-          </button>
+          </Btn>
         </div>
       ))}
     </div>
@@ -93,14 +85,13 @@ export const BansPanel = ({ id }: { id: number }) => {
 
   return (
     <div className={`playground ${media.wrap}`}>
-      {(error || state.error) && <p className={media.error}>{(error || state.error)?.message}</p>}
-      {!loading && bans.length === 0 && <p className={media.empty}>Чёрный список пуст</p>}
+      {(error || state.error) && <FormError>{(error || state.error)?.message}</FormError>}
+      {!loading && bans.length === 0 && <Empty>Чёрный список пуст</Empty>}
       {bans.map((ban) => (
         <div key={ban.user.id} className={cl.requestRow}>
           <Person user={ban.user} sub={ban.reason || 'Без причины'} />
-          <button
-            type='button'
-            className={cl.secondary}
+          <Btn
+            variant='secondary'
             disabled={state.loading}
             onClick={async () => {
               await unban({ variables: { id, userId: ban.user.id ?? 0 } })
@@ -108,7 +99,7 @@ export const BansPanel = ({ id }: { id: number }) => {
             }}
           >
             Разблокировать
-          </button>
+          </Btn>
         </div>
       ))}
     </div>
@@ -136,7 +127,7 @@ export const SuggestedPanel = ({ id, onChanged }: { id: number; onChanged: () =>
 
   return (
     <div className={media.wrap}>
-      {(error || state.error) && <p className={media.error}>{(error || state.error)?.message}</p>}
+      {(error || state.error) && <FormError>{(error || state.error)?.message}</FormError>}
       {!loading && posts.length === 0 && <p className={`playground ${media.empty}`}>Предложенных записей нет</p>}
       {posts.map((post) => (
         <div key={post.id} className={`playground ${media.wrap}`}>
@@ -153,25 +144,15 @@ export const SuggestedPanel = ({ id, onChanged }: { id: number; onChanged: () =>
               <RichText text={post.description} />
             </p>
           )}
-          {(post.images?.length ?? 0) > 0 && <p className={cl.hint}>Фото: {post.images?.length}</p>}
-          {(post.videos?.length ?? 0) > 0 && <p className={cl.hint}>Видео: {post.videos?.length}</p>}
+          {(post.images?.length ?? 0) > 0 && <Hint>Фото: {post.images?.length}</Hint>}
+          {(post.videos?.length ?? 0) > 0 && <Hint>Видео: {post.videos?.length}</Hint>}
           <div className={cl.row}>
-            <button
-              type='button'
-              className={cl.primary}
-              disabled={state.loading}
-              onClick={() => void decide(post.id ?? 0, true)}
-            >
+            <Btn variant='primary' disabled={state.loading} onClick={() => void decide(post.id ?? 0, true)}>
               Опубликовать
-            </button>
-            <button
-              type='button'
-              className={cl.secondary}
-              disabled={state.loading}
-              onClick={() => void decide(post.id ?? 0, false)}
-            >
+            </Btn>
+            <Btn variant='secondary' disabled={state.loading} onClick={() => void decide(post.id ?? 0, false)}>
               Отклонить
-            </button>
+            </Btn>
           </div>
         </div>
       ))}

@@ -4,7 +4,9 @@ import { useState } from 'react'
 import { useRefreshStore } from '@/app/providers/routes/model'
 import { GET_FRIENDS, INVITE_TO_COMMUNITY } from '@/shared/graphql/schema'
 import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
+import { Btn } from '@/shared/ui/btn'
 import { Dialog } from '@/shared/ui/dialog'
+import { FormError, Hint } from '@/shared/ui/notice'
 
 import cl from './dialogs.module.css'
 
@@ -20,9 +22,9 @@ const Friend = ({
   <div className={cl.member}>
     <img src={useSrcAvatar(user.avatar)} alt='' />
     <span style={{ flex: 1 }}>{user.login}</span>
-    <button type='button' className={cl.secondary} disabled={state === 'sent'} onClick={onInvite}>
+    <Btn variant='secondary' disabled={state === 'sent'} onClick={onInvite}>
       {state === 'sent' ? 'Приглашён' : 'Пригласить'}
-    </button>
+    </Btn>
   </div>
 )
 
@@ -38,8 +40,8 @@ export const InviteDialog = ({ id, onClose }: { id: number; onClose: () => void 
   return (
     <Dialog title='Пригласить друзей' width={440} onClose={onClose}>
       <div className={cl.members}>
-        {loading && <p className={cl.hint}>Загрузка…</p>}
-        {!loading && friends.length === 0 && <p className={cl.hint}>У вас пока нет друзей, которых можно пригласить</p>}
+        {loading && <Hint>Загрузка…</Hint>}
+        {!loading && friends.length === 0 && <Hint>У вас пока нет друзей, которых можно пригласить</Hint>}
         {friends.map((friend) => (
           <Friend
             key={friend.id}
@@ -56,7 +58,7 @@ export const InviteDialog = ({ id, onClose }: { id: number; onClose: () => void 
             }}
           />
         ))}
-        {(failed || error) && <p className={cl.error}>{failed || error?.message}</p>}
+        {(failed || error) && <FormError>{failed || error?.message}</FormError>}
       </div>
     </Dialog>
   )

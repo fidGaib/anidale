@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { client } from '@/app/providers/apollo-client'
+import { Track, toTrack } from '@/features/music/module'
 import { GET_POST, SET_LIKE } from '@/shared/graphql/schema'
 import { useSocket } from '@/shared/hooks/useSocket'
 import { toTimestamp } from '@/shared/lib/time'
@@ -35,6 +36,7 @@ export interface ViewedPost {
   repostDeleted: boolean
   article: { id: number; title: string; cover: string; excerpt: string } | null
   community: { id: number; name: string; avatar: string } | null
+  music: Track[]
   repostOf: {
     id: number
     description: string
@@ -116,6 +118,7 @@ export const usePost = (postId: number) => {
           repostDeleted: !!p.repostDeleted,
           article: p.article ?? null,
           community: p.community ?? null,
+          music: (p.music ?? []).map(toTrack),
           repostOf: p.repostOf
             ? {
                 id: p.repostOf.id ?? 0,

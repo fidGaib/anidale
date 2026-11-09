@@ -2,12 +2,23 @@ import { useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
-import { BAN_COMMUNITY_MEMBER, COMMUNITY_MEMBERS, SET_COMMUNITY_ADMIN } from '@/shared/graphql/schema'
+import { BAN_COMMUNITY_MEMBER, COMMUNITY_MEMBERS, SET_COMMUNITY_ROLE } from '@/shared/graphql/schema'
 import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
+import { Btn } from '@/shared/ui/btn'
 import { Dialog } from '@/shared/ui/dialog'
+import { Hint } from '@/shared/ui/notice'
 
 import cl from './dialogs.module.css'
+import { ROLE_LABELS, assignableRoles, canBanMember, roleBadge } from './roles'
 import side from './ui.module.css'
+
+/** Права просматривающего в сообществе. */
+export interface Viewer {
+  role: string
+  isOwner: boolean
+  isAdmin: boolean
+  canModerate: boolean
+}
 
 const PREVIEW = 6
 const PAGE = 30
@@ -24,16 +35,21 @@ const Avatar = ({ avatar }: { avatar?: string | null }) => <img src={useSrcAvata
 export const MembersCard = ({
   id,
   count,
-  isOwner,
-  isAdmin,
+  viewer,
   canView,
+  open,
+  onOpen,
+  onClose,
   onInvite,
 }: {
   id: number
   count: number
-  isOwner: boolean
-  isAdmin: boolean
+  viewer: Viewer
   canView: boolean
+  /** Окно со всеми участниками открыто. */
+  open: boolean
+  onOpen: () => void
+  onClose: () => void
   onInvite?: () => void
 }) => {
   const { data } = useQuery(COMMUNITY_MEMBERS, {
@@ -41,12 +57,12 @@ export const MembersCard = ({
     skip: !canView,
     fetchPolicy: 'cache-and-network',
   })
-  const [open, setOpen] = useState(false)
   const members = (data?.getCommunityMembers ?? []) as Member[]
+  const manages = viewer.isAdmin || viewer.canModerate
 
   return (
     <div className={`playground ${side.sideCard}`}>
-      <button type='button' className={side.cardTitle} disabled={!canView} onClick={() => setOpen(true)}>
+      <button type='button' className={side.cardTitle} disabled={!canView} onClick={onOpen}>
         Участники <span className={side.count}>{count}</span>
       </button>
       <div className={side.people}>
@@ -58,33 +74,28 @@ export const MembersCard = ({
         ))}
       </div>
       {!canView && <p className={side.muted}>Участников видят только участники сообщества</p>}
+      {canView && manages && (
+        <Btn block onClick={onOpen}>
+          {viewer.isAdmin ? 'Участники и роли' : 'Управление участниками'}
+        </Btn>
+      )}
       {onInvite && (
         <button type='button' className={side.inviteButton} onClick={onInvite}>
           Пригласить друзей
         </button>
       )}
-      {open && <MembersDialog id={id} isOwner={isOwner} isAdmin={isAdmin} onClose={() => setOpen(false)} />}
+      {open && <MembersDialog id={id} viewer={viewer} onClose={onClose} />}
     </div>
   )
 }
 
 /** Полный список участников: администраторы сверху; создатель назначает и снимает администраторов. */
-const MembersDialog = ({
-  id,
-  isOwner,
-  isAdmin,
-  onClose,
-}: {
-  id: number
-  isOwner: boolean
-  isAdmin: boolean
-  onClose: () => void
-}) => {
+const MembersDialog = ({ id, viewer, onClose }: { id: number; viewer: Viewer; onClose: () => void }) => {
   const { data, loading, fetchMore, refetch } = useQuery(COMMUNITY_MEMBERS, {
     variables: { id, limit: PAGE, offset: 0 },
     fetchPolicy: 'network-only',
   })
-  const [setAdmin] = useMutation(SET_COMMUNITY_ADMIN)
+  const [setRole] = useMutation(SET_COMMUNITY_ROLE)
   const [ban] = useMutation(BAN_COMMUNITY_MEMBER)
   const [done, setDone] = useState(false)
   const [busy, setBusy] = useState<number | null>(null)
@@ -95,10 +106,10 @@ const MembersDialog = ({
     if ((res.data?.getCommunityMembers?.length ?? 0) < PAGE) setDone(true)
   }
 
-  const toggle = async (m: Member) => {
+  const changeRole = async (m: Member, role: string) => {
     setBusy(m.user.id ?? 0)
     try {
-      await setAdmin({ variables: { id, userId: m.user.id ?? 0, admin: m.role !== 'admin' } })
+      await setRole({ variables: { id, userId: m.user.id ?? 0, role } })
       await refetch()
     } finally {
       setBusy(null)
@@ -117,48 +128,49 @@ const MembersDialog = ({
   }
 
   return (
-    <Dialog title='Участники' width={440} onClose={onClose}>
+    <Dialog title={viewer.isAdmin ? 'Участники и роли' : 'Участники'} width={480} onClose={onClose}>
+      {viewer.isAdmin && (
+        <Hint>
+          Роль выбирается в списке справа от участника. Модератор следит за порядком, редактор ведёт содержимое,
+          администратор управляет всем. Роль администратора выдаёт только создатель.
+        </Hint>
+      )}
       <div className={cl.members}>
-        {loading && members.length === 0 && <p className={cl.hint}>Загрузка…</p>}
+        {loading && members.length === 0 && <Hint>Загрузка…</Hint>}
         {members.map((m) => (
           <div key={m.user.id} className={cl.member}>
             <Link to={`/profile/${m.user.id}`} onClick={onClose}>
               <Avatar avatar={m.user.avatar} />
               <span>
                 {m.user.login}
-                {m.isOwner ? (
-                  <span className={cl.badge}> · создатель</span>
-                ) : (
-                  m.role === 'admin' && <span className={cl.badge}> · администратор</span>
-                )}
+                {roleBadge(m.role, m.isOwner) && <span className={cl.badge}> · {roleBadge(m.role, m.isOwner)}</span>}
               </span>
             </Link>
-            {isAdmin && !m.isOwner && (m.role !== 'admin' || isOwner) && (
-              <button
-                type='button'
-                className={cl.danger}
+            {assignableRoles(viewer, m).length > 0 && (
+              <select
+                className={cl.select}
+                value={m.role}
                 disabled={busy === m.user.id}
-                onClick={() => void banMember(m)}
+                onChange={(e) => void changeRole(m, e.target.value)}
               >
-                Заблокировать
-              </button>
+                {assignableRoles(viewer, m).map((role) => (
+                  <option key={role} value={role}>
+                    {ROLE_LABELS[role]}
+                  </option>
+                ))}
+              </select>
             )}
-            {isOwner && !m.isOwner && (
-              <button
-                type='button'
-                className={cl.secondary}
-                disabled={busy === m.user.id}
-                onClick={() => void toggle(m)}
-              >
-                {m.role === 'admin' ? 'Снять права' : 'Сделать администратором'}
-              </button>
+            {canBanMember(viewer, m) && (
+              <Btn variant='danger' disabled={busy === m.user.id} onClick={() => void banMember(m)}>
+                Заблокировать
+              </Btn>
             )}
           </div>
         ))}
         {members.length >= PAGE && !done && (
-          <button type='button' className={cl.secondary} onClick={() => void more()}>
+          <Btn variant='secondary' onClick={() => void more()}>
             Показать ещё
-          </button>
+          </Btn>
         )}
       </div>
     </Dialog>

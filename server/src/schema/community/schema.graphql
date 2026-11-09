@@ -46,8 +46,8 @@ type Mutation {
   unbanCommunityMember(id: Int!, userId: Int!): Boolean!
   "Принять (запись появится на стене) или отклонить (будет удалена) предложенную запись"
   reviewSuggestedPost(postId: Int!, approve: Boolean!): Boolean!
-  "Назначить или снять администратора: только создатель"
-  setCommunityAdmin(id: Int!, userId: Int!, admin: Boolean!): Boolean!
+  "Назначить роль: member, moderator, editor или admin. Роль администратора выдаёт только создатель"
+  setCommunityRole(id: Int!, userId: Int!, role: String!): Boolean!
   "Удалить сообщество со всеми записями: только создатель"
   removeCommunity(id: Int!): Boolean!
 }
@@ -75,10 +75,19 @@ type Community {
   "Предложенных записей ждёт решения (только администратору)"
   suggestedCount: Int!
   links: [CommunityLink!]!
+  contacts: [CommunityContact!]!
   "Я участник"
   isMember: Boolean!
-  "Я администратор (или создатель)"
+  "Моя роль: none, member, moderator, editor или admin"
+  role: String!
+  "Я администратор (или создатель): настройки, роли, ссылки, контакты"
   isAdmin: Boolean!
+  "Могу публиковать от имени сообщества (администратор, редактор)"
+  canPublish: Boolean!
+  "Слежу за порядком: заявки, предложка, чёрный список, обсуждения (администратор, модератор)"
+  canModerate: Boolean!
+  "Могу править и удалять записи и файлы сообщества"
+  canManagePosts: Boolean!
   "Я создатель"
   isOwner: Boolean!
 }
@@ -112,4 +121,49 @@ type CommunityBan {
 type UserCommunities {
   total: Int!
   items: [Community!]!
+}
+type DiscussionTopic {
+  id: Int!
+  title: String!
+  pinned: Boolean!
+  closed: Boolean!
+  date: Date!
+  lastMessageAt: Date!
+  communityId: Int!
+  author: Owner!
+  messagesCount: Int!
+  "Начало последнего сообщения"
+  lastText: String!
+}
+type DiscussionMessage {
+  id: Int!
+  text: String!
+  date: Date!
+  topicId: Int!
+  author: Owner!
+}
+type CommunityContact {
+  user: Owner!
+  position: String!
+}
+input CommunityContactInput {
+  userId: Int!
+  position: String
+}
+extend type Query {
+  "Темы обсуждений: закреплённые сверху, затем по последнему сообщению"
+  getDiscussionTopics(id: Int!, limit: Int!, offset: Int!): [DiscussionTopic!]!
+  getDiscussionTopic(topicId: Int!): DiscussionTopic
+  getDiscussionMessages(topicId: Int!, limit: Int!, offset: Int!): [DiscussionMessage!]!
+}
+extend type Mutation {
+  "Новая тема с первым сообщением (участники)"
+  createDiscussionTopic(id: Int!, title: String!, text: String!): DiscussionTopic!
+  addDiscussionMessage(topicId: Int!, text: String!): DiscussionMessage!
+  removeDiscussionMessage(messageId: Int!): Boolean!
+  removeDiscussionTopic(topicId: Int!): Boolean!
+  "Закрепить или закрыть тему (администратор)"
+  setDiscussionTopicFlags(topicId: Int!, pinned: Boolean, closed: Boolean): Boolean!
+  "Заменить контакты сообщества: участники с должностями (до 10, администратор)"
+  setCommunityContacts(id: Int!, contacts: [CommunityContactInput!]!): Community!
 }

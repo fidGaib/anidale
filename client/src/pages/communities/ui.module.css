@@ -12,52 +12,6 @@
   margin-bottom: 14px;
 }
 
-.meshBlock {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-}
-
-.meshBlock .mesh {
-  display: flex;
-  align-items: center;
-  padding: 5px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.meshBlock .mesh:hover {
-  background: rgba(128, 128, 128, 0.1);
-}
-
-.meshBlock .mesh p {
-  color: var(--color-text-main);
-  font-family: var(--font-text-main);
-  font-size: var(--size-text-main);
-  font-weight: 500;
-}
-
-.meshBlock .meshActive p {
-  color: var(--accent);
-}
-
-.meshBlock .meshActive {
-  box-shadow: inset 0 -2px 0 var(--accent);
-}
-
-.create {
-  padding: 8px 16px;
-  border: 0;
-  border-radius: 8px;
-  background: var(--accent);
-  color: #fff;
-  font-family: var(--font-text-main);
-  font-size: 14px;
-  cursor: pointer;
-}
-
 .wrappSearch {
   display: flex;
   align-items: center;
@@ -75,58 +29,6 @@
   width: 40%;
   padding: 5px 10px;
   border-radius: 10px;
-}
-
-.action {
-  padding: 6px 14px;
-  border: 0;
-  border-radius: 8px;
-  background: var(--accent);
-  color: #fff;
-  font-family: var(--font-text-main);
-  font-size: 13px;
-  cursor: pointer;
-}
-
-.actionOn {
-  background: rgba(128, 128, 128, 0.25);
-  color: var(--color-text-main);
-}
-
-.action:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
-
-.owner {
-  font-size: 12px;
-  color: var(--color-text-main);
-  opacity: 0.6;
-}
-
-.empty {
-  padding: 30px 10px;
-  color: var(--color-text-main);
-  font-family: var(--font-text-main);
-  text-align: center;
-  opacity: 0.7;
-}
-
-.error {
-  color: var(--accent);
-  font-weight: bold;
-}
-
-.more {
-  display: block;
-  margin: 12px auto;
-  padding: 8px 20px;
-  border: 0;
-  border-radius: 8px;
-  background: rgba(128, 128, 128, 0.2);
-  color: var(--color-text-main);
-  font-family: var(--font-text-main);
-  cursor: pointer;
 }
 
 @media (max-width: 650px) {

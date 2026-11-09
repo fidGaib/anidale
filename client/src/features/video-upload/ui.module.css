@@ -41,24 +41,6 @@
   background: rgba(128, 128, 128, 0.12);
 }
 
-.pick,
-.primary {
-  padding: 10px 16px;
-  border: 0;
-  border-radius: 10px;
-  background: var(--accent);
-  color: #fff;
-  font-family: var(--font-text-main);
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.pick:disabled,
-.primary:disabled {
-  opacity: 0.45;
-  cursor: default;
-}
-
 .list {
   display: flex;
   flex-direction: column;
@@ -125,12 +107,4 @@
 .total {
   font-size: 12px;
   opacity: 0.6;
-}
-
-.error {
-  margin: 0;
-  color: var(--accent);
-  font-size: 13px;
-  font-weight: bold;
-  white-space: pre-line;
 }

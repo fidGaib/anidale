@@ -53,6 +53,9 @@ model User {
   communityMemberships CommunityMember[]
   communityRequests CommunityRequest[]
   communityBans CommunityBan[]
+  discussionTopics DiscussionTopic[]
+  discussionMessages DiscussionMessage[]
+  communityContacts CommunityContact[]
   notifications    Notification[] @relation("NotificationOwner")
   notificationsMade Notification[] @relation("NotificationActor")
   // Подписки: кого подписан я и кто подписан на меня
@@ -191,8 +194,16 @@ model Music {
   image       String   @default("")
   owner       Int
   user        User     @relation(fields: [owner], references: [id])
+  // Трек из музыки сообщества (загрузил редактор или администратор)
+  communityId Int?
+  community   Community? @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  // Трек, прикреплённый к записи: в «Мою музыку» и музыку сообщества не входит
+  postId      Int?
+  post        Post?      @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@index([owner])
+  @@index([communityId])
+  @@index([postId])
 }
 model Post {
   id          Int      @id @default(autoincrement())
@@ -217,6 +228,7 @@ model Post {
   repostDeleted Boolean @default(false)
   // Статья: пост-обёртка с заголовком и блоками (лайки, комментарии, архив и закладки работают как у поста)
   article     Article?
+  music       Music[]
   // Пост на стене сообщества: owner — администратор, который его написал
   communityId Int?
   community   Community? @relation(fields: [communityId], references: [id], onDelete: Cascade)
@@ -387,6 +399,9 @@ model Story {
   expiresAt DateTime
   userId    Int
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // История сообщества (опубликовал редактор или администратор)
+  communityId Int?
+  community   Community? @relation(fields: [communityId], references: [id], onDelete: Cascade)
   views     StoryView[]
 
   @@index([userId, id])
@@ -457,14 +472,20 @@ model Community {
   videos      Video[]
   photos      Photo[]
   notifications Notification[]
+  topics      DiscussionTopic[]
+  contacts    CommunityContact[]
+  music       Music[]
+  stories     Story[]
 
   @@index([name])
 }
 
-// Участник сообщества. role: member | admin (создатель тоже admin, он же Community.ownerId)
+// Участник сообщества. role: member | moderator | editor | admin (создатель тоже admin, он же Community.ownerId).
+// rank хранит старшинство роли (0..3): по нему сортируется список участников
 model CommunityMember {
   id          Int      @id @default(autoincrement())
   role        String   @default("member")
+  rank        Int      @default(0)
   date        DateTime @default(now())
   communityId Int
   userId      Int
@@ -504,6 +525,49 @@ model CommunityBan {
   id          Int       @id @default(autoincrement())
   reason      String    @default("")
   date        DateTime  @default(now())
+  communityId Int
+  userId      Int
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([communityId, userId])
+}
+
+// Тема обсуждения в сообществе
+model DiscussionTopic {
+  id            Int       @id @default(autoincrement())
+  title         String
+  pinned        Boolean   @default(false)
+  closed        Boolean   @default(false)
+  date          DateTime  @default(now())
+  // Когда писали последнее сообщение: по нему темы сортируются
+  lastMessageAt DateTime  @default(now())
+  communityId   Int
+  authorId      Int
+  community     Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  author        User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  messages      DiscussionMessage[]
+
+  @@index([communityId, lastMessageAt])
+}
+
+model DiscussionMessage {
+  id       Int      @id @default(autoincrement())
+  text     String
+  date     DateTime @default(now())
+  topicId  Int
+  authorId Int
+  topic    DiscussionTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  author   User            @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([topicId, id])
+}
+
+// Контакт в карточке сообщества: участник и его должность
+model CommunityContact {
+  id          Int       @id @default(autoincrement())
+  position    String    @default("")
+  sort        Int       @default(0)
   communityId Int
   userId      Int
   community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)

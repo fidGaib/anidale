@@ -22,9 +22,14 @@ interface Props {
 /** Модальное окно по центру экрана с затемнением. */
 export const Dialog = ({ title, onClose, busy = false, width = 480, headerExtra, children, footer, bare }: Props) => {
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && !busy && onClose()
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
+    // Перехватываем Escape раньше остальных: закрыться должно только верхнее окно
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return
+      e.stopPropagation()
+      if (!busy) onClose()
+    }
+    window.addEventListener('keydown', onKey, true)
+    return () => window.removeEventListener('keydown', onKey, true)
   }, [onClose, busy])
 
   return (

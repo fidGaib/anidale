@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
+import { Empty } from '@/shared/ui/notice'
 
 import cl from './ui.module.css'
 
@@ -42,8 +43,8 @@ interface UserListProps {
 }
 
 const UserList = ({ users, loading, empty, renderAction }: UserListProps) => {
-  if (loading && users.length === 0) return <p className={cl.empty}>Загрузка…</p>
-  if (users.length === 0) return <p className={cl.empty}>{empty}</p>
+  if (loading && users.length === 0) return <Empty>Загрузка…</Empty>
+  if (users.length === 0) return <Empty>{empty}</Empty>
   return (
     <>
       {users.map((user) => (

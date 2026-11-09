@@ -150,27 +150,11 @@
   font-size: 12px;
 }
 
-.dialogOverlay {
-  position: fixed;
-  inset: 0;
-  z-index: 2500;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.5);
-}
-
 .dialog {
   width: min(460px, 92vw);
   padding: 16px;
   border-radius: 12px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-}
-
-.dialogTitle {
-  margin: 0 0 10px;
-  font-weight: bold;
-  color: var(--color-text-main);
 }
 
 .dialogText {

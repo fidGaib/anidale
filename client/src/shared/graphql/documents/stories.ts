@@ -25,8 +25,8 @@ export const STORIES = graphql(`
 `)
 
 export const CREATE_STORY = graphql(`
-  mutation CREATE_STORY($image: File!, $text: String) {
-    createStory(image: $image, text: $text) {
+  mutation CREATE_STORY($image: File!, $text: String, $communityId: Int) {
+    createStory(image: $image, text: $text, communityId: $communityId) {
       id
     }
   }
@@ -53,6 +53,22 @@ export const STORY_VIEWERS = graphql(`
         login
         avatar
       }
+    }
+  }
+`)
+
+export const COMMUNITY_STORIES = graphql(`
+  query COMMUNITY_STORIES($id: Int!) {
+    getCommunityStories(id: $id) {
+      id
+      high
+      medium
+      small
+      text
+      date
+      expiresAt
+      seen
+      viewsCount
     }
   }
 `)

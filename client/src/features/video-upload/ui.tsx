@@ -7,7 +7,10 @@ import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
 import { UploadProgressEvent, toPercent } from '@/shared/lib/progress-fetch'
 import { formatFileSize } from '@/shared/lib/time'
 import { validateUpload } from '@/shared/lib/upload-limits'
+import { Btn } from '@/shared/ui/btn'
+import { DeleteIcon } from '@/shared/ui/delete-icon'
 import { Dialog } from '@/shared/ui/dialog'
+import { FormError } from '@/shared/ui/notice'
 import { UploadProgress } from '@/shared/ui/progress'
 
 import { MAX_TITLE, titleFromName } from './title'
@@ -105,14 +108,9 @@ export const VideoUploadDialog = ({ onClose, onUploaded, communityId }: Props) =
       footer={
         <>
           <span className={cl.total}>{entries.length ? `Выбрано: ${entries.length}` : 'Файлы не выбраны'}</span>
-          <button
-            type='button'
-            className={cl.primary}
-            disabled={!entries.length || uploading}
-            onClick={() => void upload()}
-          >
+          <Btn variant='primary' disabled={!entries.length || uploading} onClick={() => void upload()}>
             {uploading ? 'Загрузка…' : 'Загрузить'}
-          </button>
+          </Btn>
         </>
       }
     >
@@ -151,7 +149,7 @@ export const VideoUploadDialog = ({ onClose, onUploaded, communityId }: Props) =
                   disabled={uploading}
                   onClick={() => setEntries((all) => all.filter((_, i) => i !== index))}
                 >
-                  ×
+                  <DeleteIcon />
                 </button>
               </div>
               <input
@@ -178,9 +176,9 @@ export const VideoUploadDialog = ({ onClose, onUploaded, communityId }: Props) =
         onDragLeave={() => setDragging(false)}
         onDrop={onDrop}
       >
-        <button type='button' className={cl.pick} disabled={uploading} onClick={() => input.current?.click()}>
+        <Btn variant='primary' disabled={uploading} onClick={() => input.current?.click()}>
           {entries.length ? 'Добавить ещё' : 'Выбрать файл'}
-        </button>
+        </Btn>
       </div>
 
       {progress && (
@@ -189,7 +187,7 @@ export const VideoUploadDialog = ({ onClose, onUploaded, communityId }: Props) =
           label={`Загрузка ${progress.index} из ${progress.total}: ${progress.name}`}
         />
       )}
-      {error && <p className={cl.error}>{error}</p>}
+      {error && <FormError>{error}</FormError>}
     </Dialog>
   )
 }

@@ -410,7 +410,7 @@ const SearchBody = ({ onClose }: { onClose: () => void }) => {
                     </span>
                     <img
                       className={cl.remove}
-                      src='/icons/close.svg'
+                      src='/icons/delete.svg'
                       alt='Убрать'
                       title='Убрать из истории'
                       onClick={(e) => {

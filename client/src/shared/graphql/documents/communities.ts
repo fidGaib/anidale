@@ -41,8 +41,20 @@ export const COMMUNITY = graphql(`
         title
         url
       }
+      contacts {
+        position
+        user {
+          id
+          login
+          avatar
+        }
+      }
+      role
       isMember
       isAdmin
+      canPublish
+      canModerate
+      canManagePosts
       isOwner
     }
   }
@@ -139,9 +151,9 @@ export const LEAVE_COMMUNITY = graphql(`
   }
 `)
 
-export const SET_COMMUNITY_ADMIN = graphql(`
-  mutation SET_COMMUNITY_ADMIN($id: Int!, $userId: Int!, $admin: Boolean!) {
-    setCommunityAdmin(id: $id, userId: $userId, admin: $admin)
+export const SET_COMMUNITY_ROLE = graphql(`
+  mutation SET_COMMUNITY_ROLE($id: Int!, $userId: Int!, $role: String!) {
+    setCommunityRole(id: $id, userId: $userId, role: $role)
   }
 `)
 
@@ -285,5 +297,106 @@ export const CREATE_COMMUNITY_VIDEO = graphql(`
     createVideo(file: $file, title: $title, communityId: $communityId) {
       id
     }
+  }
+`)
+
+export const SET_COMMUNITY_CONTACTS = graphql(`
+  mutation SET_COMMUNITY_CONTACTS($id: Int!, $contacts: [CommunityContactInput!]!) {
+    setCommunityContacts(id: $id, contacts: $contacts) {
+      id
+      contacts {
+        position
+        user {
+          id
+          login
+          avatar
+        }
+      }
+    }
+  }
+`)
+
+export const DISCUSSION_TOPICS = graphql(`
+  query DISCUSSION_TOPICS($id: Int!, $limit: Int!, $offset: Int!) {
+    getDiscussionTopics(id: $id, limit: $limit, offset: $offset) {
+      id
+      title
+      pinned
+      closed
+      lastMessageAt
+      messagesCount
+      lastText
+      author {
+        id
+        login
+        avatar
+      }
+    }
+  }
+`)
+
+export const DISCUSSION_TOPIC = graphql(`
+  query DISCUSSION_TOPIC($topicId: Int!) {
+    getDiscussionTopic(topicId: $topicId) {
+      id
+      title
+      pinned
+      closed
+      communityId
+      author {
+        id
+        login
+        avatar
+      }
+    }
+  }
+`)
+
+export const DISCUSSION_MESSAGES = graphql(`
+  query DISCUSSION_MESSAGES($topicId: Int!, $limit: Int!, $offset: Int!) {
+    getDiscussionMessages(topicId: $topicId, limit: $limit, offset: $offset) {
+      id
+      text
+      date
+      author {
+        id
+        login
+        avatar
+      }
+    }
+  }
+`)
+
+export const CREATE_DISCUSSION_TOPIC = graphql(`
+  mutation CREATE_DISCUSSION_TOPIC($id: Int!, $title: String!, $text: String!) {
+    createDiscussionTopic(id: $id, title: $title, text: $text) {
+      id
+    }
+  }
+`)
+
+export const ADD_DISCUSSION_MESSAGE = graphql(`
+  mutation ADD_DISCUSSION_MESSAGE($topicId: Int!, $text: String!) {
+    addDiscussionMessage(topicId: $topicId, text: $text) {
+      id
+    }
+  }
+`)
+
+export const REMOVE_DISCUSSION_MESSAGE = graphql(`
+  mutation REMOVE_DISCUSSION_MESSAGE($messageId: Int!) {
+    removeDiscussionMessage(messageId: $messageId)
+  }
+`)
+
+export const REMOVE_DISCUSSION_TOPIC = graphql(`
+  mutation REMOVE_DISCUSSION_TOPIC($topicId: Int!) {
+    removeDiscussionTopic(topicId: $topicId)
+  }
+`)
+
+export const SET_DISCUSSION_TOPIC_FLAGS = graphql(`
+  mutation SET_DISCUSSION_TOPIC_FLAGS($topicId: Int!, $pinned: Boolean, $closed: Boolean) {
+    setDiscussionTopicFlags(topicId: $topicId, pinned: $pinned, closed: $closed)
   }
 `)

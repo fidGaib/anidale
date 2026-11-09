@@ -1,8 +1,8 @@
 import { graphql } from '../gql/gql'
 
 export const CREATE_MUSIC = graphql(`
-  mutation CREATE_MUSIC($title: String!, $artist: String, $file: File!) {
-    createMusic(music: { title: $title, artist: $artist, file: $file }) {
+  mutation CREATE_MUSIC($title: String!, $artist: String, $file: File!, $communityId: Int) {
+    createMusic(music: { title: $title, artist: $artist, file: $file, communityId: $communityId }) {
       id
       title
       artist
@@ -79,5 +79,21 @@ export const ADD_MUSIC = graphql(`
 export const REMOVE_MUSIC = graphql(`
   mutation REMOVE_MUSIC($id: Int!) {
     removeMusic(id: $id)
+  }
+`)
+
+export const COMMUNITY_MUSIC = graphql(`
+  query COMMUNITY_MUSIC($id: Int!, $limit: Int!, $page: Int!) {
+    getCommunityMusic(id: $id, limit: $limit, page: $page) {
+      id
+      title
+      artist
+      file
+      size
+      user {
+        id
+        login
+      }
+    }
   }
 `)

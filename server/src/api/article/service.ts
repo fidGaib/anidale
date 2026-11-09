@@ -5,7 +5,7 @@ import PostService from '@/api/post/service'
 import { storagePath } from '@/config'
 import prisma from '@/db/db'
 
-import { canViewCommunity, isCommunityAdmin } from '../community/access'
+import { canManageContent, canPublish, canViewCommunity } from '../community/access'
 import {
   Block,
   ParsedBlock,
@@ -61,7 +61,7 @@ const resolveBlocks = (parsed: ParsedBlock[], saved: Map<number, SaveImage>): Bl
 class ArticleService {
   /** Создаёт статью вместе с постом, который её публикует. Возвращает пост в обычном виде. */
   async create(owner: number, input: ArticleInput) {
-    if (input.communityId && !(await isCommunityAdmin(input.communityId, owner))) {
+    if (input.communityId && !(await canPublish(input.communityId, owner))) {
       throw createGraphQLError('Публиковать статьи в сообществе могут только администраторы')
     }
     const title = cleanTitle(input.title)
@@ -113,7 +113,7 @@ class ArticleService {
     if (!article) throw createGraphQLError('Статья не найдена')
     // Править может автор, а статью сообщества — любой его администратор
     const { owner, communityId } = article.post
-    if (owner !== userId && !(communityId && (await isCommunityAdmin(communityId, userId)))) {
+    if (owner !== userId && !(communityId && (await canManageContent(communityId, userId)))) {
       throw createGraphQLError('Нет доступа')
     }
 

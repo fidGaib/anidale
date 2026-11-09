@@ -5,20 +5,23 @@ import { CommunityListItem, CommunityRow } from '@/entities/community'
 import Content from '@/shared/content'
 import { COMMUNITIES, JOIN_COMMUNITY, LEAVE_COMMUNITY } from '@/shared/graphql/schema'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
+import { Btn } from '@/shared/ui/btn'
 import Input from '@/shared/ui/input'
+import { Empty, FormError, Hint } from '@/shared/ui/notice'
+import { Tabs } from '@/shared/ui/tabs'
 import { CreateCommunityDialog } from '@/widgets/community'
 
 import cl from './ui.module.css'
 
 const PAGE = 30
 
-const tabs = [
-  { id: 'mine', text: 'Мои сообщества' },
-  { id: 'managed', text: 'Управление' },
-  { id: 'all', text: 'Все сообщества' },
-] as const
+type Tab = 'mine' | 'managed' | 'all'
 
-type Tab = (typeof tabs)[number]['id']
+const tabs: { id: Tab; title: string }[] = [
+  { id: 'mine', title: 'Мои сообщества' },
+  { id: 'managed', title: 'Управление' },
+  { id: 'all', title: 'Все сообщества' },
+]
 
 interface Row extends CommunityListItem {
   isMember: boolean
@@ -98,20 +101,10 @@ export const Communities = () => {
   return (
     <Content className={cl.content}>
       <div className={cl.top}>
-        <div className={cl.meshBlock}>
-          {tabs.map((item) => (
-            <div
-              key={item.id}
-              className={`playground ${cl.mesh} ${tab === item.id ? cl.meshActive : ''}`}
-              onClick={() => setTab(item.id)}
-            >
-              <p>{item.text}</p>
-            </div>
-          ))}
-        </div>
-        <button type='button' className={cl.create} onClick={() => setCreating(true)}>
+        <Tabs items={tabs} value={tab} onChange={setTab} />
+        <Btn variant='primary' onClick={() => setCreating(true)}>
           ＋ Создать сообщество
-        </button>
+        </Btn>
       </div>
 
       <div className={cl.wrappSearch}>
@@ -129,9 +122,9 @@ export const Communities = () => {
         />
       </div>
 
-      {error && <p className={cl.error}>{error.message}</p>}
-      {loading && rows.length === 0 && <p className={cl.empty}>Загрузка…</p>}
-      {!loading && rows.length === 0 && !error && <p className={cl.empty}>{empty}</p>}
+      <FormError>{error?.message}</FormError>
+      {loading && rows.length === 0 && <Empty>Загрузка…</Empty>}
+      {!loading && rows.length === 0 && !error && <Empty>{empty}</Empty>}
       {rows.map((community) => (
         <CommunityRow
           key={community.id}
@@ -139,11 +132,10 @@ export const Communities = () => {
           action={
             // Создатель из своего сообщества выйти не может
             community.isOwner ? (
-              <span className={cl.owner}>Вы создатель</span>
+              <Hint>Вы создатель</Hint>
             ) : (
-              <button
-                type='button'
-                className={`${cl.action} ${community.isMember ? cl.actionOn : ''}`}
+              <Btn
+                variant={community.isMember ? 'secondary' : 'primary'}
                 disabled={actionId === community.id || requested.includes(community.id)}
                 onClick={() => void toggle(community)}
               >
@@ -154,15 +146,15 @@ export const Communities = () => {
                   : community.isClosed
                   ? 'Подать заявку'
                   : 'Подписаться'}
-              </button>
+              </Btn>
             )
           }
         />
       ))}
       {rows.length >= PAGE && !done && (
-        <button type='button' className={cl.more} onClick={() => void loadMore()} disabled={loadingMore}>
+        <Btn onClick={() => void loadMore()} disabled={loadingMore}>
           {loadingMore ? 'Загрузка…' : 'Показать ещё'}
-        </button>
+        </Btn>
       )}
       {creating && <CreateCommunityDialog onClose={() => setCreating(false)} />}
     </Content>

@@ -31,6 +31,12 @@ input CreatePost {
   videos: [FILE]
   "Опубликовать на стене сообщества (нужны права администратора)"
   communityId: Int
+  "Аудиофайлы, которые загружаются вместе с записью"
+  music: [FILE]
+  "Треки из своей музыки: к записи прикрепляются их копии"
+  musicIds: [Int!]
+  "Видео из своей коллекции: к записи прикрепляются их копии"
+  videoIds: [Int!]
 }
 type Post {
   id: Int
@@ -55,6 +61,8 @@ type Post {
   repostDeleted: Boolean
   "Статья, если пост — статья"
   article: ArticleCard
+  "Прикреплённые треки"
+  music: [Music!]
   "Сообщество, на стене которого опубликована запись"
   community: CommunityBrief
 }

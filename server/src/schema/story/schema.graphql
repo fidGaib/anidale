@@ -1,12 +1,14 @@
 type Query {
   "Активные истории (до 24 часов), сгруппированные по людям: свои, затем непросмотренные, затем просмотренные"
   getStories: [StoryGroup!]!
+  "Активные истории сообщества, старые первыми"
+  getCommunityStories(id: Int!): [Story!]!
   "Кто смотрел историю (только автор), новые просмотры сверху"
   storyViewers(id: Int!): [StoryViewer!]!
 }
 type Mutation {
   "Добавить историю-картинку на 24 часа"
-  createStory(image: FILE!, text: String): Story!
+  createStory(image: FILE!, text: String, communityId: Int): Story!
   "Отметить историю просмотренной"
   viewStory(id: Int!): Boolean!
   deleteStory(id: Int!): Boolean!

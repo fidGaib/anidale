@@ -1,5 +1,7 @@
 import { KeyboardEvent, MutableRefObject } from 'react'
 
+import { DeleteIcon } from '@/shared/ui/delete-icon'
+
 import cl from './editor.module.css'
 import { EditorBlock } from './model'
 
@@ -63,7 +65,7 @@ export const EditorBlockView = ({
           ↓
         </button>
         <button type='button' title='Удалить блок' onClick={onRemove}>
-          ×
+          <DeleteIcon />
         </button>
       </div>
 

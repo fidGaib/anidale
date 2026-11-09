@@ -4,6 +4,7 @@ import { storagePath } from '@/config'
 import prisma from '@/db/db'
 import { io } from '@/index'
 
+import { canManageContent, canPublish, canViewCommunity } from '../community/access'
 import FileStorageService from '../post/file-service'
 
 /** Сколько живёт история. */
@@ -27,8 +28,11 @@ class StoryController {
     }
   }
 
-  async create(userId: number, image: File, text?: string | null) {
+  async create(userId: number, image: File, text?: string | null, communityId?: number | null) {
     if (!image) throw createGraphQLError('Выберите изображение')
+    if (communityId && !(await canPublish(communityId, userId))) {
+      throw createGraphQLError('Добавлять истории в сообщество могут только администраторы и редакторы')
+    }
     if (!image.type.startsWith('image/')) throw createGraphQLError('В историю можно добавить только изображение')
     const clean = (text ?? '').trim().slice(0, MAX_TEXT)
     const saved = await new FileStorageService(storagePath).saveImage(image, 'stories/')
@@ -36,6 +40,7 @@ class StoryController {
       const story = await prisma.story.create({
         data: {
           userId,
+          communityId: communityId || null,
           high: saved.high,
           medium: saved.medium,
           small: saved.small,
@@ -45,8 +50,8 @@ class StoryController {
           expiresAt: new Date(Date.now() + STORY_TTL_MS),
         },
       })
-      io.emit('newStory', { userId })
-      return this.view(story, userId, true)
+      if (!communityId) io.emit('newStory', { userId })
+      return this.view(story, userId, true, 0, true)
     } catch (error) {
       await new FileStorageService(storagePath).removeFiles(saved)
       throw error
@@ -68,6 +73,7 @@ class StoryController {
     viewerId: number | undefined,
     seen: boolean,
     viewsCount?: number,
+    canSeeViews = false,
   ) {
     return {
       id: story.id,
@@ -78,7 +84,7 @@ class StoryController {
       date: story.date,
       expiresAt: story.expiresAt,
       seen,
-      viewsCount: viewerId === story.userId ? (viewsCount ?? 0) : null,
+      viewsCount: viewerId === story.userId || canSeeViews ? (viewsCount ?? 0) : null,
     }
   }
 
@@ -89,7 +95,8 @@ class StoryController {
   async feed(viewerId?: number) {
     await this.cleanup()
     const stories = await prisma.story.findMany({
-      where: { expiresAt: { gt: new Date() } },
+      // Истории сообществ показываются на их страницах, а не в общей ленте людей
+      where: { expiresAt: { gt: new Date() }, communityId: null },
       orderBy: { id: 'asc' },
       include: {
         user: userSelect,
@@ -122,6 +129,25 @@ class StoryController {
       )
   }
 
+  /** Активные истории сообщества, старые первыми. Закрытое сообщество показывает их только участникам. */
+  async communityStories(communityId: number, viewerId?: number) {
+    await this.cleanup()
+    if (!(await canViewCommunity(communityId, viewerId))) return []
+    const staff = viewerId ? await canManageContent(communityId, viewerId) : false
+    const stories = await prisma.story.findMany({
+      where: { communityId, expiresAt: { gt: new Date() } },
+      orderBy: { id: 'asc' },
+      include: {
+        _count: { select: { views: true } },
+        ...(viewerId ? { views: { where: { userId: viewerId }, select: { id: true }, take: 1 } } : {}),
+      },
+    })
+    return stories.map((story) => {
+      const seen = viewerId === story.userId || ((story as { views?: { id: number }[] }).views?.length ?? 0) > 0
+      return this.view(story, viewerId, seen, story._count.views, staff)
+    })
+  }
+
   /** Отмечает просмотр. Свои истории и повторные просмотры не считаются. */
   async markViewed(userId: number, storyId: number) {
     const story = await prisma.story.findUnique({ where: { id: storyId }, select: { userId: true, expiresAt: true } })
@@ -137,9 +163,12 @@ class StoryController {
 
   /** Кто смотрел историю: только её автор, новые просмотры сверху. */
   async viewers(userId: number, storyId: number) {
-    const story = await prisma.story.findUnique({ where: { id: storyId }, select: { userId: true } })
+    const story = await prisma.story.findUnique({ where: { id: storyId }, select: { userId: true, communityId: true } })
     if (!story) throw createGraphQLError('История не найдена')
-    if (story.userId !== userId) throw createGraphQLError('Нет доступа')
+    // Зрителей видит автор, а у истории сообщества — ещё и те, кто ведёт его содержимое
+    const allowed =
+      story.userId === userId || (!!story.communityId && (await canManageContent(story.communityId, userId)))
+    if (!allowed) throw createGraphQLError('Нет доступа')
     const rows = await prisma.storyView.findMany({
       where: { storyId },
       orderBy: { id: 'desc' },
@@ -152,7 +181,9 @@ class StoryController {
   async remove(userId: number, storyId: number) {
     const story = await prisma.story.findUnique({ where: { id: storyId } })
     if (!story) throw createGraphQLError('История не найдена')
-    if (story.userId !== userId) throw createGraphQLError('Нет доступа')
+    const allowed =
+      story.userId === userId || (!!story.communityId && (await canManageContent(story.communityId, userId)))
+    if (!allowed) throw createGraphQLError('Нет доступа')
     await prisma.story.delete({ where: { id: storyId } })
     try {
       await new FileStorageService(storagePath).removeFiles({
@@ -163,7 +194,7 @@ class StoryController {
     } catch (error) {
       console.error('Не удалось удалить файлы истории', storyId, error)
     }
-    io.emit('storyRemoved', { userId, storyId })
+    if (!story.communityId) io.emit('storyRemoved', { userId, storyId })
     return true
   }
 }

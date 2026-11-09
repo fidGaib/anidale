@@ -10,33 +10,6 @@
   font-size: 13px;
 }
 
-.albums {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 10px;
-  flex-wrap: wrap;
-}
-
-.album {
-  padding: 5px 12px;
-  border: 0;
-  border-radius: 15px;
-  background: rgba(128, 128, 128, 0.14);
-  color: inherit;
-  font-family: var(--font-text-main);
-  font-size: 13px;
-  cursor: pointer;
-}
-
-.album:hover {
-  background: rgba(128, 128, 128, 0.24);
-}
-
-.albumActive {
-  background: var(--accent);
-  color: #fff;
-}
-
 .albumActive:hover {
   background: var(--accent);
 }
