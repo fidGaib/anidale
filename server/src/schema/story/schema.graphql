@@ -1,0 +1,35 @@
+type Query {
+  "Активные истории (до 24 часов), сгруппированные по людям: свои, затем непросмотренные, затем просмотренные"
+  getStories: [StoryGroup!]!
+  "Кто смотрел историю (только автор), новые просмотры сверху"
+  storyViewers(id: Int!): [StoryViewer!]!
+}
+type Mutation {
+  "Добавить историю-картинку на 24 часа"
+  createStory(image: FILE!, text: String): Story!
+  "Отметить историю просмотренной"
+  viewStory(id: Int!): Boolean!
+  deleteStory(id: Int!): Boolean!
+}
+type StoryGroup {
+  user: Owner!
+  stories: [Story!]!
+  "Все истории этого человека уже просмотрены"
+  allSeen: Boolean!
+}
+type StoryViewer {
+  user: Owner!
+  date: Date!
+}
+type Story {
+  id: Int!
+  high: String!
+  medium: String!
+  small: String!
+  text: String!
+  date: Date!
+  expiresAt: Date!
+  seen: Boolean!
+  "Сколько человек посмотрело; только у автора, иначе null"
+  viewsCount: Int
+}

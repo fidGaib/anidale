@@ -1,0 +1,429 @@
+.row {
+  display: flex;
+  gap: 14px;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 8px;
+  padding: 10px 12px;
+  overflow-x: auto;
+  border-radius: var(--playground-border);
+  margin: 0 auto;
+}
+@media (min-width: 1600px) and (max-width: 3000px) {
+  .row {
+    width: 70%;
+  }
+}
+.item {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 68px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-main);
+  font-family: var(--font-text-main);
+  cursor: pointer;
+}
+
+.ring {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff8a00, #e52e71 55%, #8a2be2);
+}
+
+.ringSeen {
+  background: rgba(128, 128, 128, 0.5);
+}
+
+.ringAdd {
+  background: rgba(128, 128, 128, 0.25);
+}
+
+.plus {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.avatar {
+  display: flex;
+  box-sizing: border-box;
+  width: 56px;
+  height: 56px;
+  /* border: 3px solid var(--playground, #fff); */
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.name {
+  max-width: 68px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+.error {
+  align-self: center;
+  margin: 0;
+  color: red;
+  font-size: 12px;
+}
+
+/* просмотр */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.95);
+}
+
+.stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(420px, 100vw);
+  height: min(100vh, 780px);
+  user-select: none;
+}
+
+.bars {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  left: 8px;
+  z-index: 3;
+  display: flex;
+  gap: 4px;
+}
+
+.bar {
+  flex: 1;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.barFill {
+  display: block;
+  height: 100%;
+  background: #fff;
+}
+
+.head {
+  position: absolute;
+  top: 18px;
+  right: 8px;
+  left: 8px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  font-family: var(--font-text-main);
+}
+
+.author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  text-decoration: none;
+}
+
+.headAvatar img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.login {
+  display: block;
+  font-weight: bold;
+}
+
+.time {
+  display: block;
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.headButton {
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.canvas {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity 0.15s;
+  pointer-events: none;
+}
+
+.imageLoaded {
+  opacity: 1;
+}
+
+.spinner {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: story-spin 0.8s linear infinite;
+}
+
+@keyframes story-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.caption {
+  position: absolute;
+  right: 12px;
+  bottom: 16px;
+  left: 12px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 15px;
+  text-align: center;
+  overflow-wrap: anywhere;
+  pointer-events: none;
+}
+
+.views {
+  position: absolute;
+  bottom: 8px;
+  left: 12px;
+  z-index: 3;
+  color: #fff;
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+/* окно новой истории */
+.dialogOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(380px, 92vw);
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+.dialogTitle {
+  margin: 0;
+  font-weight: bold;
+  color: var(--color-text-main);
+}
+
+.dialogPreview {
+  max-width: 100%;
+  max-height: 320px;
+  border-radius: 10px;
+  object-fit: contain;
+  background: rgba(128, 128, 128, 0.15);
+}
+
+.dialogInput {
+  padding: 10px;
+  border: 1px solid rgba(128, 128, 128, 0.4);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--color-text-main);
+  font-size: 14px;
+  outline: none;
+}
+
+.dialogButtons {
+  display: flex;
+  gap: 8px;
+}
+
+.dialogPrimary,
+.dialogButton {
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.dialogPrimary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.dialogButton {
+  background: rgba(128, 128, 128, 0.25);
+  color: var(--color-text-main);
+}
+
+/* зрители */
+button.views {
+  border: 0;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 4px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.viewersPanel {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 4;
+  max-height: 55%;
+  overflow-y: auto;
+  padding: 12px;
+  border-radius: 14px 14px 0 0;
+  background: rgba(20, 20, 20, 0.96);
+  color: #fff;
+  font-family: var(--font-text-main);
+}
+
+.viewersHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.viewersEmpty {
+  margin: 8px 0;
+  opacity: 0.7;
+  text-align: center;
+}
+
+.viewerRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  color: #fff;
+  text-decoration: none;
+}
+
+.viewerAvatar img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.viewerName {
+  flex: 1;
+  font-weight: bold;
+}
+
+.viewerTime {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+/* ответ на историю */
+.replyBar {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  left: 10px;
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.replyInput {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 22px;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 14px;
+  outline: none;
+}
+
+.replyInput::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.replySend {
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+
+.replySend:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.replyError {
+  width: 100%;
+  color: #ff8a8a;
+  font-size: 12px;
+}
