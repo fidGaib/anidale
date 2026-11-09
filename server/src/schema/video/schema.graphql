@@ -1,0 +1,37 @@
+# Видео профиля: ролик из поста (postId) или отдельно загруженный в альбом (postId = null).
+# file — путь внутри /storage вместе с расширением, клиент подставляет его в URL как есть.
+type Video {
+  id: Int!
+  title: String!
+  file: String!
+  size: Int!
+  type: String!
+  date: Date!
+  "Пост, к которому прикреплено видео; null для отдельного альбома"
+  postId: Int
+  user: Owner!
+  "Сохранено ли видео текущим пользователем"
+  saved: Boolean
+  "Когда видео сохранено; null, если не сохранено"
+  savedAt: Date
+}
+
+extend type Query {
+  "Видео пользователя из постов и альбома, новые сверху"
+  getVideos(id: Int!, limit: Int, offset: Int): [Video!]!
+  "Видео всех пользователей для ленты: из постов и альбомов, новые сверху. Архивные посты не показываются"
+  getAllVideos(limit: Int, offset: Int): [Video!]!
+  "Число видео пользователя: посты и отдельный альбом"
+  videosCount(id: Int!): Int!
+  "Сохранённые видео текущего пользователя, недавно сохранённые сверху"
+  getSavedVideos(limit: Int, offset: Int): [Video!]!
+}
+
+extend type Mutation {
+  "Загрузить видео в свой альбом без публикации"
+  createVideo(file: FILE!, title: String): Video!
+  "Удалить своё отдельно загруженное видео"
+  removeVideo(id: Int!): Boolean!
+  "Сохранить чужое видео в альбом или убрать его оттуда"
+  saveVideo(id: Int!, saved: Boolean!): Boolean!
+}

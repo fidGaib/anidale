@@ -1,10 +1,12 @@
 import { useState } from 'react'
 
 import { ProfileMusicList } from '@/features/music'
+import { StoriesRow } from '@/features/stories'
 import { assetUrl } from '@/shared/config'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import Posts from '@/widgets/post'
 
+import { FeedVideos } from './videos'
 import cl from './ui.module.css'
 
 const meshBlock = [
@@ -27,8 +29,10 @@ export const MeshBlockFeed = () => {
           )
         })}
       </div>
+      <StoriesRow />
       {layout === 1 ? <Posts /> : <></>}
       {layout === 3 ? <ProfileMusicList scope='all' canAdd={false} /> : <></>}
+      {layout === 4 ? <FeedVideos /> : <></>}
     </>
   )
 }

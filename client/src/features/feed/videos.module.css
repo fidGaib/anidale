@@ -1,0 +1,67 @@
+.wrap {
+  width: 100%;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: 10px;
+  border-radius: var(--playground-border);
+}
+
+.title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-text-main);
+  font-family: var(--font-text-main);
+  font-weight: bold;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.author {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text-main);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.avatar img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.date {
+  color: gray;
+  font-size: 12px;
+}
+
+.message {
+  padding: 20px;
+  text-align: center;
+  color: gray;
+}
+
+.more {
+  display: flex;
+  justify-content: center;
+  padding: 12px 0;
+}

@@ -1,142 +1,405 @@
-.wrapper {
+.card {
+  --avatar-size: 160px;
+  --head-pad: 20px;
+  --head-gap: 18px;
+  width: 100%;
+  display: flex;
   flex-direction: column;
-  border-radius: var(--playground-border);
-  margin: 0 auto;
-  position: relative;
-}
-
-@media (min-width: 1600px) and (max-width: 3000px) {
-  .wrapper {
-    width: 70%;
-  }
-}
-
-.wrappSubscribe {
-  display: flex;
-  margin: 0 auto;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.wrappSubscribe button {
-  color: var(--accent);
-  background: #ffe6e6;
-  margin-left: 10px;
-}
-
-.artwork {
-  display: flex;
-  width: 100%;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  padding: 20px;
-}
-
-.artwork .avatar {
-  border-radius: 50%;
-}
-
-.artwork .avatar img {
-  width: 250px;
-  height: 250px;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.5s;
-}
-
-.artwork .avatar img:hover {
-  opacity: 0.8;
-}
-
-@media (min-width: 720px) and (max-width: 1600px) {
-  .artwork .avatar img {
-    width: 200px;
-    height: 200px;
-  }
-}
-
-@media (min-width: 0px) and (max-width: 720px) {
-  .artwork .avatar img {
-    width: 100px;
-    height: 100px;
-  }
-}
-
-#edit_profile_ico {
-  position: absolute;
-  right: 10px;
-  top: 10px;
-  cursor: pointer;
-  padding: 5px;
-}
-
-#loginWrap {
-  z-index: 1;
-  position: absolute;
-  display: flex;
-  justify-content: center;
-  bottom: 10px;
-}
-
-.nickname {
-  border-radius: 20px;
-  padding: 3px 15px;
-  font-weight: bold;
-  overflow: hidden;
-  font-family: calibri, sans-serif;
-  font-size: 18px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-#edit_login_ico {
-  cursor: pointer;
-  padding: 5px;
-  margin-left: 10px;
-}
-
-.wrapperSwiper {
-  justify-content: center;
-  display: flex;
-}
-
-.wrapperSwiper .mesh {
-  display: flex;
-  align-items: center;
-  padding: 5px 10px;
-  border-radius: 8px;
-  margin: 0 5px;
-  cursor: pointer;
-  width: 100px;
-}
-
-.wrapperSwiper .mesh .meshIcon {
-  width: 20px;
-  height: 20px;
   padding: 0;
-  margin: 0;
+  margin: 0 auto 10px;
+  border-radius: var(--playground-border);
+  overflow: hidden;
+  position: relative;
 }
 
-.wrapperSwiper .mesh p {
-  color: var(--color-text-main);
+/* ---------- Обложка ---------- */
+
+.cover {
+  position: relative;
+  height: 240px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.coverGradient {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 18% 20%, rgba(255, 255, 255, 0.3), transparent 45%),
+    radial-gradient(circle at 82% 30%, rgba(255, 220, 180, 0.35), transparent 50%),
+    linear-gradient(135deg, #6d3b1e 0%, #a52a2a 55%, #d98b4a 100%);
+}
+
+.coverGradient::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.05) 0 2px, transparent 2px 16px);
+}
+
+.coverImage {
+  position: absolute;
+  inset: 0;
+}
+
+.coverImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.coverButton {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 3;
+  padding: 7px 14px;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
   font-family: var(--font-text-main);
-  font-size: var(--size-text-main);
-  padding-left: 10px;
+  display: inline-block;
+  font-size: 13px;
+  text-decoration: none;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
 }
 
-.artInModal {
-  width: 100%;
+.coverButton:hover {
+  background: rgba(0, 0, 0, 0.6);
 }
 
-.artInModal img {
-  width: 100%;
-}
+/* ---------- Шапка: аватар, имя, кнопки ---------- */
 
-.pizdez {
-  justify-content: center;
+.head {
   display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: var(--head-gap);
+  padding: 0 var(--head-pad);
+  margin-top: calc(var(--avatar-size) / -2);
+  position: relative;
+  z-index: 2;
+}
+
+.avatar {
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #fff;
+  cursor: pointer;
+  box-shadow:
+    0 0 0 4px #fff,
+    0 4px 18px rgba(0, 0, 0, 0.28);
+}
+
+.avatar img {
   width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.avatar:hover img {
+  opacity: 0.85;
+}
+
+.identity {
+  flex: 1 1 220px;
+  min-width: 0;
+  padding-bottom: 6px;
+}
+
+.name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 26px;
+  line-height: 1.15;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.nameEdit {
+  display: inline-flex;
+  opacity: 0.55;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.nameEdit:hover {
+  opacity: 1;
+}
+
+.editIcon {
+  width: 16px;
+  height: 16px;
+}
+
+.status,
+.statusMuted {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 14px;
+  font-family: var(--font-text-main);
+  text-decoration: none;
+}
+
+.status {
+  color: var(--accent);
+}
+
+.statusMuted {
+  opacity: 0.5;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin-top: 6px;
+  font-size: 13px;
+  opacity: 0.65;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-left: auto;
+  padding-bottom: 6px;
+}
+
+.actions a {
+  text-decoration: none;
+}
+
+.actions button {
+  background: rgba(165, 42, 42, 0.12);
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.actions button:hover {
+  background: rgba(165, 42, 42, 0.2);
+}
+
+.moreButton {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(128, 128, 128, 0.16);
+  color: inherit;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.moreButton:hover {
+  background: rgba(128, 128, 128, 0.26);
+}
+
+.actionError {
+  width: 100%;
+  margin: 0;
+  color: var(--accent);
+  font-family: var(--font-text-main);
+  font-size: 12px;
+  text-align: right;
+}
+
+/* ---------- Счётчики ---------- */
+
+.counters {
+  display: flex;
+  gap: 28px;
+  padding: 14px var(--head-pad) 0 calc(var(--head-pad) + var(--avatar-size) + var(--head-gap));
+}
+
+.counter {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.counter b {
+  font-size: 15px;
+}
+
+.counter span {
+  font-size: 12px;
+  opacity: 0.55;
+}
+
+/* ---------- Вкладки ---------- */
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-top: 14px;
+  padding: 10px 12px 0;
+  border-top: 1px solid rgba(128, 128, 128, 0.15);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 8px 8px 0 0;
+  background: transparent;
+  color: inherit;
+  font-family: var(--font-text-main);
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+  opacity: 0.6;
+  transition:
+    background 0.2s,
+    opacity 0.2s;
+}
+
+.tab:hover {
+  background: rgba(128, 128, 128, 0.1);
+}
+
+.tabActive {
+  opacity: 1;
+  color: var(--accent);
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+
+.tabIcon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.tabIcon img {
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Пустое состояние вкладки ---------- */
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 40px 20px;
+  border-radius: var(--playground-border);
+  opacity: 0.6;
+  text-align: center;
+}
+
+.emptyIcon {
+  width: 40px;
+  height: 40px;
+}
+
+/* ---------- История вокруг аватара ---------- */
+
+.storyNew {
+  outline: 3px solid #e52e71;
+  outline-offset: 3px;
+  cursor: pointer;
+}
+
+.storySeen {
+  outline: 3px solid rgba(128, 128, 128, 0.6);
+  outline-offset: 3px;
+  cursor: pointer;
+}
+
+/* ---------- Адаптив ---------- */
+
+@media (max-width: 900px) {
+  .card {
+    --avatar-size: 120px;
+    --head-pad: 16px;
+    --head-gap: 14px;
+  }
+
+  .cover {
+    height: 180px;
+  }
+
+  .name {
+    font-size: 22px;
+  }
+
+  .counters {
+    gap: 20px;
+  }
+}
+
+@media (max-width: 760px) {
+  .card {
+    --avatar-size: 96px;
+    --head-pad: 12px;
+    --head-gap: 12px;
+  }
+
+  .cover {
+    height: 130px;
+  }
+
+  .coverButton {
+    top: 10px;
+    right: 10px;
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .head {
+    margin-top: calc(var(--avatar-size) / -2.4);
+  }
+
+  .identity {
+    flex: 1 1 calc(100% - var(--avatar-size) - var(--head-gap));
+  }
+
+  .name {
+    font-size: 19px;
+  }
+
+  .status,
+  .statusMuted {
+    margin-top: 3px;
+    font-size: 12px;
+  }
+
+  .actions {
+    width: 100%;
+    margin-left: 0;
+    padding-bottom: 0;
+  }
+
+  .actions button {
+    padding: 5px 12px;
+  }
+
+  .counters {
+    gap: 18px;
+    padding-left: var(--head-pad);
+  }
+
+  .tab {
+    padding: 8px 12px;
+  }
 }

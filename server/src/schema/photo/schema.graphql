@@ -1,0 +1,38 @@
+# Фотография профиля: из поста или из отдельного альбома. Пути без расширения, клиент добавляет .webp
+type Photo {
+  id: Int!
+  "POST — изображение из поста, ALBUM — загружено отдельно"
+  source: String!
+  "Пост, к которому относится фото; null для отдельного альбома"
+  postId: Int
+  "Владелец фотографии"
+  ownerId: Int!
+  high: String!
+  medium: String!
+  small: String!
+  vertical: Boolean!
+  type: String!
+  date: Date!
+  "Сохранено ли фото текущим пользователем"
+  saved: Boolean!
+  "Когда фото сохранено; null, если не сохранено"
+  savedAt: Date
+}
+
+extend type Query {
+  "Фото пользователя из постов и альбома, новые сверху"
+  getPhotos(id: Int!, limit: Int, offset: Int): [Photo!]!
+  "Общее число фото из постов и альбома"
+  photosCount(id: Int!): Int!
+  "Сохранённые фото других пользователей, недавно сохранённые сверху"
+  getSavedPhotos(limit: Int, offset: Int): [Photo!]!
+}
+
+extend type Mutation {
+  "Добавить фотографию в свой альбом"
+  createPhoto(image: FILE!): Photo!
+  "Удалить свою фотографию"
+  removePhoto(id: Int!): Boolean!
+  "Сохранить чужое фото (source: POST | ALBUM) или убрать его из сохранённых"
+  savePhoto(source: String!, id: Int!, saved: Boolean!): Boolean!
+}
