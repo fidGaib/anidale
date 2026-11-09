@@ -1,0 +1,21 @@
+# Единые окончания строк: в репозитории и в рабочей папке всегда LF (на любой ОС и в любом редакторе)
+* text=auto eol=lf
+
+# Бинарные файлы git не трогает
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.mp3 binary
+*.mp4 binary
+*.webm binary
+*.node binary
+
+# Скрипты Windows требуют CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf

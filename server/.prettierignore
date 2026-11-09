@@ -1,0 +1,4 @@
+src/schema/resolvers-types.ts
+src/api/post/native/
+dist/
+storage/
