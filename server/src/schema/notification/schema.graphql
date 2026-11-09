@@ -1,0 +1,19 @@
+type Query {
+  "Уведомления текущего пользователя, новые сверху; beforeId — подгрузка более старых"
+  getNotifications(limit: Int!, beforeId: Int): [Notification!]!
+  unreadNotificationsCount: Int!
+}
+type Mutation {
+  "Отметить все уведомления прочитанными"
+  markNotificationsRead: Boolean!
+}
+"type: like | comment | track | repost. text: фрагмент комментария или название трека"
+type Notification {
+  id: Int!
+  type: String!
+  text: String!
+  date: Date!
+  read: Boolean!
+  postId: Int
+  actor: Owner!
+}

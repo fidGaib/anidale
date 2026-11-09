@@ -2,6 +2,7 @@ import { createGraphQLError } from 'graphql-yoga'
 
 import { storagePath } from '@/config'
 import { Music } from '@/db/models/music-model'
+import NotificationController from '@/api/notification/controller'
 import { io } from '@/index'
 
 import AudioStorageService from './audio-service'
@@ -47,18 +48,52 @@ class MusicController {
     })
   }
 
+  /** Условие выборки треков: только с файлом, при поиске — по названию или исполнителю. */
+  private searchWhere(search?: string) {
+    return {
+      file: { not: '' },
+      ...(search
+        ? {
+            OR: [
+              { title: { contains: search, mode: 'insensitive' as const } },
+              { artist: { contains: search, mode: 'insensitive' as const } },
+            ],
+          }
+        : {}),
+    }
+  }
+
+  /** Сколько разных треков (по файлу) подходит под поиск. */
+  async countAll(search?: string) {
+    const groups = await Music.groupBy({ by: ['file'], where: this.searchWhere(search) })
+    return groups.length
+  }
+
   /** Вся музыка сайта для ленты. Один и тот же файл, добавленный в несколько профилей, показывается один раз. */
-  async getAllMusic(limit: number, page: number) {
+  async getAllMusic(limit: number, page: number, search?: string) {
     const take = Math.min(Math.max(Math.trunc(limit) || 1, 1), MAX_PAGE_LIMIT)
     const skip = Math.max(Math.trunc(page) || 0, 0) * take
-    return await Music.findMany({
+    const page_ = await Music.findMany({
       take,
       skip,
       // Записи без файла (созданные до появления загрузки аудио) играть нечем
-      where: { file: { not: '' } },
+      where: this.searchWhere(search),
       distinct: ['file'],
       orderBy: { id: 'desc' },
+      select: { file: true },
+    })
+    if (page_.length === 0) return []
+    // Автор оригинала — самая ранняя запись с этим файлом (остальные — копии, добавленные из ленты)
+    const originals = await Music.findMany({
+      where: { file: { in: page_.map((row) => row.file) } },
+      distinct: ['file'],
+      orderBy: { id: 'asc' },
       include: { user: userSelect },
+    })
+    const byFile = new Map(originals.map((row) => [row.file, row]))
+    return page_.flatMap((row) => {
+      const original = byFile.get(row.file)
+      return original ? [original] : []
     })
   }
 
@@ -80,7 +115,7 @@ class MusicController {
     const exists = await Music.findFirst({ where: { owner: userId, file: source.file } })
     if (exists) throw createGraphQLError('Этот трек уже в вашем профиле')
 
-    return await Music.create({
+    const added = await Music.create({
       data: {
         title: source.title,
         artist: source.artist,
@@ -90,6 +125,8 @@ class MusicController {
       },
       include: { user: userSelect },
     })
+    await NotificationController.notify(source.owner, userId, 'track', { text: source.title })
+    return added
   }
 
   async remove(id: number, userId: number) {

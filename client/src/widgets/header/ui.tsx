@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import darkLogo from '@/assets/images/dark_logo.png'
 import lightLogo from '@/assets/images/ligth_logo.png'
 import { useDarkModeStore } from '@/app/module'
-import { FindAnime, MenuHeader, NotificationHeader } from '@/features/header'
+import { MenuHeader, NotificationHeader, Search } from '@/features/header'
 import Content from '@/shared/content'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 
@@ -20,7 +20,7 @@ export const Header = () => {
         />
       </Link>
       <NotificationHeader />
-      <FindAnime />
+      <Search />
       <MenuHeader />
     </Content>
   )

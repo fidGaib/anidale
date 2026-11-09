@@ -1,0 +1,13 @@
+type Query {
+  "Поиск по людям, постам и музыке. type: all | users | posts | music. Для all — первые результаты каждого раздела, page игнорируется"
+  search(query: String!, type: String, limit: Int!, page: Int!): SearchResult!
+}
+type SearchResult {
+  users: [User!]!
+  posts: [Post!]!
+  music: [Music!]!
+  "Сколько всего найдено в каждом разделе"
+  usersTotal: Int!
+  postsTotal: Int!
+  musicTotal: Int!
+}

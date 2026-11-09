@@ -42,7 +42,7 @@ interface RawTrack {
   user?: { id?: number | null; login?: string | null } | null
 }
 
-const toTrack = (track: RawTrack): Track => ({
+export const toTrack = (track: RawTrack): Track => ({
   id: track.id ?? 0,
   title: track.title ?? '',
   artist: track.artist ?? '',
