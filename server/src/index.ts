@@ -3,6 +3,8 @@ import http from 'http'
 import { Server as IoServer } from 'socket.io'
 
 import { getOptionalUserId } from './api/user/optional-user'
+import prisma from './db/db'
+import { markConnected, markDisconnected, presenceRoom } from './handlers/presence'
 import { applyCors, getAllowedOrigins } from './handlers/cors'
 import { parseCookies } from './handlers/cookie-parser'
 import { serveStatic } from './handlers/file-upload'
@@ -57,9 +59,37 @@ io.on('connection', async (socket) => {
   // Вошедший пользователь получает личные события (сообщения) через свою комнату.
   // Куки читаем из рукопожатия, поэтому после входа клиент переподключает сокет.
   const userId = await getOptionalUserId({ cookies: parseCookies(socket.request) })
-  if (userId) socket.join(`user:${userId}`)
-  socket.on('disconnect', () => {
+  if (userId) {
+    socket.join(`user:${userId}`)
+    if (markConnected(userId)) {
+      io.to(presenceRoom(userId)).emit('presence', { userId, online: true, lastSeenAt: null })
+    }
+  }
+  // Подписка на статус собеседника открытого чата: одна за раз
+  let watched: number | null = null
+  socket.on('watch', (payload: unknown) => {
+    const target = (payload as { userId?: unknown } | null)?.userId
+    if (watched !== null) socket.leave(presenceRoom(watched))
+    watched = typeof target === 'number' && Number.isInteger(target) ? target : null
+    if (watched !== null) socket.join(presenceRoom(watched))
+  })
+  // «Печатает…»: пересылаем собеседнику только от авторизованного отправителя
+  socket.on('typing', (payload: unknown) => {
+    const to = (payload as { to?: unknown } | null)?.to
+    if (!userId || typeof to !== 'number' || !Number.isInteger(to) || to === userId) return
+    io.to(`user:${to}`).emit('typing', { from: userId })
+  })
+  socket.on('disconnect', async () => {
     console.log('Клиент отключился: ', socket.id)
+    if (userId && markDisconnected(userId)) {
+      const lastSeenAt = new Date()
+      io.to(presenceRoom(userId)).emit('presence', { userId, online: false, lastSeenAt })
+      try {
+        await prisma.user.update({ where: { id: userId }, data: { lastSeenAt } })
+      } catch (error) {
+        console.error('Не удалось записать время последнего визита', error)
+      }
+    }
   })
 })
 

@@ -4,6 +4,7 @@ import { storagePath } from '@/config'
 import prisma from '@/db/db'
 import { Conversation, Message } from '@/db/models/message-model'
 import User from '@/db/models/user-model'
+import { isOnline } from '@/handlers/presence'
 import { io } from '@/index'
 
 import AttachmentService, { MAX_ATTACHMENTS, MAX_TOTAL_SIZE, SavedAttachment } from './attachment-service'
@@ -12,6 +13,7 @@ const MAX_TEXT_LENGTH = 2000
 const MAX_PAGE_LIMIT = 50
 const MAX_CONVERSATIONS = 50
 const MAX_FORWARD_RECIPIENTS = 10
+const MAX_SELECTION = 30
 
 const userSelect = { id: true, avatar: true, login: true } as const
 
@@ -28,6 +30,16 @@ interface DbAttachment {
   high: string
 }
 
+/** Что подгружать вместе с сообщением: вложения и реакции. */
+const messageInclude = {
+  attachments: true,
+  reactions: { select: { userId: true, emoji: true } },
+} as const
+
+/** Реакции, которые можно ставить (как в панели клиента). */
+export const ALLOWED_REACTIONS = ['👍', '❤️', '😂', '😮', '😢', '🔥', '👎', '🎉']
+const MAX_PINNED = 10
+
 interface DbMessage {
   id: number
   text: string
@@ -38,6 +50,7 @@ interface DbMessage {
   fwdUserId: number | null
   fwdLogin: string
   attachments: DbAttachment[]
+  reactions?: { userId: number; emoji: string }[]
 }
 
 /** Краткое содержимое сообщения, на которое ответили. */
@@ -61,6 +74,7 @@ const toMessage = (message: DbMessage, userA: number, userB: number) => ({
   forwardedFrom: message.fwdLogin || null,
   forwardedFromId: message.fwdUserId,
   attachments: message.attachments,
+  reactions: message.reactions ?? [],
 })
 
 const room = (userId: number) => `user:${userId}`
@@ -117,7 +131,7 @@ class MessageController {
   private async findVisible(me: number, messageId: number) {
     const message = await Message.findUnique({
       where: { id: messageId },
-      include: { attachments: true, conversation: true },
+      include: { ...messageInclude, conversation: true },
     })
     const conv = message?.conversation
     if (!message || !conv || (conv.userAId !== me && conv.userBId !== me)) {
@@ -172,7 +186,7 @@ class MessageController {
             })),
           },
         },
-        include: { attachments: true },
+        include: messageInclude,
       })
       await tx.conversation.update({
         where: { id: conversation.id },
@@ -181,6 +195,9 @@ class MessageController {
           lastMessageAt: created.date,
           // Свои сообщения прочитаны автоматически
           ...(from === a ? { readA: created.id } : { readB: created.id }),
+          // Новое сообщение возвращает диалог из архива, если он не заглушён (как в Телеграме)
+          ...(conversation.archivedA && !conversation.mutedA ? { archivedA: false } : {}),
+          ...(conversation.archivedB && !conversation.mutedB ? { archivedB: false } : {}),
         },
       })
       return created
@@ -253,7 +270,7 @@ class MessageController {
       },
       orderBy: { id: 'desc' },
       take,
-      include: { attachments: true },
+      include: messageInclude,
     })
     return await this.withReplies(
       messages.map((m) => toMessage(m, a, b)),
@@ -294,12 +311,98 @@ class MessageController {
             NOT: { hiddenBy: { has: me } },
           },
         })
-        return { user: mine ? c.userB : c.userA, lastMessage: toMessage(last, c.userAId, c.userBId), unread }
+        return {
+          user: mine ? c.userB : c.userA,
+          lastMessage: toMessage(last, c.userAId, c.userBId),
+          unread,
+          muted: mine ? c.mutedA : c.mutedB,
+          archived: mine ? c.archivedA : c.archivedB,
+          pinned: mine ? c.topA : c.topB,
+        }
       }),
     )
     return items
       .flatMap((item) => (item ? [item] : []))
-      .sort((x, y) => y.lastMessage.date.getTime() - x.lastMessage.date.getTime())
+      .sort(
+        (x, y) =>
+          // Закреплённые диалоги сверху, внутри групп — свежие выше
+          Number(y.pinned) - Number(x.pinned) || y.lastMessage.date.getTime() - x.lastMessage.date.getTime(),
+      )
+  }
+
+  /** Настройки диалога у себя. Диалога ещё нет (нет переписки): настраивать нечего. */
+  async setSettings(
+    me: number,
+    other: number,
+    settings: { muted?: boolean | null; archived?: boolean | null; pinned?: boolean | null },
+  ) {
+    const [a, b] = pair(me, other)
+    const conversation = await Conversation.findUnique({ where: { userAId_userBId: { userAId: a, userBId: b } } })
+    if (!conversation) throw createGraphQLError('Диалог не найден')
+    const mine = me === a
+    const data: Record<string, boolean> = {}
+    if (typeof settings.muted === 'boolean') data[mine ? 'mutedA' : 'mutedB'] = settings.muted
+    if (typeof settings.archived === 'boolean') data[mine ? 'archivedA' : 'archivedB'] = settings.archived
+    if (typeof settings.pinned === 'boolean') data[mine ? 'topA' : 'topB'] = settings.pinned
+    if (Object.keys(data).length) await Conversation.update({ where: { id: conversation.id }, data })
+    // Остальные вкладки пользователя обновят список
+    io.to(room(me)).emit('conversationSettings', { userA: a, userB: b })
+    return true
+  }
+
+  /** Реакция на сообщение. Своя реакция одна: новая заменяет прежнюю, повтор той же снимает её. */
+  async react(me: number, id: number, emoji: string | null | undefined) {
+    const { message, conv } = await this.findVisible(me, id)
+    if (emoji && !ALLOWED_REACTIONS.includes(emoji)) throw createGraphQLError('Такая реакция недоступна')
+    const current = message.reactions.find((r) => r.userId === me)
+    if (!emoji || current?.emoji === emoji) {
+      if (current) await prisma.messageReaction.deleteMany({ where: { messageId: id, userId: me } })
+    } else {
+      await prisma.messageReaction.upsert({
+        where: { messageId_userId: { messageId: id, userId: me } },
+        create: { messageId: id, userId: me, emoji },
+        update: { emoji },
+      })
+    }
+    const reactions = await prisma.messageReaction.findMany({
+      where: { messageId: id },
+      select: { userId: true, emoji: true },
+      orderBy: { id: 'asc' },
+    })
+    io.to(room(conv.userAId))
+      .to(room(conv.userBId))
+      .emit('messageReactions', { userA: conv.userAId, userB: conv.userBId, id, reactions })
+    const [result] = await this.withReplies([toMessage({ ...message, reactions }, conv.userAId, conv.userBId)], {
+      me,
+      cleared: me === conv.userAId ? conv.clearedA : conv.clearedB,
+    })
+    return result
+  }
+
+  /** Поиск по тексту сообщений диалога среди видимых пользователю. Новые сверху. */
+  async search(me: number, other: number, query: string, beforeId: number | undefined, limit: number) {
+    const needle = query.trim().slice(0, 100)
+    if (!needle) return []
+    const [a, b] = pair(me, other)
+    const conversation = await Conversation.findUnique({ where: { userAId_userBId: { userAId: a, userBId: b } } })
+    if (!conversation) return []
+    const cleared = me === a ? conversation.clearedA : conversation.clearedB
+    const take = Math.min(Math.max(Math.trunc(limit) || 1, 1), MAX_PAGE_LIMIT)
+    const messages = await Message.findMany({
+      where: {
+        conversationId: conversation.id,
+        id: { gt: cleared, ...(beforeId ? { lt: beforeId } : {}) },
+        text: { contains: needle, mode: 'insensitive' },
+        NOT: { hiddenBy: { has: me } },
+      },
+      orderBy: { id: 'desc' },
+      take,
+      include: messageInclude,
+    })
+    return await this.withReplies(
+      messages.map((m) => toMessage(m, a, b)),
+      { me, cleared },
+    )
   }
 
   async markRead(me: number, other: number) {
@@ -310,7 +413,17 @@ class MessageController {
       where: { id: conversation.id },
       data: me === a ? { readA: conversation.lastMessageId } : { readB: conversation.lastMessageId },
     })
+    // Собеседник видит, что его сообщения прочитаны
+    io.to(room(other)).emit('messagesRead', { reader: me, upTo: conversation.lastMessageId })
     return true
+  }
+
+  /** До какого сообщения дочитал собеседник; нужно для галочек «прочитано» у моих сообщений. */
+  async peerRead(me: number, other: number) {
+    const [a, b] = pair(me, other)
+    const conversation = await Conversation.findUnique({ where: { userAId_userBId: { userAId: a, userBId: b } } })
+    if (!conversation) return 0
+    return me === a ? conversation.readB : conversation.readA
   }
 
   // ---------- действия над отдельным сообщением ----------
@@ -326,7 +439,7 @@ class MessageController {
     const updated = await Message.update({
       where: { id },
       data: { text: clean, editedAt: new Date() },
-      include: { attachments: true },
+      include: messageInclude,
     })
     const [result] = await this.withReplies([toMessage(updated, conv.userAId, conv.userBId)])
     io.to(room(conv.userAId)).to(room(conv.userBId)).emit('messageUpdated', { message: result })
@@ -383,7 +496,7 @@ class MessageController {
       data: {
         lastMessageId: last.id,
         lastMessageAt: last.date,
-        ...(conv.pinnedMessageId === messageId ? { pinnedMessageId: null } : {}),
+        ...(conv.pinnedIds.includes(messageId) ? { pinnedIds: conv.pinnedIds.filter((x) => x !== messageId) } : {}),
       },
     })
     // Если все оставшиеся сообщения уже очищены обоими, диалог больше не нужен
@@ -426,38 +539,89 @@ class MessageController {
     return sent
   }
 
-  /** Закрепляет (pinned) или открепляет сообщение. В диалоге одно закреплённое сообщение, видно обоим. */
-  async pin(me: number, id: number, pinned: boolean) {
-    const { conv } = await this.findVisible(me, id)
-    if (pinned) {
-      await Conversation.update({ where: { id: conv.id }, data: { pinnedMessageId: id } })
-    } else if (conv.pinnedMessageId === id) {
-      await Conversation.update({ where: { id: conv.id }, data: { pinnedMessageId: null } })
+  /** Чистит список id: уникальные, по возрастанию (порядок переписки), не больше MAX_SELECTION. */
+  private normalizeIds(ids: number[]) {
+    const unique = [...new Set(ids)].sort((x, y) => x - y)
+    if (unique.length === 0) throw createGraphQLError('Выберите сообщения')
+    if (unique.length > MAX_SELECTION) throw createGraphQLError(`Можно выбрать не больше ${MAX_SELECTION} сообщений`)
+    return unique
+  }
+
+  /** Удаление нескольких сообщений. Для «у всех» сначала проверяем, что все свои: либо удаляется всё, либо ничего. */
+  async deleteMessages(me: number, ids: number[], forEveryone: boolean) {
+    const list = this.normalizeIds(ids)
+    const found = await Promise.all(list.map((id) => this.findVisible(me, id)))
+    if (forEveryone && found.some(({ message }) => message.senderId !== me)) {
+      throw createGraphQLError('Удалить у всех можно только свои сообщения')
     }
-    io.to(room(conv.userAId))
-      .to(room(conv.userBId))
-      .emit('messagePinned', { userA: conv.userAId, userB: conv.userBId, pinnedMessageId: pinned ? id : null })
+    for (const [index, id] of list.entries()) {
+      try {
+        await this.deleteMessage(me, id, forEveryone)
+      } catch (error) {
+        // Диалог мог стереться целиком на предыдущем сообщении (удалили последнее): остальные уже не существуют
+        if (index === 0) throw error
+      }
+    }
     return true
   }
 
-  /** Закреплённое сообщение диалога, если пользователь его видит. */
+  /** Пересылка нескольких сообщений: в порядке переписки, каждому получателю. */
+  async forwardMany(me: number, ids: number[], to: number[]) {
+    const list = this.normalizeIds(ids)
+    // Проверяем доступ ко всем заранее, чтобы не переслать половину
+    await Promise.all(list.map((id) => this.findVisible(me, id)))
+    const sent = []
+    for (const id of list) sent.push(...(await this.forward(me, id, to)))
+    return sent
+  }
+
+  /** Закрепляет (pinned) или открепляет сообщение. В диалоге одно закреплённое сообщение, видно обоим. */
+  async pin(me: number, id: number, pinned: boolean) {
+    const { conv } = await this.findVisible(me, id)
+    let ids = conv.pinnedIds
+    if (pinned && !ids.includes(id)) {
+      if (ids.length >= MAX_PINNED) throw createGraphQLError(`Можно закрепить не больше ${MAX_PINNED} сообщений`)
+      ids = [...ids, id]
+    } else if (!pinned) {
+      ids = ids.filter((x) => x !== id)
+    }
+    await Conversation.update({ where: { id: conv.id }, data: { pinnedIds: ids } })
+    io.to(room(conv.userAId))
+      .to(room(conv.userBId))
+      .emit('messagePinned', { userA: conv.userAId, userB: conv.userBId, pinnedIds: ids })
+    return true
+  }
+
+  /** Закреплённые сообщения диалога, которые пользователь видит. Порядок закрепления: новые последними. */
   async getPinned(me: number, other: number) {
     const [a, b] = pair(me, other)
     const conv = await Conversation.findUnique({ where: { userAId_userBId: { userAId: a, userBId: b } } })
-    if (!conv?.pinnedMessageId) return null
+    if (!conv || conv.pinnedIds.length === 0) return []
     const cleared = me === a ? conv.clearedA : conv.clearedB
-    const message = await Message.findFirst({
+    const messages = await Message.findMany({
       where: {
         // Закреплённое должно быть среди видимых: не очищено и не скрыто пользователем
-        id: { equals: conv.pinnedMessageId, gt: cleared },
+        id: { in: conv.pinnedIds, gt: cleared },
         conversationId: conv.id,
         NOT: { hiddenBy: { has: me } },
       },
-      include: { attachments: true },
+      include: messageInclude,
     })
-    if (!message) return null
-    const [result] = await this.withReplies([toMessage(message, a, b)], { me, cleared })
-    return result
+    const order = new Map(conv.pinnedIds.map((id, index) => [id, index]))
+    messages.sort((x, y) => (order.get(x.id) ?? 0) - (order.get(y.id) ?? 0))
+    return await this.withReplies(
+      messages.map((m) => toMessage(m, a, b)),
+      { me, cleared },
+    )
+  }
+
+  // ---------- присутствие ----------
+
+  /** В сети ли пользователь (есть открытые сокеты) и когда был в последний раз. */
+  async presence(userId: number) {
+    const user = await User.findUnique({ where: { id: userId }, select: { lastSeenAt: true } })
+    if (!user) throw createGraphQLError('Пользователь не найден')
+    return { online: isOnline(userId), lastSeenAt: user.lastSeenAt }
   }
 
   // ---------- диалог целиком ----------

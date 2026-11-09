@@ -3,8 +3,14 @@ type Query {
   getConversations: [ConversationItem!]!
   "Сообщения диалога с userId порядком «новые сверху»; beforeId — подгрузка более старых"
   getMessages(userId: Int!, beforeId: Int, limit: Int!): [Message!]!
-  "Закреплённое сообщение диалога с userId (если есть и видно пользователю)"
-  getPinnedMessage(userId: Int!): Message
+  "Закреплённые сообщения диалога с userId, которые видны пользователю (новые закрепы последними)"
+  getPinnedMessages(userId: Int!): [Message!]!
+  "Поиск по тексту сообщений диалога, новые сверху; beforeId — подгрузка более старых результатов"
+  searchMessages(userId: Int!, query: String!, beforeId: Int, limit: Int!): [Message!]!
+  "В сети ли пользователь и когда был в последний раз"
+  getPresence(userId: Int!): Presence!
+  "Id последнего сообщения, до которого дочитал собеседник (0 — ничего не прочитано)"
+  getPeerRead(userId: Int!): Int!
 }
 type Mutation {
   "replyTo — id сообщения этого же диалога, на которое отвечаем"
@@ -18,10 +24,30 @@ type Mutation {
   deleteMessage(id: Int!, forEveryone: Boolean): Boolean!
   "Переслать сообщение нескольким пользователям (до 10). Файлы не копируются"
   forwardMessage(id: Int!, to: [Int!]!): [Message!]!
-  "Закрепить или открепить сообщение; в диалоге одно закреплённое, видно обоим"
+  "Удалить несколько сообщений (до 30). С forEveryone все должны быть вашими, иначе не удаляется ничего"
+  deleteMessages(ids: [Int!]!, forEveryone: Boolean): Boolean!
+  "Поставить реакцию на сообщение; emoji: null убирает свою реакцию. Повторная та же реакция тоже снимает"
+  reactMessage(id: Int!, emoji: String): Message!
+  "Настройки диалога у себя: без звука, архив, закрепить в списке. Не переданное не меняется"
+  setConversationSettings(userId: Int!, muted: Boolean, archived: Boolean, pinned: Boolean): Boolean!
+  "Переслать несколько сообщений (до 30) нескольким пользователям (до 10), в порядке переписки"
+  forwardMessages(ids: [Int!]!, to: [Int!]!): [Message!]!
+  "Закрепить или открепить сообщение; в диалоге до 10 закреплённых, видно обоим"
   pinMessage(id: Int!, pinned: Boolean!): Boolean!
 }
+type Presence {
+  online: Boolean!
+  lastSeenAt: Date
+}
+type MessageReaction {
+  userId: Int!
+  emoji: String!
+}
 type ConversationItem {
+  "Без звука, в архиве, закреплён вверху списка (настройки каждого участника свои)"
+  muted: Boolean!
+  archived: Boolean!
+  pinned: Boolean!
   user: Owner!
   lastMessage: Message
   unread: Int!
@@ -42,6 +68,7 @@ type Message {
   "Краткое содержимое оригинала; null, если оригинал удалён или недоступен"
   replyTo: ReplyPreview
   attachments: [MessageAttachment!]!
+  reactions: [MessageReaction!]!
 }
 type ReplyPreview {
   id: Int!

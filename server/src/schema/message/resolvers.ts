@@ -12,9 +12,21 @@ const MessageResolvers: Resolvers = {
       const user = await UserController.refresh(res, req.cookies.refreshToken)
       return await MessageController.list(user.id, userId, beforeId ?? undefined, limit)
     },
-    async getPinnedMessage(_, { userId }, { req, res }) {
+    async getPinnedMessages(_, { userId }, { req, res }) {
       const user = await UserController.refresh(res, req.cookies.refreshToken)
       return await MessageController.getPinned(user.id, userId)
+    },
+    async searchMessages(_, { userId, query, beforeId, limit }, { req, res }) {
+      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      return await MessageController.search(user.id, userId, query, beforeId ?? undefined, limit)
+    },
+    async getPresence(_, { userId }, { req, res }) {
+      await UserController.refresh(res, req.cookies.refreshToken)
+      return await MessageController.presence(userId)
+    },
+    async getPeerRead(_, { userId }, { req, res }) {
+      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      return await MessageController.peerRead(user.id, userId)
     },
   },
   Mutation: {
@@ -29,6 +41,22 @@ const MessageResolvers: Resolvers = {
     async forwardMessage(_, { id, to }, { req, res }) {
       const user = await UserController.refresh(res, req.cookies.refreshToken)
       return await MessageController.forward(user.id, id, to)
+    },
+    async deleteMessages(_, { ids, forEveryone }, { req, res }) {
+      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      return await MessageController.deleteMessages(user.id, ids, forEveryone ?? false)
+    },
+    async forwardMessages(_, { ids, to }, { req, res }) {
+      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      return await MessageController.forwardMany(user.id, ids, to)
+    },
+    async reactMessage(_, { id, emoji }, { req, res }) {
+      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      return await MessageController.react(user.id, id, emoji)
+    },
+    async setConversationSettings(_, { userId, muted, archived, pinned }, { req, res }) {
+      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      return await MessageController.setSettings(user.id, userId, { muted, archived, pinned })
     },
     async pinMessage(_, { id, pinned }, { req, res }) {
       const user = await UserController.refresh(res, req.cookies.refreshToken)

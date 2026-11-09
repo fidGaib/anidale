@@ -19,6 +19,10 @@ export const MessagesBridge = () => {
   const applyUpdated = useMessagesStore((s) => s.applyUpdated)
   const applyDeleted = useMessagesStore((s) => s.applyDeleted)
   const applyPinned = useMessagesStore((s) => s.applyPinned)
+  const applyRead = useMessagesStore((s) => s.applyRead)
+  const applyTyping = useMessagesStore((s) => s.applyTyping)
+  const applyReactions = useMessagesStore((s) => s.applyReactions)
+  const applyPresence = useMessagesStore((s) => s.applyPresence)
 
   useEffect(() => {
     if (myId) void loadConversations()
@@ -33,21 +37,37 @@ export const MessagesBridge = () => {
     // Сообщение изменено, удалено или закреплено: обновляем открытый чат и список диалогов
     const onUpdated = ({ message }: { message: Parameters<typeof toMessage>[0] }) => applyUpdated(toMessage(message))
     const onMessagesDeleted = (event: { userA: number; userB: number; ids: number[] }) => applyDeleted(event, myId)
-    const onPinned = (event: { userA: number; userB: number; pinnedMessageId: number | null }) =>
+    const onPinned = (event: { userA: number; userB: number; pinnedIds: number[] }) =>
       applyPinned(event, myId)
     socket.on('newMessage', onNew)
     socket.on('conversationDeleted', onDeleted)
     socket.on('messageUpdated', onUpdated)
     socket.on('messagesDeleted', onMessagesDeleted)
     socket.on('messagePinned', onPinned)
+    const onRead = (event: { reader: number; upTo: number }) => applyRead(event)
+    const onTyping = ({ from }: { from: number }) => applyTyping(from)
+    const onReactions = (event: Parameters<typeof applyReactions>[0]) => applyReactions(event, myId)
+    const onPresence = (event: Parameters<typeof applyPresence>[0]) => applyPresence(event)
+    // Настройки диалога изменены в другой вкладке: подтягиваем список
+    const onSettings = () => void loadConversations()
+    socket.on('messageReactions', onReactions)
+    socket.on('presence', onPresence)
+    socket.on('conversationSettings', onSettings)
+    socket.on('messagesRead', onRead)
+    socket.on('typing', onTyping)
     return () => {
+      socket.off('messageReactions', onReactions)
+      socket.off('presence', onPresence)
+      socket.off('conversationSettings', onSettings)
+      socket.off('messagesRead', onRead)
+      socket.off('typing', onTyping)
       socket.off('newMessage', onNew)
       socket.off('conversationDeleted', onDeleted)
       socket.off('messageUpdated', onUpdated)
       socket.off('messagesDeleted', onMessagesDeleted)
       socket.off('messagePinned', onPinned)
     }
-  }, [socket, isConnected, myId, receive, drop, applyUpdated, applyDeleted, applyPinned])
+  }, [socket, isConnected, myId, receive, drop, applyUpdated, applyDeleted, applyPinned, applyRead, applyTyping, applyReactions, applyPresence, loadConversations])
 
   return null
 }
