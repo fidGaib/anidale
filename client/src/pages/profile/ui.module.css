@@ -1,4 +1,17 @@
-.content {
-  width: 40%;
+.content.content {
+  width: min(1000px, 100%);
   margin: 10px auto;
+}
+
+@media (min-width: 601px) and (max-width: 1300px) {
+  .content.content {
+    width: 70%;
+  }
+}
+
+@media (max-width: 760px) {
+  .content.content {
+    width: 100%;
+    margin: 0 auto 10px;
+  }
 }

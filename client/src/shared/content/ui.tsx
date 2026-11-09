@@ -7,9 +7,9 @@ interface Props extends React.PropsWithChildren {
   id?: string
 }
 
-export const Content: React.FC<Props> = ({ children, id }) => {
+export const Content: React.FC<Props> = ({ children, id, className }) => {
   return (
-    <div className={cl.content} id={id}>
+    <div className={`${cl.content} ${className ?? ''}`} id={id}>
       {children}
     </div>
   )

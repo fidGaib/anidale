@@ -1,39 +1,56 @@
-import { useQuery } from '@apollo/client'
+import { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 
-import { GET_USERS } from '@/shared/graphql/schema'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
 
 import cl from './ui.module.css'
 
-interface UserType {
+export interface FriendUser {
   id: number
-  avatar: string
   login: string
+  avatar: string
 }
-const CardUser = () => {
-  const { data } = useQuery(GET_USERS)
+
+interface UserCardProps {
+  user: FriendUser
+  action?: ReactNode
+}
+
+const UserCard = ({ user, action }: UserCardProps) => (
+  <div className={`playground ${cl.oneUser}`}>
+    <Link to={`/profile/${user.id}`}>
+      <ImageLoading className={cl.wrapAvatar} src={useSrcAvatar(user.avatar)} alt={user.login} />
+      <div className={cl.login}>{user.login}</div>
+    </Link>
+    {action}
+    <Link
+      className={`${cl.toChat} ${action ? cl.toChatWithAction : ''}`}
+      to={`/messages/${user.id}`}
+      title='Написать сообщение'
+    >
+      <ImageLoading src='/icons/chat.svg' alt='anidale chat icon' className={cl.svg} />
+    </Link>
+  </div>
+)
+
+interface UserListProps {
+  users: FriendUser[]
+  loading?: boolean
+  empty: string
+  renderAction?: (user: FriendUser) => ReactNode
+}
+
+const UserList = ({ users, loading, empty, renderAction }: UserListProps) => {
+  if (loading && users.length === 0) return <p className={cl.empty}>Загрузка…</p>
+  if (users.length === 0) return <p className={cl.empty}>{empty}</p>
   return (
     <>
-      {data && data.getUsers && data.getUsers.length > 0 ? (
-        data.getUsers.map(({ id, login, avatar }: UserType) => (
-          <div key={id} className={`playground ${cl.oneUser}`}>
-            <Link to={`/profile/${id}`}>
-              <ImageLoading className={cl.wrapAvatar} src={useSrcAvatar(avatar)} alt='anidale' />
-              <div className={cl.login}>{login}</div>
-            </Link>
-            <Link className={cl.toChat} to={`/messages/${id}`}>
-              <ImageLoading src='/icons/chat.svg' alt='anidale chat icon' className={cl.svg} />
-            </Link>
-            <ImageLoading src='/icons/close.svg' alt='anidale close icon' className={cl.svg} />
-          </div>
-        ))
-      ) : (
-        <></>
-      )}
+      {users.map((user) => (
+        <UserCard key={user.id} user={user} action={renderAction?.(user)} />
+      ))}
     </>
   )
 }
 
-export default CardUser
+export default UserList

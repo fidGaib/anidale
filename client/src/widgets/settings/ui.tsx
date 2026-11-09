@@ -1,71 +1,198 @@
-import { useMutation } from '@apollo/client'
-import { useEffect, useState } from 'react'
-import { useRef } from 'react'
+import { useMutation, useQuery } from '@apollo/client'
+import { useEffect, useRef, useState } from 'react'
 import AvatarEditor from 'react-avatar-editor'
 import Dropzone from 'react-dropzone'
 
 import { useRefreshStore } from '@/app/providers/routes/model'
 import { useSettingsStore } from '@/features/settings/module'
-import { updateUserQuery } from '@/shared/graphql/schema'
+import { PROFILE, UPDATE_COVER, UPDATE_PROFILE, updateUserQuery } from '@/shared/graphql/schema'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
+import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
+import { toTimestamp } from '@/shared/lib/time'
 import { ButtonUI } from '@/shared/ui/button/ui'
 import Input from '@/shared/ui/input'
 
 import cl from './ui.module.css'
 
-// Layout editor login && avatar
+const IMAGE_TYPES = { 'image/*': ['.jpeg', '.jpg', '.png', '.gif', '.webp'] }
+
+type ProfileData = {
+  login?: string | null
+  status?: string | null
+  city?: string | null
+  birthDate?: unknown
+  backgroundImage?: string | null
+}
+
+// Layout editor profile
 export const LayoutLoginAvatar = () => {
+  const me = useRefreshStore((state) => state.refreshData)
+  const { data } = useQuery(PROFILE, {
+    variables: { id: me.id ?? 0 },
+    skip: !me.id,
+    fetchPolicy: 'network-only',
+  })
+  const user = data?.getUser as ProfileData | undefined
+
   return (
     <div className={cl.wrapper}>
+      <EditProfile user={user} />
+      <CoverEditor user={user} />
       <AvatarEditorComponent />
-      <EditLogin />
     </div>
   )
 }
-// Edit Login
-const EditLogin = () => {
-  const [refreshData, setRefreshData] = useRefreshStore((state) => [state.refreshData, state.setRefreshData])
-  const errorInStore = useSettingsStore((state) => state.errorLogin)
-  const setLogin = useSettingsStore((state) => state.setLogin)
-  const [login, isSetLogin] = useState(refreshData.login)
-  //Отслеживаем изменения data и обновляем refreshData
-  const [updateUser, { data, error, loading }] = useMutation(updateUserQuery)
+
+// Основные поля профиля: логин, статус, город и дата рождения
+const EditProfile = ({ user }: { user?: ProfileData }) => {
+  const setRefreshData = useRefreshStore((state) => state.setRefreshData)
+  const [login, setLogin] = useState('')
+  const [status, setStatus] = useState('')
+  const [city, setCity] = useState('')
+  const [birthDate, setBirthDate] = useState('')
+  const [saved, setSaved] = useState(false)
+  const [updateProfile, { loading, error }] = useMutation(UPDATE_PROFILE)
+  // Заполняем форму один раз: после сохранения обложки запрос может обновиться,
+  // и это не должно затирать несохранённые правки.
+  const initialized = useRef(false)
+
   useEffect(() => {
-    if (data?.updateUser && data.updateUser.login !== null) {
-      setRefreshData({ login: data.updateUser.login })
+    if (!user || initialized.current) return
+    initialized.current = true
+    setLogin(user.login ?? '')
+    setStatus(user.status ?? '')
+    setCity(user.city ?? '')
+    const timestamp = toTimestamp(user.birthDate)
+    setBirthDate(timestamp ? new Date(timestamp).toISOString().slice(0, 10) : '')
+  }, [user])
+
+  const save = async () => {
+    setSaved(false)
+    const timestamp = birthDate ? new Date(`${birthDate}T00:00:00.000Z`).getTime() : null
+    try {
+      const result = await updateProfile({
+        variables: { login: login.trim() || null, status, city, birthDate: timestamp },
+      })
+      const updated = result.data?.updateUser
+      if (updated?.login) setRefreshData({ login: updated.login })
+      setSaved(true)
+    } catch {
+      // Текст ошибки берём из состояния мутации
     }
-  }, [data])
-  useEffect(() => {
-    if (!login) return
-    setLogin(login)
-  }, [login])
+  }
+
   return (
-    <>
-      <h2>Информация</h2>
-      <p className={cl.error}>{error?.message || loading ? 'Сохранение...' : errorInStore || error?.message}</p>
-      <div className={cl.editLogin}>
-        <Input
-          type='text'
-          placeholder='Введите логин...'
-          value={login}
-          onChange={(e) => isSetLogin(e.target.value)}
-          required
-        />
-        {refreshData.login !== login ? (
-          <ButtonUI
-            onClick={async () => {
-              await updateUser({ variables: { login, avatar: '' } })
-            }}
-          >
-            Сохранить
-          </ButtonUI>
-        ) : (
-          <></>
-        )}
+    <section className={cl.section}>
+      <h2>Профиль</h2>
+      <p className={cl.error}>{loading ? 'Сохранение...' : error?.message}</p>
+      {saved && !loading && !error && <p className={cl.success}>Сохранено</p>}
+      <div className={cl.form}>
+        <label>
+          Логин
+          <Input type='text' placeholder='Введите логин...' value={login} onChange={(e) => setLogin(e.target.value)} />
+        </label>
+        <label>
+          Статус
+          <Input
+            type='text'
+            placeholder='Пару слов о себе'
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+          />
+        </label>
+        <label>
+          Город
+          <Input type='text' placeholder='Где вы живёте' value={city} onChange={(e) => setCity(e.target.value)} />
+        </label>
+        <label>
+          Дата рождения
+          <Input type='date' value={birthDate} onChange={(e) => setBirthDate(e.target.value)} />
+        </label>
+        <ButtonUI onClick={save} disabled={loading}>
+          Сохранить
+        </ButtonUI>
       </div>
-    </>
+    </section>
   )
 }
+
+// Обложка профиля
+const CoverEditor = ({ user }: { user?: ProfileData }) => {
+  const validateFile = useSettingsStore((state) => state.validateFile)
+  const errorInStore = useSettingsStore((state) => state.errorAvatar)
+  const [file, setFile] = useState<File | null>(null)
+  const [preview, setPreview] = useState('')
+  const [uploadedCover, setUploadedCover] = useState('')
+  const [updateCover, { loading, error }] = useMutation(UPDATE_COVER)
+
+  const storedCover = useSrcAvatar(user?.backgroundImage ?? '')
+  const shownCover = uploadedCover || storedCover
+
+  const handleDrop = async (acceptedFiles: File[]) => {
+    if (!acceptedFiles.length) return
+    if (await validateFile(acceptedFiles)) {
+      setFile(acceptedFiles[0])
+      setPreview(URL.createObjectURL(acceptedFiles[0]))
+    }
+  }
+
+  const saveCover = async () => {
+    if (!file) return
+    try {
+      const result = await updateCover({ variables: { backgroundImage: file } })
+      const path = result.data?.updateUser?.backgroundImage
+      if (path) setUploadedCover(useSrcAvatar(path))
+      setFile(null)
+      setPreview('')
+    } catch {
+      // Текст ошибки берём из состояния мутации
+    }
+  }
+
+  return (
+    <section className={cl.section}>
+      <h2>Обложка профиля</h2>
+      <p className={cl.error}>{loading ? 'Сохранение...' : error?.message || errorInStore}</p>
+
+      <div
+        className={cl.coverPreview}
+        style={shownCover ? { backgroundImage: `url(${shownCover})` } : undefined}
+      >
+        {!shownCover && <span>Обложка пока не загружена</span>}
+      </div>
+
+      {!file ? (
+        <Dropzone onDrop={handleDrop} accept={IMAGE_TYPES}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()} className={cl.coverDrop}>
+              <input {...getInputProps()} />
+              <ImageLoading src='/icons/add_photo.svg' />
+              <span>Выбрать обложку</span>
+            </div>
+          )}
+        </Dropzone>
+      ) : (
+        <>
+          <div className={cl.coverPreview} style={{ backgroundImage: `url(${preview})` }} />
+          <div className={cl.actions}>
+            <ButtonUI
+              onClick={() => {
+                setFile(null)
+                setPreview('')
+              }}
+            >
+              Отмена
+            </ButtonUI>
+            <ButtonUI onClick={saveCover} disabled={loading}>
+              Сохранить
+            </ButtonUI>
+          </div>
+        </>
+      )}
+    </section>
+  )
+}
+
 const AvatarEditorComponent = () => {
   const [image, setImage] = useState<File | string>('')
   const [scale, setScale] = useState(1)
@@ -102,7 +229,7 @@ const AvatarEditorComponent = () => {
   }
 
   const [updateUser, { data, error, loading }] = useMutation(updateUserQuery)
-  const [refreshData, setRefreshData] = useRefreshStore((state) => [state.refreshData, state.setRefreshData])
+  const setRefreshData = useRefreshStore((state) => state.setRefreshData)
   const uploadAvatarToServer = async (file: File) => {
     await updateUser({ variables: { avatar: file }, fetchPolicy: 'network-only' })
   }
@@ -113,11 +240,11 @@ const AvatarEditorComponent = () => {
     }
   }, [data])
   return (
-    <div className={cl.container}>
+    <section className={cl.container}>
       <h2>Изменить фотографию профиля</h2>
       {/* Зона загрузки */}
       {!image && (
-        <Dropzone onDrop={handleDrop} accept={{ 'image/*': ['.jpeg', '.jpg', '.png', '.gif', '.webp'] }}>
+        <Dropzone onDrop={handleDrop} accept={IMAGE_TYPES}>
           {({ getRootProps, getInputProps }) => (
             <div {...getRootProps()} className={cl.dropzone}>
               <input {...getInputProps()} />
@@ -176,7 +303,7 @@ const AvatarEditorComponent = () => {
 
       {/* Кнопки действий */}
       {image && (
-        <div className={`${cl.actions}`}>
+        <div className={cl.actions}>
           <ButtonUI onClick={() => setImage('')} disabled={!image}>
             Удалить
           </ButtonUI>
@@ -185,6 +312,6 @@ const AvatarEditorComponent = () => {
           </ButtonUI>
         </div>
       )}
-    </div>
+    </section>
   )
 }

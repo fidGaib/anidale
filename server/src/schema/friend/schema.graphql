@@ -1,0 +1,18 @@
+# Отношения зрителя с профилем: FRIEND — встречная подписка, SUBSCRIBED — я подписан,
+# SUBSCRIBER — подписаны на меня, NONE — связей нет.
+type FriendState {
+  status: String!
+  friendsCount: Int!
+  subscribersCount: Int!
+}
+
+extend type Query {
+  getFriends(id: Int!, limit: Int, offset: Int): [User!]!
+  getSubscribers(id: Int!, limit: Int, offset: Int): [User!]!
+  getFriendState(id: Int!): FriendState!
+}
+
+extend type Mutation {
+  subscribe(userId: Int!): FriendState!
+  unsubscribe(userId: Int!): FriendState!
+}
