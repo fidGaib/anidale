@@ -6,6 +6,7 @@ import User from '@/db/models/user-model'
 import Video from '@/db/models/video-model'
 
 import { canPublish, canViewCommunity } from '../community/access'
+import { canSeePost } from '../post/visibility'
 import VideoStorageService from './video-service'
 
 const MAX_PAGE_LIMIT = 100
@@ -176,7 +177,9 @@ class VideoService {
     })
     if (!video) throw createGraphQLError('Видео не найдено')
     if (video.ownerId === userId) throw createGraphQLError('Своё видео не нужно сохранять')
-    if (video.post?.archived) throw createGraphQLError('Видео недоступно')
+    if (video.post?.archived || (video.postId && !(await canSeePost(video.postId, userId)))) {
+      throw createGraphQLError('Видео недоступно')
+    }
 
     if (saved) {
       await prisma.savedVideo.upsert({

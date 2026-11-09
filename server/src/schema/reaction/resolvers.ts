@@ -1,20 +1,24 @@
 import ReactionController from '@/api/reaction/controller'
 import UserController from '@/api/user/controller'
+import { getOptionalUserId } from '@/api/user/optional-user'
 import { Resolvers } from '@/schema/resolvers-types'
+import { throttle } from '@/utils/rate-limit'
 
 const ReactionResolvers: Resolvers = {
   Query: {
-    async getComments(_, { postId, limit, page }) {
-      return await ReactionController.getComments(postId, limit, page)
+    async getComments(_, { postId, limit, page }, { req }) {
+      return await ReactionController.getComments(postId, limit, page, await getOptionalUserId(req))
     },
   },
   Mutation: {
     async setLike(_, { id, liked }, { req, res }) {
       const user = await UserController.refresh(res, req.cookies.refreshToken)
+      await throttle('reaction', user.id)
       return await ReactionController.setLike(id, user.id, liked)
     },
     async addComment(_, { postId, text }, { req, res }) {
       const user = await UserController.refresh(res, req.cookies.refreshToken)
+      await throttle('comment', user.id)
       return await ReactionController.addComment(postId, user.id, text)
     },
     async removeComment(_, { id }, { req, res }) {

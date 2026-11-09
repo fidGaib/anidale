@@ -19,6 +19,7 @@ import MusicController from '../music/controller'
 import VideoService from '../video/service'
 import VideoStorageService from '../video/video-service'
 import FileStorageService, { SaveImage } from './file-service'
+import { canSeePost, visiblePostsWhere } from './visibility'
 
 const MAX_PAGE_LIMIT = 50
 /** Сколько треков можно прикрепить к одной записи. */
@@ -194,7 +195,10 @@ class PostService {
     const posts = await Post.findMany({
       take,
       skip,
-      where: { bookmarks: { some: { userId: viewerId } }, OR: [{ archived: false }, { owner: viewerId }] },
+      where: {
+        bookmarks: { some: { userId: viewerId } },
+        AND: [{ OR: [{ archived: false }, { owner: viewerId }] }, visiblePostsWhere(viewerId)],
+      },
       orderBy: { id: 'desc' },
       include: postInclude(viewerId),
     })
@@ -283,11 +287,11 @@ class PostService {
   /** Репост на свою страницу с необязательным комментарием. Репост репоста ссылается на исходный пост. */
   async repost(userId: number, id: number, comment?: string | null) {
     const source = await Post.findUnique({ where: { id } })
-    if (!source || (source.archived && source.owner !== userId)) throw createGraphQLError('Пост не найден')
+    if (!source || !(await canSeePost(id, userId))) throw createGraphQLError('Пост не найден')
     if (!source.repostOfId && source.repostDeleted) throw createGraphQLError('Исходный пост удалён')
     const rootId = source.repostOfId ?? source.id
     const root = source.repostOfId ? await Post.findUnique({ where: { id: rootId } }) : source
-    if (!root || (root.archived && root.owner !== userId)) throw createGraphQLError('Исходный пост недоступен')
+    if (!root || !(await canSeePost(root.id, userId))) throw createGraphQLError('Исходный пост недоступен')
     const text = (comment ?? '').trim()
     if (text.length > MAX_DESCRIPTION) throw createGraphQLError(`Текст длиннее ${MAX_DESCRIPTION} символов`)
     const created = await Post.create({ data: { owner: userId, description: text, repostOfId: rootId } })
@@ -303,7 +307,7 @@ class PostService {
     const list = [...new Set(ids)].slice(0, MAX_VIEW_IDS)
     if (list.length === 0) return []
     const posts = await Post.findMany({
-      where: { id: { in: list }, archived: false },
+      where: { id: { in: list }, archived: false, ...visiblePostsWhere(userId) },
       select: { id: true, owner: true },
     })
     const countable = posts.filter((post) => post.owner !== userId)

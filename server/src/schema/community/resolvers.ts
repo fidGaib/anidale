@@ -5,6 +5,7 @@ import UserController from '@/api/user/controller'
 import { getOptionalUserId } from '@/api/user/optional-user'
 import VideoService from '@/api/video/service'
 import { Resolvers } from '@/schema/resolvers-types'
+import { throttle } from '@/utils/rate-limit'
 
 const CommunityResolvers: Resolvers = {
   Query: {
@@ -54,10 +55,12 @@ const CommunityResolvers: Resolvers = {
   Mutation: {
     async createDiscussionTopic(_, { id, title, text }, { req, res }) {
       const user = await UserController.refresh(res, req.cookies.refreshToken)
+      await throttle('discussion', user.id)
       return await DiscussionService.createTopic(user.id, id, title, text)
     },
     async addDiscussionMessage(_, { topicId, text }, { req, res }) {
       const user = await UserController.refresh(res, req.cookies.refreshToken)
+      await throttle('discussion', user.id)
       return await DiscussionService.addMessage(user.id, topicId, text)
     },
     async removeDiscussionMessage(_, { messageId }, { req, res }) {
@@ -78,6 +81,7 @@ const CommunityResolvers: Resolvers = {
     },
     async createCommunity(_, { name, description, avatar, isClosed }, { req, res }) {
       const user = await UserController.refresh(res, req.cookies.refreshToken)
+      await throttle('createCommunity', user.id)
       return await CommunityService.create(user.id, { name, description, avatar, isClosed })
     },
     async updateCommunity(_, { id, ...input }, { req, res }) {
@@ -86,6 +90,7 @@ const CommunityResolvers: Resolvers = {
     },
     async joinCommunity(_, { id }, { req, res }) {
       const user = await UserController.refresh(res, req.cookies.refreshToken)
+      await throttle('join', user.id)
       return await CommunityService.join(user.id, id)
     },
     async leaveCommunity(_, { id }, { req, res }) {

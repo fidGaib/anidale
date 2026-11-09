@@ -5,21 +5,24 @@ import { Post } from '@/db/models/post-model'
 import { Comment, Like } from '@/db/models/reaction-model'
 import { io } from '@/index'
 
+import { canSeePost } from '../post/visibility'
+
 const MAX_PAGE_LIMIT = 50
 const MAX_COMMENT_LENGTH = 500
 
 const userSelect = { select: { id: true, avatar: true, login: true } }
 
 class ReactionController {
-  private async ensurePost(postId: number) {
+  /** Запись должна существовать и быть видна этому человеку: чужие архивные, предложенные и закрытые — как несуществующие. */
+  private async ensurePost(postId: number, viewerId?: number) {
     const post = await Post.findUnique({ where: { id: postId }, select: { id: true, owner: true } })
-    if (!post) throw createGraphQLError('Пост не найден')
+    if (!post || !(await canSeePost(postId, viewerId))) throw createGraphQLError('Пост не найден')
     return post
   }
 
   /** Идемпотентно: повторный вызов с тем же значением ничего не ломает (двойной клик, гонки). */
   async setLike(postId: number, userId: number, liked: boolean) {
-    const post = await this.ensurePost(postId)
+    const post = await this.ensurePost(postId, userId)
     if (liked) {
       await Like.upsert({
         where: { userId_postId: { userId, postId } },
@@ -36,7 +39,8 @@ class ReactionController {
     return { liked, likesCount }
   }
 
-  async getComments(postId: number, limit: number, page: number) {
+  async getComments(postId: number, limit: number, page: number, viewerId?: number) {
+    if (!(await canSeePost(postId, viewerId))) return []
     const take = Math.min(Math.max(Math.trunc(limit) || 1, 1), MAX_PAGE_LIMIT)
     const skip = Math.max(Math.trunc(page) || 0, 0) * take
     return await Comment.findMany({
@@ -54,7 +58,7 @@ class ReactionController {
     if (clean.length > MAX_COMMENT_LENGTH) {
       throw createGraphQLError(`Комментарий длиннее ${MAX_COMMENT_LENGTH} символов`)
     }
-    const post = await this.ensurePost(postId)
+    const post = await this.ensurePost(postId, userId)
     const comment = await Comment.create({
       data: { postId, userId, text: clean },
       include: { user: userSelect },

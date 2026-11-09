@@ -2,6 +2,7 @@ import StoryController from '@/api/story/controller'
 import UserController from '@/api/user/controller'
 import { getOptionalUserId } from '@/api/user/optional-user'
 import { Resolvers } from '@/schema/resolvers-types'
+import { throttle } from '@/utils/rate-limit'
 
 const StoryResolvers: Resolvers = {
   Query: {
@@ -19,6 +20,7 @@ const StoryResolvers: Resolvers = {
   Mutation: {
     async createStory(_, { image, text, communityId }, { req, res }) {
       const user = await UserController.refresh(res, req.cookies.refreshToken)
+      await throttle('upload', user.id)
       return await StoryController.create(user.id, image, text, communityId)
     },
     async viewStory(_, { id }, { req, res }) {

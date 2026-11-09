@@ -8,6 +8,7 @@ import User from '@/db/models/user-model'
 
 import { canManageContent, canPublish, canViewCommunity } from '../community/access'
 import FileStorageService from '../post/file-service'
+import { canSeePost } from '../post/visibility'
 
 const MAX_PAGE_LIMIT = 100
 const clampLimit = (limit?: number | null) => Math.min(Math.max(limit ?? 30, 1), MAX_PAGE_LIMIT)
@@ -280,11 +281,12 @@ class PhotoService {
     if (source === 'POST') {
       const image = await PostImage.findUnique({
         where: { id },
-        select: { id: true, post: { select: { owner: true, archived: true } } },
+        select: { id: true, postId: true, post: { select: { owner: true, archived: true } } },
       })
       if (!image) throw createGraphQLError('Фотография не найдена')
       if (image.post.owner === userId) throw createGraphQLError('Своё фото не нужно сохранять')
-      if (image.post.archived) throw createGraphQLError('Фотография недоступна')
+      if (image.post.archived || !(await canSeePost(image.postId, userId)))
+        throw createGraphQLError('Фотография недоступна')
 
       if (saved) {
         await prisma.savedPhoto.upsert({

@@ -2,11 +2,11 @@ import { createGraphQLError } from 'graphql-yoga'
 
 import NotificationController from '@/api/notification/controller'
 import { storagePath } from '@/config'
-import prisma from '@/db/db'
 import { Music } from '@/db/models/music-model'
 import { io } from '@/index'
 
 import { canManageContent, canPublish, canViewCommunity } from '../community/access'
+import { canSeePost } from '../post/visibility'
 import AudioStorageService from './audio-service'
 
 const MAX_PAGE_LIMIT = 50
@@ -146,7 +146,7 @@ class MusicController {
       throw createGraphQLError('Трек не найден')
     }
     // Трек из записи можно взять к себе, если запись вам видна
-    if (source.postId && !(await this.canSeePost(source.postId, userId))) throw createGraphQLError('Трек не найден')
+    if (source.postId && !(await canSeePost(source.postId, userId))) throw createGraphQLError('Трек не найден')
     if (source.owner === userId && !source.communityId && !source.postId) {
       throw createGraphQLError('Этот трек уже в вашем профиле')
     }
@@ -199,17 +199,6 @@ class MusicController {
     const tracks = await Music.findMany({ where: { communityId }, select: { id: true, file: true } })
     await Music.deleteMany({ where: { communityId } })
     for (const track of tracks) await this.removeFileIfUnused(track.file)
-  }
-
-  /** Запись с треком видна просматривающему: не в архиве чужого, не предложка, не закрытое сообщество. */
-  private async canSeePost(postId: number, viewerId: number) {
-    const post = await prisma.post.findUnique({
-      where: { id: postId },
-      select: { owner: true, archived: true, suggested: true, communityId: true },
-    })
-    if (!post) return false
-    if ((post.archived || post.suggested) && post.owner !== viewerId) return false
-    return post.communityId ? await canViewCommunity(post.communityId, viewerId) : true
   }
 
   /** Удаляет файлы, которые после удаления записи или сообщества больше никому не нужны. */

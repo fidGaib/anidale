@@ -95,7 +95,9 @@ class TokenService {
       sameSite?: 'Strict' | 'Lax' | 'None'
     } = {},
   ) {
-    const { maxAge, path = '/', httpOnly, secure, sameSite } = options
+    // По умолчанию Lax: куку не отправят при межсайтовых запросах, которые меняют данные (защита от CSRF).
+    // Secure включается в продакшене, где сайт работает по HTTPS.
+    const { maxAge, path = '/', httpOnly, secure = process.env.NODE_ENV === 'production', sameSite = 'Lax' } = options
     const parts: string[] = []
     // Имя и значение
     parts.push(`${name}=${encodeURIComponent(value)}`)

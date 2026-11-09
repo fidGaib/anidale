@@ -2,6 +2,7 @@ import postController from '@/api/post/controller'
 import UserController from '@/api/user/controller'
 import { getOptionalUserId } from '@/api/user/optional-user'
 import { Resolvers } from '@/schema/resolvers-types'
+import { throttle } from '@/utils/rate-limit'
 
 const PostResolvers: Resolvers = {
   Query: {
@@ -25,6 +26,7 @@ const PostResolvers: Resolvers = {
     async createPost(_, { post }, ctx) {
       const { req, res } = ctx
       const user = await UserController.refresh(res, req.cookies.refreshToken)
+      await throttle('post', user.id)
       const { description, images, videos, communityId, music, musicIds, videoIds } = post
       const postData = await postController.create(
         user.id,
@@ -68,6 +70,7 @@ const PostResolvers: Resolvers = {
     },
     async repostPost(_, { id, comment }, ctx) {
       const user = await UserController.refresh(ctx.res, ctx.req.cookies.refreshToken)
+      await throttle('post', user.id)
       return await postController.repost(user.id, id, comment)
     },
     async viewPosts(_, { ids }, ctx) {

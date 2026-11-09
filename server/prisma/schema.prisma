@@ -575,3 +575,12 @@ model CommunityContact {
 
   @@unique([communityId, userId])
 }
+
+// Счётчик ограничителя частоты: key = «действие:субъект», окно закрывается в resetAt
+model RateLimit {
+  key     String   @id
+  count   Int      @default(0)
+  resetAt DateTime
+
+  @@index([resetAt])
+}

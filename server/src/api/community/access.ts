@@ -67,3 +67,10 @@ export const isBanned = async (communityId: number, userId: number): Promise<boo
     where: { communityId_userId: { communityId, userId } },
     select: { id: true },
   })) !== null
+
+/** Сообщество закрытое. Для записи без сообщества (null) — нет. */
+export const isClosedCommunity = async (communityId: number | null | undefined): Promise<boolean> => {
+  if (!communityId) return false
+  const community = await prisma.community.findUnique({ where: { id: communityId }, select: { isClosed: true } })
+  return !!community?.isClosed
+}

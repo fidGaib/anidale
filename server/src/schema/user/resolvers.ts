@@ -1,5 +1,6 @@
 import UserController from '@/api/user/controller'
 import { Resolvers, TypeUpdateUser, User } from '@/schema/resolvers-types'
+import { clientIp, resetLimit, throttle } from '@/utils/rate-limit'
 
 const UserResolvers: Resolvers = {
   Query: {
@@ -18,10 +19,21 @@ const UserResolvers: Resolvers = {
   },
   Mutation: {
     async registration(_, args, { req, res }) {
+      await throttle('registration', clientIp(req))
       return await UserController.registration(args.user, req, res)
     },
     async login(_, args, { req, res }) {
-      return await UserController.login(args.user, req, res)
+      const ip = clientIp(req)
+      const email = String(args.user.email ?? '')
+        .trim()
+        .toLowerCase()
+      // Подбор пароля: ограничиваем и попытки под одной почтой, и общий поток с одного адреса
+      await throttle('login', `${ip}:${email}`)
+      await throttle('loginIp', ip)
+      const result = await UserController.login(args.user, req, res)
+      // Успешный вход: счётчик этой почты начинается заново
+      await resetLimit('login', `${ip}:${email}`)
+      return result
     },
     async updateUser(_, { user }, { req, res }) {
       const tokienData = await UserController.refresh(res, req.cookies.refreshToken)

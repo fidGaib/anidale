@@ -8,6 +8,7 @@ import { parseCookies } from './handlers/cookie-parser'
 import { applyCors, getAllowedOrigins } from './handlers/cors'
 import { serveStatic } from './handlers/file-upload'
 import { markConnected, markDisconnected, presenceRoom } from './handlers/presence'
+import { storageAuth } from './handlers/storage-auth'
 import { yoga } from './schema'
 
 const server = http.createServer()
@@ -30,6 +31,18 @@ server.on('request', async (req, res) => {
       return
     }
     applyCors(req, res)
+    // Заголовки безопасности для всех ответов: браузер не должен угадывать тип файла и вставлять сайт во фреймы
+    res.setHeader('X-Content-Type-Options', 'nosniff')
+    res.setHeader('X-Frame-Options', 'DENY')
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin')
+    if (process.env.NODE_ENV === 'production') {
+      res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')
+    }
+    // Проверка доступа к файлам для nginx
+    if (req.url?.startsWith('/_storage-auth')) {
+      await storageAuth(req, res)
+      return
+    }
     if (serveStatic(req, res)) {
       return
     }

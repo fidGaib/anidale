@@ -3,6 +3,7 @@ import { createGraphQLError } from 'graphql-yoga'
 import NotificationController from '@/api/notification/controller'
 import { io } from '@/index'
 
+import { isClosedCommunity } from '../community/access'
 import { notifyAdmins } from '../community/notify'
 import PostService, { WALL_KINDS } from './service'
 
@@ -42,7 +43,9 @@ class PostController {
       await notifyAdmins(postData.post.communityId, owner, 'community_suggest', { postId: postData.post.id })
       return postData
     }
-    // Остальные клиенты узнают о новом посте: лента покажет кнопку, профиль автора добавит пост
+    // Остальные клиенты узнают о новом посте: лента покажет кнопку, профиль автора добавит пост.
+    // Записи закрытых сообществ по сокету никому не рассылаются: их увидят только участники при загрузке стены
+    if (await isClosedCommunity(postData.post.communityId)) return postData
     io.emit('newPost', {
       post: {
         ...postData.post,

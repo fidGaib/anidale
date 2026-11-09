@@ -4,6 +4,9 @@ import * as mime from 'mime-types'
 import * as path from 'path'
 import { fileURLToPath } from 'url'
 
+import { canAccessFile, cleanRelative, viewerFromCookies } from '../api/storage/access'
+import { parseCookies } from './cookie-parser'
+
 // Получаем __dirname для ES‑модулей
 export const __dirname = fileURLToPath(new URL('../../', import.meta.url))
 
@@ -23,12 +26,43 @@ export const serveStatic = (req: http.IncomingMessage, res: http.ServerResponse)
   const normalizedPath = path.normalize(filePath)
 
   // Проверяем, что файл находится внутри разрешённой директории
-  if (!normalizedPath.startsWith(path.join(__dirname, 'storage'))) {
+  // С разделителем на конце: иначе соседняя папка вроде storage-private тоже прошла бы по префиксу
+  if (!normalizedPath.startsWith(path.join(__dirname, 'storage') + path.sep)) {
     res.writeHead(403)
     res.end('Forbidden')
     return true
   }
 
+  const relative = cleanRelative(relativePath)
+  const allowed = relative
+    ? viewerFromCookies(parseCookies(req)).then((viewerId) => canAccessFile(relative, viewerId))
+    : Promise.resolve(false)
+  void allowed.then(
+    (ok) => {
+      if (!ok) {
+        // Для постороннего файл выглядит как несуществующий
+        res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' })
+        res.end('Not Found')
+        return
+      }
+      sendFile(req, res, normalizedPath, relativePath, requestUrl)
+    },
+    () => {
+      res.writeHead(500)
+      res.end('Internal Server Error')
+    },
+  )
+
+  return true // Запрос обработан
+}
+
+const sendFile = (
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+  normalizedPath: string,
+  relativePath: string,
+  requestUrl: URL,
+) => {
   fs.stat(normalizedPath, (err, stats) => {
     if (err || !stats.isFile()) {
       res.writeHead(404)
@@ -105,12 +139,11 @@ export const serveStatic = (req: http.IncomingMessage, res: http.ServerResponse)
       'Content-Length': end - start + 1,
       'Accept-Ranges': 'bytes',
       'X-Content-Type-Options': 'nosniff',
-      'Cache-Control': 'public, max-age=31536000', // Кеширование на год
+      // Файл может быть виден не всем: общие кэши (прокси) его хранить не должны, браузеру — на сутки
+      'Cache-Control': 'private, max-age=86400',
       ...(partial ? { 'Content-Range': `bytes ${start}-${end}/${stats.size}` } : {}),
     })
 
     fileStream.pipe(res)
   })
-
-  return true // Запрос обработан
 }

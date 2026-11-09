@@ -2,6 +2,7 @@ import MusicController from '@/api/music/controller'
 import UserController from '@/api/user/controller'
 import { getOptionalUserId } from '@/api/user/optional-user'
 import { Resolvers } from '@/schema/resolvers-types'
+import { throttle } from '@/utils/rate-limit'
 
 const PostResolvers: Resolvers = {
   Query: {
@@ -26,6 +27,7 @@ const PostResolvers: Resolvers = {
     },
     async createMusic(_, { music }, { req, res }) {
       const user = await UserController.refresh(res, req.cookies.refreshToken)
+      await throttle('upload', user.id)
       const { title, artist, file, communityId } = music
       return await MusicController.create(user.id, title, artist ?? undefined, file, communityId)
     },

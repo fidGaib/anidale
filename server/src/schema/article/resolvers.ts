@@ -2,6 +2,7 @@ import ArticleController from '@/api/article/controller'
 import UserController from '@/api/user/controller'
 import { getOptionalUserId } from '@/api/user/optional-user'
 import { Resolvers } from '@/schema/resolvers-types'
+import { throttle } from '@/utils/rate-limit'
 
 const ArticleResolvers: Resolvers = {
   Query: {
@@ -12,6 +13,7 @@ const ArticleResolvers: Resolvers = {
   Mutation: {
     async createArticle(_, { article }, { req, res }) {
       const user = await UserController.refresh(res, req.cookies.refreshToken)
+      await throttle('post', user.id)
       return (await ArticleController.create(user.id, article)) as never
     },
     async editArticle(_, { article }, { req, res }) {

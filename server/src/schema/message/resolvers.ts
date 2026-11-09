@@ -1,6 +1,7 @@
 import MessageController from '@/api/message/controller'
 import UserController from '@/api/user/controller'
 import { Resolvers } from '@/schema/resolvers-types'
+import { throttle } from '@/utils/rate-limit'
 
 const MessageResolvers: Resolvers = {
   Query: {
@@ -48,6 +49,7 @@ const MessageResolvers: Resolvers = {
     },
     async forwardMessages(_, { ids, to }, { req, res }) {
       const user = await UserController.refresh(res, req.cookies.refreshToken)
+      await throttle('message', user.id)
       return await MessageController.forwardMany(user.id, ids, to)
     },
     async reactMessage(_, { id, emoji }, { req, res }) {
@@ -64,6 +66,7 @@ const MessageResolvers: Resolvers = {
     },
     async sendMessage(_, { to, text, files, replyTo }, { req, res }) {
       const user = await UserController.refresh(res, req.cookies.refreshToken)
+      await throttle('message', user.id)
       return await MessageController.send(user.id, to, text ?? undefined, files ?? undefined, replyTo ?? undefined)
     },
     async deleteConversation(_, { userId, forEveryone }, { req, res }) {

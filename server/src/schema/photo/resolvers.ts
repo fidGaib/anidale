@@ -2,6 +2,7 @@ import PhotoController from '@/api/photo/controller'
 import UserController from '@/api/user/controller'
 import { getOptionalUserId } from '@/api/user/optional-user'
 import { Resolvers } from '@/schema/resolvers-types'
+import { throttle } from '@/utils/rate-limit'
 
 const PhotoResolvers: Resolvers = {
   Query: {
@@ -18,7 +19,9 @@ const PhotoResolvers: Resolvers = {
   },
   Mutation: {
     async createPhoto(_, { image, communityId }, { req }) {
-      return await PhotoController.create(await getOptionalUserId(req), image, communityId)
+      const userId = await getOptionalUserId(req)
+      if (userId) await throttle('upload', userId)
+      return await PhotoController.create(userId, image, communityId)
     },
     async removePhoto(_, { id }, { req }) {
       return await PhotoController.remove(await getOptionalUserId(req), id)

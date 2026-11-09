@@ -14,11 +14,15 @@ const LIBUV_MAX_THREADS = 1024
 const threads =
   process.env.UV_THREADPOOL_SIZE || String(Math.min(os.availableParallelism(), LIBUV_MAX_THREADS))
 
+// `--prod` запускает сервер в боевом режиме: NODE_ENV=production (без интроспекции GraphQL, с Secure-куками и HSTS)
+const args = process.argv.slice(2).filter((arg) => arg !== '--prod')
+const production = process.argv.includes('--prod')
+
 const viteNode = fileURLToPath(new URL('../node_modules/vite-node/dist/cli.mjs', import.meta.url))
 
-const child = spawn(process.execPath, [viteNode, ...process.argv.slice(2)], {
+const child = spawn(process.execPath, [viteNode, ...args], {
   stdio: 'inherit',
-  env: { ...process.env, UV_THREADPOOL_SIZE: threads },
+  env: { ...process.env, UV_THREADPOOL_SIZE: threads, ...(production ? { NODE_ENV: 'production' } : {}) },
 })
 
 // Сигналы передаём дочернему процессу, чтобы сервер корректно завершался

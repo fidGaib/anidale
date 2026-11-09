@@ -1,5 +1,6 @@
 import { io } from '@/index'
 
+import { isClosedCommunity } from '../community/access'
 import ArticleService from './service'
 
 type CreateInput = Parameters<typeof ArticleService.create>[1]
@@ -9,7 +10,8 @@ class ArticleController {
   async create(owner: number, input: CreateInput) {
     const post = await ArticleService.create(owner, input)
     // Остальные клиенты увидят новую статью на стене и в ленте, как любой пост
-    if (post) io.emit('newPost', { post })
+    // Статьи закрытого сообщества по сокету не рассылаются
+    if (post && !(await isClosedCommunity(post.communityId))) io.emit('newPost', { post })
     return post
   }
   async edit(userId: number, id: number, input: EditInput) {

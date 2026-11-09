@@ -9,6 +9,7 @@
     "test:watch": "vitest",
     "dev": "node scripts/start.mjs -w src/index.ts",
     "start": "node scripts/start.mjs src/index.ts",
+    "start:prod": "node scripts/start.mjs --prod src/index.ts",
     "build": "vite-node build",
     "preview": "vite-node preview",
     "codegen": "graphql-codegen -w",

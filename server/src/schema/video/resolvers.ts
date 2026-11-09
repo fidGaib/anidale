@@ -2,6 +2,7 @@ import UserController from '@/api/user/controller'
 import { getOptionalUserId } from '@/api/user/optional-user'
 import VideoController from '@/api/video/controller'
 import { Resolvers } from '@/schema/resolvers-types'
+import { throttle } from '@/utils/rate-limit'
 
 const VideoResolvers: Resolvers = {
   Query: {
@@ -22,6 +23,7 @@ const VideoResolvers: Resolvers = {
   Mutation: {
     async createVideo(_, { file, title, communityId }, { req, res }) {
       const user = await UserController.refresh(res, req.cookies.refreshToken)
+      await throttle('upload', user.id)
       return await VideoController.create(user.id, file, title, communityId)
     },
     async removeVideo(_, { id }, { req, res }) {
