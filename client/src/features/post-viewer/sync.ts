@@ -14,6 +14,8 @@ export interface PostPatch {
   bookmarked?: boolean
   views?: number
   repostsCount?: number
+  /** Из поста удалили видео с этим id: убрать ролик из карточки. */
+  removedVideoId?: number
   /** Пост удалён: убрать отовсюду. */
   removed?: boolean
 }

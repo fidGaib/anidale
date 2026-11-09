@@ -1,12 +1,12 @@
 import { create } from 'zustand'
 
 import { client } from '@/app/providers/apollo-client'
-import { BOOKMARKS, POSTS, POST_BY_USER } from '@/shared/graphql/schema'
+import { BOOKMARKS, POSTS, POSTS_BY_COMMUNITY, POST_BY_USER } from '@/shared/graphql/schema'
 import { UploadProgressEvent, toPercent } from '@/shared/lib/progress-fetch'
 import { toTimestamp } from '@/shared/lib/time'
 import { validateUpload } from '@/shared/lib/upload-limits'
 
-import { Post, PostStore } from './types'
+import { Post, PostStore, WallKind } from './types'
 
 interface RawPost {
   id?: number | null
@@ -23,6 +23,8 @@ interface RawPost {
   repostsCount?: number | null
   bookmarked?: boolean | null
   repostDeleted?: boolean | null
+  article?: { id: number; title: string; cover: string; excerpt: string } | null
+  community?: { id: number; name: string; avatar: string } | null
   repostOf?: {
     id?: number | null
     description?: string | null
@@ -103,6 +105,8 @@ export const toPost = (post: RawPost): Post => ({
   repostsCount: post.repostsCount ?? 0,
   bookmarked: post.bookmarked ?? false,
   repostDeleted: post.repostDeleted ?? false,
+  article: post.article ?? null,
+  community: post.community ?? null,
   repostOf: post.repostOf
     ? {
         id: post.repostOf.id ?? 0,
@@ -162,14 +166,22 @@ export const usePostStore = create<PostStore>()((set, get) => ({
 
     return (data.getPosts ?? []).map(toPost)
   },
-  fetchPostsProfile: async (id: number, page: number, limit: number) => {
+  fetchPostsProfile: async (id: number, page: number, limit: number, kind: WallKind = 'all', search = '') => {
     const { data } = await client.query({
       query: POST_BY_USER,
-      variables: { id, limit, page },
+      variables: { id, limit, page, kind, search: search.trim() || null },
       fetchPolicy: 'network-only',
     })
 
     return (data.getPostsByUser ?? []).map(toPost)
+  },
+  fetchPostsCommunity: async (id: number, page: number, limit: number) => {
+    const { data } = await client.query({
+      query: POSTS_BY_COMMUNITY,
+      variables: { id, limit, page },
+      fetchPolicy: 'network-only',
+    })
+    return (data.getCommunityPosts ?? []).map(toPost)
   },
   setFiles: async (fileList) => {
     get().setError('')
@@ -197,15 +209,15 @@ export const usePostStore = create<PostStore>()((set, get) => ({
   removeVideo: (video) => {
     set(() => ({ videos: get().videos.filter((item) => item !== video) }))
   },
-  send: async (schemaFn, owner) => {
+  send: async (schemaFn, owner, communityId) => {
     const hasImages = get().images.length > 0
     const hasVideos = get().videos.length > 0
     if (!get().description.trim() && !hasImages && !hasVideos) return
     // Прогресс показываем только когда есть что загружать
     if (hasImages || hasVideos) set({ uploadProgress: 0 })
     try {
-      const res: any = await schemaFn({
-        variables: { owner, description: get().description, images: get().images, videos: get().videos },
+      const res = await schemaFn({
+        variables: { owner, description: get().description, images: get().images, videos: get().videos, communityId },
         context:
           hasImages || hasVideos
             ? {
@@ -213,7 +225,7 @@ export const usePostStore = create<PostStore>()((set, get) => ({
               }
             : undefined,
       })
-      const created = res?.data?.createPost
+      const created = res?.data?.createPost as RawPost | null | undefined
       set(() => ({
         description: '',
         images: [],

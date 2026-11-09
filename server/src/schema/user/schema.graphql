@@ -22,6 +22,10 @@ type User {
   avatar: String!
   status: String
   city: String
+  work: String
+  education: String
+  about: String
+  website: String
   birthDate: Date
   activationLink: String
   isActivated: Boolean
@@ -43,6 +47,10 @@ type typeUpdateUser {
   avatar: FILE
   status: String
   city: String
+  work: String
+  education: String
+  about: String
+  website: String
   birthDate: Date
   backgroundImage: String
   activationLink: String
@@ -55,6 +63,10 @@ input UpdateUser {
   avatar: FILE
   status: String
   city: String
+  work: String
+  education: String
+  about: String
+  website: String
   birthDate: Date
   backgroundImage: FILE
   activationLink: String

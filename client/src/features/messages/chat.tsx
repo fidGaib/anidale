@@ -50,7 +50,7 @@ export const Chat = ({ userId }: { userId: number }) => {
   const clearSelection = useMessagesStore((s) => s.clearSelection)
   const deleteMessages = useMessagesStore((s) => s.deleteMessages)
   const navigate = useNavigate()
-  const { ask, modal } = useDeleteDialog(() => navigate('/messages'))
+  const { modal } = useDeleteDialog(() => navigate('/messages'))
   // Меню действий над сообщением и окно пересылки
   const [menu, setMenu] = useState<{ x: number; y: number; message: ChatMessage } | null>(null)
   const [forwardIds, setForwardIds] = useState<number[] | null>(null)

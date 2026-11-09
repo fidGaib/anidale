@@ -1,0 +1,58 @@
+.emojiPanel {
+  position: absolute;
+  bottom: 42px;
+  left: 0;
+  z-index: 20;
+  width: 300px;
+  padding: 6px;
+  border-radius: 12px;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.3);
+}
+
+.emojiTabs {
+  display: flex;
+  gap: 2px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.3);
+}
+
+.emojiTab {
+  flex: 1;
+  padding: 4px 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.emojiTabActive {
+  background: rgba(128, 128, 128, 0.3);
+}
+
+.emojiGrid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  max-height: 200px;
+  margin-top: 4px;
+  overflow-y: auto;
+}
+
+.emojiItem {
+  padding: 3px 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.emojiItem:hover {
+  background: rgba(128, 128, 128, 0.25);
+}
+
+@media (max-width: 600px) {
+  .emojiPanel {
+    width: min(300px, 85vw);
+  }
+}

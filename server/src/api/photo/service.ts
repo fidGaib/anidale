@@ -6,6 +6,7 @@ import Photo from '@/db/models/photo-model'
 import { PostImage } from '@/db/models/post-model'
 import User from '@/db/models/user-model'
 
+import { canViewCommunity, isCommunityAdmin } from '../community/access'
 import FileStorageService from '../post/file-service'
 
 const MAX_PAGE_LIMIT = 100
@@ -65,7 +66,8 @@ class PhotoService {
 
   /** Условие по постам: архив виден только их автору. */
   private postWhere(id: number, viewerId?: number) {
-    return { owner: id, ...(viewerId === id ? {} : { archived: false }) }
+    // Записи сообществ и их альбомы к личной странице не относятся
+    return { owner: id, communityId: null, ...(viewerId === id ? {} : { archived: false }) }
   }
 
   /**
@@ -97,7 +99,7 @@ class PhotoService {
         },
       }),
       Photo.findMany({
-        where: { userId: id },
+        where: { userId: id, communityId: null },
         orderBy: [{ date: 'desc' }, { id: 'desc' }],
         take: perSource,
       }),
@@ -121,11 +123,44 @@ class PhotoService {
     return await withSaved(page, viewerId)
   }
 
+  /** Фото сообщества: снимки из его записей и альбом. Закрытое сообщество показывает их только участникам. */
+  async listCommunity(communityId: number, limit?: number | null, offset?: number | null, viewerId?: number) {
+    if (!(await canViewCommunity(communityId, viewerId))) return []
+    const take = clampLimit(limit)
+    const skip = clampOffset(offset)
+    const perSource = skip + take
+    const [postImages, albumPhotos] = await Promise.all([
+      PostImage.findMany({
+        where: { post: { communityId, archived: false, suggested: false } },
+        orderBy: [{ date: 'desc' }, { id: 'desc' }],
+        take: perSource,
+        select: {
+          id: true,
+          high: true,
+          medium: true,
+          small: true,
+          vertical: true,
+          type: true,
+          date: true,
+          postId: true,
+          post: { select: { owner: true } },
+        },
+      }),
+      Photo.findMany({ where: { communityId }, orderBy: [{ date: 'desc' }, { id: 'desc' }], take: perSource }),
+    ])
+    const photos: Omit<PhotoView, 'saved' | 'savedAt'>[] = [
+      ...postImages.map(({ post, ...image }) => ({ ...image, source: 'POST' as const, ownerId: post.owner })),
+      ...albumPhotos.map((photo) => ({ ...photo, source: 'ALBUM' as const, postId: null, ownerId: photo.userId })),
+    ]
+    const page = photos.sort((a, b) => b.date.getTime() - a.date.getTime() || b.id - a.id).slice(skip, skip + take)
+    return await withSaved(page, viewerId)
+  }
+
   async count(id: number, viewerId?: number) {
     await this.assertUser(id)
     const [posts, album] = await Promise.all([
       PostImage.count({ where: { post: this.postWhere(id, viewerId) } }),
-      Photo.count({ where: { userId: id } }),
+      Photo.count({ where: { userId: id, communityId: null } }),
     ])
     return posts + album
   }
@@ -187,8 +222,11 @@ class PhotoService {
     return result
   }
 
-  async create(userId: number, image: File) {
+  async create(userId: number, image: File, communityId?: number | null) {
     if (!image) throw createGraphQLError('Выберите фотографию')
+    if (communityId && !(await isCommunityAdmin(communityId, userId))) {
+      throw createGraphQLError('Добавлять фото в сообщество могут только администраторы')
+    }
     if (!image.type.startsWith('image/')) throw createGraphQLError('Можно загрузить только изображение')
 
     const storage = new FileStorageService(storagePath)
@@ -197,6 +235,7 @@ class PhotoService {
       const photo = await Photo.create({
         data: {
           userId,
+          communityId: communityId || null,
           high: saved.high,
           medium: saved.medium,
           small: saved.small,
@@ -216,7 +255,9 @@ class PhotoService {
   async remove(userId: number, id: number) {
     const photo = await Photo.findUnique({ where: { id } })
     if (!photo) throw createGraphQLError('Фотография не найдена')
-    if (photo.userId !== userId) throw createGraphQLError('Нет доступа')
+    const allowed =
+      photo.userId === userId || (!!photo.communityId && (await isCommunityAdmin(photo.communityId, userId)))
+    if (!allowed) throw createGraphQLError('Нет доступа')
 
     await Photo.delete({ where: { id } })
     try {
@@ -224,7 +265,7 @@ class PhotoService {
         high: photo.high,
         medium: photo.medium,
         small: photo.small,
-      } as never)
+      })
     } catch (error) {
       // Файла может уже не быть — запись в БД всё равно должна удалиться
       console.error('Не удалось удалить файлы фотографии', id, error)

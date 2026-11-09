@@ -153,15 +153,6 @@
   opacity: 0.5;
 }
 
-.meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 14px;
-  margin-top: 6px;
-  font-size: 13px;
-  opacity: 0.65;
-}
-
 .actions {
   display: flex;
   align-items: center;
@@ -216,10 +207,17 @@
 .counters {
   display: flex;
   gap: 28px;
-  padding: 14px var(--head-pad) 0 calc(var(--head-pad) + var(--avatar-size) + var(--head-gap));
+  padding: 14px var(--head-pad) 16px calc(var(--head-pad) + var(--avatar-size) + var(--head-gap));
 }
 
 .counter {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  cursor: default;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -234,58 +232,29 @@
   opacity: 0.55;
 }
 
-/* ---------- Вкладки ---------- */
-
-.tabs {
-  display: flex;
-  gap: 4px;
-  margin-top: 14px;
-  padding: 10px 12px 0;
-  border-top: 1px solid rgba(128, 128, 128, 0.15);
-  overflow-x: auto;
-  scrollbar-width: none;
+.counterLink:not(:disabled) {
+  cursor: pointer;
 }
 
-.tabs::-webkit-scrollbar {
-  display: none;
+.counterLink:not(:disabled):hover b {
+  color: var(--accent);
 }
 
-.tab {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
+.backToWall {
+  display: block;
+  margin-bottom: 10px;
+  padding: 6px 12px;
   border: 0;
-  border-radius: 8px 8px 0 0;
-  background: transparent;
+  border-radius: 8px;
+  background: rgba(128, 128, 128, 0.12);
   color: inherit;
   font-family: var(--font-text-main);
-  font-size: 14px;
-  white-space: nowrap;
+  font-size: 13px;
   cursor: pointer;
-  opacity: 0.6;
-  transition: background 0.2s, opacity 0.2s;
 }
 
-.tab:hover {
-  background: rgba(128, 128, 128, 0.1);
-}
-
-.tabActive {
-  opacity: 1;
+.backToWall:hover {
   color: var(--accent);
-  box-shadow: inset 0 -2px 0 var(--accent);
-}
-
-.tabIcon {
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-}
-
-.tabIcon img {
-  width: 100%;
-  height: 100%;
 }
 
 /* ---------- Пустое состояние вкладки ---------- */
@@ -393,8 +362,54 @@
     gap: 18px;
     padding-left: var(--head-pad);
   }
+}
 
-  .tab {
-    padding: 8px 12px;
+/* Две колонки: слева содержимое вкладок, справа моменты и друзья */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 12px;
+  align-items: start;
+}
+
+.main {
+  min-width: 0;
+}
+
+.aside {
+  min-width: 0;
+}
+
+@media (max-width: 1100px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
   }
+}
+
+/* Точка «в сети» у аватара и строка статуса присутствия */
+.avatarWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.onlineDot {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 3;
+  width: 22px;
+  height: 22px;
+  border: 4px solid #fff;
+  border-radius: 50%;
+  background: #4caf50;
+}
+
+.presence {
+  display: block;
+  color: gray;
+  font-size: 13px;
+}
+
+.presenceOnline {
+  color: #4caf50;
 }

@@ -1,0 +1,53 @@
+.card {
+  display: block;
+  margin: 8px 0;
+  overflow: hidden;
+  border: 1px solid rgba(128, 128, 128, 0.25);
+  border-radius: 10px;
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.2s;
+}
+
+.card:hover {
+  border-color: var(--accent);
+}
+
+.cover {
+  display: block;
+  width: 100%;
+  max-height: 260px;
+  object-fit: cover;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+}
+
+.label {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.title {
+  margin: 0;
+  font-size: 18px;
+  overflow-wrap: anywhere;
+}
+
+.excerpt {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.8;
+  overflow-wrap: anywhere;
+}
+
+.read {
+  color: var(--accent);
+  font-size: 14px;
+}

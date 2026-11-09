@@ -15,5 +15,7 @@ type Notification {
   date: Date!
   read: Boolean!
   postId: Int
+  "Сообщество, о котором уведомление (заявка, предложка, приглашение)"
+  communityId: Int
   actor: Owner!
 }

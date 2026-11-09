@@ -1,14 +1,12 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { useRefreshStore } from '@/app/providers/routes/model'
+import { usePostSync } from '@/features/post-viewer'
 import { storageUrl } from '@/shared/config'
-import { CREATE_VIDEO, GET_SAVED_VIDEOS, GET_VIDEOS, REMOVE_VIDEO, SAVE_VIDEO } from '@/shared/graphql/schema'
+import { GET_SAVED_VIDEOS, GET_VIDEOS, REMOVE_VIDEO, SAVE_VIDEO } from '@/shared/graphql/schema'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
-import { UploadProgressEvent, toPercent } from '@/shared/lib/progress-fetch'
-import { validateUpload } from '@/shared/lib/upload-limits'
 import ButtonUI from '@/shared/ui/button'
-import { UploadProgress } from '@/shared/ui/progress'
 
 import cl from './videos.module.css'
 
@@ -32,14 +30,16 @@ type Album = 'all' | 'saved'
 interface Props {
   id: number
   isOwn: boolean
-  /** Изменение числа видео для счётчика профиля: +1 после загрузки, -1 после удаления. */
+  /** Открыть окно загрузки нового видео. */
+  onAdd: () => void
+  /** Изменение числа видео для счётчика профиля: -1 после удаления. */
   onCountChange: (delta: number) => void
 }
 
 const videoSrc = (video: Video) => storageUrl(video.file)
 
 /** Вкладка «Видео»: ролики из постов и отдельный альбом, сохранённые, загрузка и полноэкранный просмотр. */
-export const ProfileVideos = ({ id, isOwn, onCountChange }: Props) => {
+export const ProfileVideos = ({ id, isOwn, onAdd, onCountChange }: Props) => {
   const myId = useRefreshStore((state) => state.refreshData.id) ?? 0
   const [album, setAlbum] = useState<Album>('all')
 
@@ -56,16 +56,10 @@ export const ProfileVideos = ({ id, isOwn, onCountChange }: Props) => {
 
   const activeQuery = album === 'saved' ? savedQuery : profileQuery
   const videos: Video[] = (album === 'saved' ? savedQuery.data?.getSavedVideos : profileQuery.data?.getVideos) ?? []
-  const [createVideo, createResult] = useMutation(CREATE_VIDEO)
   const [removeVideo, removeResult] = useMutation(REMOVE_VIDEO)
   const [saveVideo, saveResult] = useMutation(SAVE_VIDEO)
   const [hasMore, setHasMore] = useState(false)
-  const [uploading, setUploading] = useState(false)
-  // Сколько видео в очереди и сколько процентов текущего отправлено
-  const [progress, setProgress] = useState<{ index: number; total: number; percent: number; name: string } | null>(null)
-  const [uploadError, setUploadError] = useState('')
   const [opened, setOpened] = useState<Video | null>(null)
-  const input = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     setAlbum('all')
@@ -96,45 +90,11 @@ export const ProfileVideos = ({ id, isOwn, onCountChange }: Props) => {
     }
   }, [opened, close])
 
-  /** Грузит видео по одному (каждое отдельным запросом, поэтому лимит 110 МБ на запрос не мешает набору). */
-  const upload = async (files: File[]) => {
-    setUploadError('')
-    const failed: string[] = []
-    const queue: File[] = []
-    for (const file of files) {
-      const problem = validateUpload([file])
-      if (problem) failed.push(problem)
-      else queue.push(file)
-    }
-    setUploading(true)
-    let uploaded = 0
-    for (const [index, file] of queue.entries()) {
-      setProgress({ index: index + 1, total: queue.length, percent: 0, name: file.name })
-      try {
-        await createVideo({
-          variables: { file },
-          context: {
-            fetchOptions: {
-              onProgress: (event: UploadProgressEvent) =>
-                setProgress({ index: index + 1, total: queue.length, percent: toPercent(event), name: file.name }),
-            },
-          },
-        })
-        uploaded += 1
-        onCountChange(1)
-      } catch (error) {
-        failed.push(`«${file.name}»: ${error instanceof Error ? error.message : 'не удалось загрузить'}`)
-      }
-    }
-    setProgress(null)
-    setUploading(false)
-    if (failed.length) setUploadError(failed.join('\n'))
-    if (uploaded) await profileQuery.refetch()
-  }
-
-  const remove = async (videoId: number) => {
+  const remove = async (video: Video) => {
     try {
-      await removeVideo({ variables: { id: videoId } })
+      await removeVideo({ variables: { id: video.id } })
+      // Ролик из поста пропадает и в карточке поста на стене
+      if (video.postId) usePostSync.getState().publish({ id: video.postId, removedVideoId: video.id })
       onCountChange(-1)
       await profileQuery.refetch()
     } catch {
@@ -162,7 +122,7 @@ export const ProfileVideos = ({ id, isOwn, onCountChange }: Props) => {
   }
 
   const canSave = !!opened && myId > 0 && opened.user?.id !== myId
-  const actionError = createResult.error || removeResult.error || saveResult.error
+  const actionError = removeResult.error || saveResult.error
   const actionMessage =
     actionError?.message ||
     activeQuery.error?.message ||
@@ -190,13 +150,6 @@ export const ProfileVideos = ({ id, isOwn, onCountChange }: Props) => {
         </div>
       )}
 
-      {progress && (
-        <UploadProgress
-          percent={progress.percent}
-          label={`Загрузка ${progress.index} из ${progress.total}: ${progress.name}`}
-        />
-      )}
-      {uploadError && <p className={`${cl.message} ${cl.messageError}`}>{uploadError}</p>}
       {actionMessage && <p className={cl.message}>{actionMessage}</p>}
 
       {videos.length === 0 && !activeQuery.loading ? (
@@ -214,27 +167,9 @@ export const ProfileVideos = ({ id, isOwn, onCountChange }: Props) => {
         <div className={cl.grid}>
           {isOwn && album === 'all' && (
             <>
-              <input
-                ref={input}
-                type='file'
-                accept='video/*'
-                multiple
-                hidden
-                onChange={(e) => {
-                  const files = Array.from(e.target.files ?? [])
-                  e.target.value = ''
-                  if (files.length) void upload(files)
-                }}
-              />
-              <button
-                type='button'
-                className={`${cl.tile} ${cl.add}`}
-                onClick={() => input.current?.click()}
-                disabled={uploading}
-                title='Добавить видео'
-              >
+              <button type='button' className={`${cl.tile} ${cl.add}`} onClick={onAdd} title='Добавить видео'>
                 <ImageLoading src='/icons/video.svg' className={cl.addIcon} />
-                <span>{uploading ? 'Загрузка...' : 'Добавить видео'}</span>
+                <span>Добавить видео</span>
               </button>
             </>
           )}
@@ -266,14 +201,14 @@ export const ProfileVideos = ({ id, isOwn, onCountChange }: Props) => {
                   ×
                 </button>
               )}
-              {isOwn && album === 'all' && video.postId === null && (
+              {isOwn && album === 'all' && (
                 <button
                   type='button'
                   className={cl.remove}
-                  title='Удалить видео'
+                  title={video.postId === null ? 'Удалить видео' : 'Удалить видео (пост останется)'}
                   onClick={(e) => {
                     e.stopPropagation()
-                    void remove(video.id)
+                    void remove(video)
                   }}
                 >
                   ×

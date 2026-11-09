@@ -20,9 +20,9 @@ const VideoResolvers: Resolvers = {
     },
   },
   Mutation: {
-    async createVideo(_, { file, title }, { req, res }) {
+    async createVideo(_, { file, title, communityId }, { req, res }) {
       const user = await UserController.refresh(res, req.cookies.refreshToken)
-      return await VideoController.create(user.id, file, title)
+      return await VideoController.create(user.id, file, title, communityId)
     },
     async removeVideo(_, { id }, { req, res }) {
       const user = await UserController.refresh(res, req.cookies.refreshToken)

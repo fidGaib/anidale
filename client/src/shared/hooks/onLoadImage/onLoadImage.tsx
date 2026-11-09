@@ -1,9 +1,15 @@
-import { useEffect, useState } from 'react'
+import { HTMLAttributes, useEffect, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
 
 import cl from './style.module.css'
 
-const ImageLoading = (props: any) => {
+/** Свойства обычного блока плюс адрес и подпись картинки внутри него. */
+export interface ImageLoadingProps extends HTMLAttributes<HTMLDivElement> {
+  src?: string
+  alt?: string
+}
+
+const ImageLoading = (props: ImageLoadingProps) => {
   const { ref, inView } = useInView({
     threshold: 0.1,
     triggerOnce: true,

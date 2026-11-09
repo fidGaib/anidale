@@ -17,16 +17,16 @@ const PostResolvers: Resolvers = {
       return await postController.getBookmarks(user.id, limit, page)
     },
     async getPostsByUser(_, args, { req }) {
-      const { id, limit, page } = args
-      return await postController.getPostsByUser(id, limit, page, await getOptionalUserId(req))
+      const { id, limit, page, search, kind } = args
+      return await postController.getPostsByUser(id, limit, page, await getOptionalUserId(req), search, kind)
     },
   },
   Mutation: {
     async createPost(_, { post }, ctx) {
       const { req, res } = ctx
       const user = await UserController.refresh(res, req.cookies.refreshToken)
-      const { description, images, videos } = post
-      const postData = await postController.create(user.id, description, images, videos)
+      const { description, images, videos, communityId } = post
+      const postData = await postController.create(user.id, description, images, videos, communityId)
 
       return {
         ...postData.post,
@@ -61,8 +61,9 @@ const PostResolvers: Resolvers = {
       const user = await UserController.refresh(ctx.res, ctx.req.cookies.refreshToken)
       return await postController.repost(user.id, id, comment)
     },
-    async viewPosts(_, { ids }) {
-      return await postController.view(ids)
+    async viewPosts(_, { ids }, ctx) {
+      const user = await UserController.refresh(ctx.res, ctx.req.cookies.refreshToken)
+      return await postController.view(user.id, ids)
     },
     async removePost(_, post, ctx) {
       const { req, res } = ctx

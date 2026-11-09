@@ -3,9 +3,16 @@
   margin: 10px auto;
 }
 
-@media (min-width: 601px) and (max-width: 1300px) {
+/* Две колонки профиля требуют больше места, чем общий «узкий» режим сайта */
+@media (min-width: 1101px) and (max-width: 1300px) {
   .content.content {
-    width: 70%;
+    width: 94%;
+  }
+}
+
+@media (min-width: 761px) and (max-width: 1100px) {
+  .content.content {
+    width: 90%;
   }
 }
 

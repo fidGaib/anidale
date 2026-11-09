@@ -10,8 +10,14 @@ interface SettingsTypes {
   setLayout: (id: number) => void
   validateFile: (file: File[]) => Promise<boolean | void>
   setFiles: (fileList: FileList) => void
-  send: (fn: any, owner: number) => void
+  send: (fn: UpdateAvatarFn, owner: number) => void
 }
+
+/** Мутация смены аватара в том виде, в каком её отдаёт useMutation. */
+export type UpdateAvatarFn = (options: {
+  variables: { id: number; avatar: File[] }
+  fetchPolicy: 'network-only'
+}) => Promise<unknown>
 
 export const useSettingsStore = create<SettingsTypes>()((set, get) => ({
   layout: 1,

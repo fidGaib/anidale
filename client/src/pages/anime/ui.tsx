@@ -1,3 +1,4 @@
+import { CSSProperties } from 'react'
 import { FreeMode, Navigation } from 'swiper'
 import 'swiper/css/free-mode'
 import 'swiper/css/navigation'
@@ -96,23 +97,30 @@ export const Anime = () => {
   )
 }
 
-const NewReleases = ({ anime }: any) => {
+interface AnimeItem {
+  title: string
+  src: string
+  date: string
+  cat: string
+  desc: string
+}
+
+const NewReleases = ({ anime }: { anime: AnimeItem[] }) => {
   return (
     <Swiper
-      style={{
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        '--swiper-navigation-color': '#fff',
-        '--swiper-pagination-color': '#fff',
-
-        width: '100%',
-      }}
+      style={
+        {
+          '--swiper-navigation-color': '#fff',
+          '--swiper-pagination-color': '#fff',
+          width: '100%',
+        } as CSSProperties
+      }
       spaceBetween={0}
       navigation={true}
       className={cl.releases}
       modules={[FreeMode, Navigation]}
     >
-      {anime.map((child: any) => {
+      {anime.map((child) => {
         return (
           <SwiperSlide id={cl.oneReales} key={child.title}>
             <ImageLoading className={cl.img} src={child.src} />

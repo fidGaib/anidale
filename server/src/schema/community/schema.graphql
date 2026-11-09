@@ -1,0 +1,115 @@
+type Query {
+  "Список сообществ. filter: all (по умолчанию, по числу участников) | mine (где я участник) | managed (где я администратор). search — по названию"
+  getCommunities(search: String, filter: String, limit: Int!, offset: Int!): [Community!]!
+  getCommunity(id: Int!): Community
+  "Участники сообщества: сначала администраторы"
+  getCommunityMembers(id: Int!, limit: Int!, offset: Int!): [CommunityMember!]!
+  "Записи на стене сообщества, закреплённая первой"
+  getCommunityPosts(id: Int!, limit: Int!, page: Int!): [Post!]!
+  "Предложенные записи, ожидающие решения (администратор)"
+  getSuggestedPosts(id: Int!, limit: Int!, page: Int!): [Post!]!
+  "Заявки на вступление в закрытое сообщество (администратор)"
+  getCommunityRequests(id: Int!, limit: Int!, offset: Int!): [CommunityMember!]!
+  "Чёрный список (администратор)"
+  getCommunityBans(id: Int!, limit: Int!, offset: Int!): [CommunityBan!]!
+  "Сообщества человека для карточки в профиле"
+  getUserCommunities(userId: Int!, limit: Int!): UserCommunities!
+  "Видео сообщества: альбом и ролики из записей"
+  getCommunityVideos(id: Int!, limit: Int, offset: Int): [Video!]!
+  "Фото сообщества: снимки из записей и альбом"
+  getCommunityPhotos(id: Int!, limit: Int, offset: Int): [Photo!]!
+}
+type Mutation {
+  createCommunity(name: String!, description: String, avatar: FILE, isClosed: Boolean): Community!
+  "Править сообщество может администратор. Пустая строка стирает поле, removeCover убирает обложку"
+  updateCommunity(
+    id: Int!
+    name: String
+    description: String
+    status: String
+    website: String
+    isClosed: Boolean
+    avatar: FILE
+    cover: FILE
+    removeCover: Boolean
+  ): Community!
+  "В закрытое сообщество вместо вступления подаётся заявка"
+  joinCommunity(id: Int!): Community!
+  "Выйти из сообщества или отменить свою заявку"
+  leaveCommunity(id: Int!): Community!
+  "Заменить ссылки сообщества (до 10)"
+  setCommunityLinks(id: Int!, links: [CommunityLinkInput!]!): Community!
+  resolveCommunityRequest(id: Int!, userId: Int!, accept: Boolean!): Boolean!
+  "Позвать человека в сообщество: ему придёт уведомление"
+  inviteToCommunity(id: Int!, userId: Int!): Boolean!
+  banCommunityMember(id: Int!, userId: Int!, reason: String): Boolean!
+  unbanCommunityMember(id: Int!, userId: Int!): Boolean!
+  "Принять (запись появится на стене) или отклонить (будет удалена) предложенную запись"
+  reviewSuggestedPost(postId: Int!, approve: Boolean!): Boolean!
+  "Назначить или снять администратора: только создатель"
+  setCommunityAdmin(id: Int!, userId: Int!, admin: Boolean!): Boolean!
+  "Удалить сообщество со всеми записями: только создатель"
+  removeCommunity(id: Int!): Boolean!
+}
+type Community {
+  id: Int!
+  name: String!
+  description: String!
+  status: String!
+  website: String!
+  avatar: String!
+  cover: String!
+  createdAt: Date!
+  ownerId: Int!
+  membersCount: Int!
+  "Закрытое: стену и участников видят только участники"
+  isClosed: Boolean!
+  "Я вижу стену и участников"
+  canView: Boolean!
+  "Я подал заявку в закрытое сообщество"
+  hasRequested: Boolean!
+  "Я в чёрном списке"
+  isBanned: Boolean!
+  "Заявок ждёт решения (только администратору)"
+  requestsCount: Int!
+  "Предложенных записей ждёт решения (только администратору)"
+  suggestedCount: Int!
+  links: [CommunityLink!]!
+  "Я участник"
+  isMember: Boolean!
+  "Я администратор (или создатель)"
+  isAdmin: Boolean!
+  "Я создатель"
+  isOwner: Boolean!
+}
+type CommunityMember {
+  user: Owner!
+  "member | admin"
+  role: String!
+  isOwner: Boolean!
+  date: Date!
+}
+"Краткие сведения о сообществе для записи на стене"
+type CommunityBrief {
+  id: Int!
+  name: String!
+  avatar: String!
+}
+input CommunityLinkInput {
+  title: String!
+  url: String!
+}
+type CommunityLink {
+  id: Int!
+  title: String!
+  url: String!
+}
+type CommunityBan {
+  user: Owner!
+  reason: String!
+  date: Date!
+}
+type UserCommunities {
+  total: Int!
+  items: [Community!]!
+}

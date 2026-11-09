@@ -4,10 +4,16 @@ type FriendState {
   status: String!
   friendsCount: Int!
   subscribersCount: Int!
+  "Сколько человек он читает, не считая друзей"
+  subscriptionsCount: Int!
 }
 
 extend type Query {
   getFriends(id: Int!, limit: Int, offset: Int): [User!]!
+  "Друзья, которые сейчас в сети"
+  getFriendsOnline(id: Int!, limit: Int): [User!]!
+  "На кого подписан человек (без друзей), новые подписки первыми"
+  getSubscriptions(id: Int!, limit: Int, offset: Int): [User!]!
   getSubscribers(id: Int!, limit: Int, offset: Int): [User!]!
   getFriendState(id: Int!): FriendState!
 }

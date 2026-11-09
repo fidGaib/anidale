@@ -12,6 +12,10 @@ const Messages = lazy(() => import('@/pages/messages'))
 const Anime = lazy(() => import('@/pages/anime'))
 const Watch = lazy(() => import('@/pages/watch'))
 const Bookmarks = lazy(() => import('@/pages/bookmarks'))
+const Communities = lazy(() => import('@/pages/communities'))
+const Community = lazy(() => import('@/pages/community'))
+const Article = lazy(() => import('@/pages/article'))
+const ArticleEditor = lazy(() => import('@/pages/article-editor'))
 
 // private routes
 export const privateRoutes = [
@@ -26,6 +30,11 @@ export const privateRoutes = [
   { path: '/anime', element: Anime },
   { path: '/watch', element: Watch },
   { path: '/bookmarks', element: Bookmarks },
+  { path: '/communities', element: Communities },
+  { path: '/community/:id', element: Community },
+  { path: '/article/new', element: ArticleEditor },
+  { path: '/article/:id/edit', element: ArticleEditor },
+  { path: '/article/:id', element: Article },
 ]
 // public routes
 export const publicRoutes = [

@@ -13,9 +13,9 @@ class PhotoController {
     if (!userId) throw createGraphQLError('Требуется авторизация')
     return await PhotoService.listSaved(userId, limit, offset)
   }
-  async create(userId: number | undefined, image: File) {
+  async create(userId: number | undefined, image: File, communityId?: number | null) {
     if (!userId) throw createGraphQLError('Требуется авторизация')
-    return await PhotoService.create(userId, image)
+    return await PhotoService.create(userId, image, communityId)
   }
   async remove(userId: number | undefined, id: number) {
     if (!userId) throw createGraphQLError('Требуется авторизация')

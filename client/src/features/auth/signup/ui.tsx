@@ -22,7 +22,7 @@ export const FormSignup = () => {
     formState: { errors },
   } = useForm<InputValues>()
 
-  const [_, setRefreshData] = useRefreshStore((state) => [state.refreshData, state.setRefreshData])
+  const setRefreshData = useRefreshStore((state) => state.setRefreshData)
   const [REG, { data, error }] = useMutation(REGISTRATION)
   const onSubmit: SubmitHandler<InputValues> = ({ email, pass, pass2 }) => {
     REG({ variables: { email, pass, pass2 }, fetchPolicy: 'network-only' })

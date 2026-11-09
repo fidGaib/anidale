@@ -1,0 +1,148 @@
+.page {
+  max-width: 760px;
+  margin: 10px auto;
+  padding: 24px 28px 28px;
+  color: var(--color-text-main);
+  font-family: var(--font-text-main);
+}
+
+.cover {
+  display: block;
+  width: calc(100% + 56px);
+  max-height: 340px;
+  margin: -24px -28px 20px;
+  border-radius: 10px 10px 0 0;
+  object-fit: cover;
+}
+
+.title {
+  margin: 0 0 12px;
+  font-size: 30px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-bottom: 22px;
+  font-size: 13px;
+}
+
+.author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: inherit;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.muted {
+  opacity: 0.6;
+}
+
+.body {
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+.p {
+  margin: 0 0 16px;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.h {
+  margin: 28px 0 12px;
+  font-size: 23px;
+  overflow-wrap: anywhere;
+}
+
+.quote {
+  margin: 18px 0;
+  padding: 4px 0 4px 16px;
+  border-left: 3px solid var(--accent);
+  font-style: italic;
+  opacity: 0.9;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.list {
+  margin: 0 0 16px;
+  padding-left: 24px;
+  overflow-wrap: anywhere;
+}
+
+.figure {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.figure img {
+  max-width: 100%;
+  max-height: 560px;
+  border-radius: 8px;
+}
+
+.figure figcaption {
+  margin-top: 6px;
+  font-size: 13px;
+  opacity: 0.6;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(128, 128, 128, 0.2);
+}
+
+.button {
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-text-main);
+  font-size: 14px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.buttonGhost {
+  background: rgba(128, 128, 128, 0.2);
+  color: inherit;
+}
+
+.hint {
+  padding: 40px 0;
+  text-align: center;
+  opacity: 0.7;
+}
+
+@media (max-width: 650px) {
+  .page {
+    padding: 16px;
+  }
+
+  .cover {
+    width: calc(100% + 32px);
+    margin: -16px -16px 16px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+}

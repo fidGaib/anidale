@@ -33,8 +33,9 @@ class FileStorageService {
     return load(hash, this.storagePath)
   }
 
-  async removeFiles(images: SaveImage | SaveImage[] | string): Promise<boolean> {
-    return removeFiles(images as any, this.storagePath)
+  /** Удаляет файлы картинки. Нужны только пути (medium, small, high): остальные поля SaveImage необязательны. */
+  async removeFiles(images: Partial<SaveImage> | Partial<SaveImage>[] | string): Promise<boolean> {
+    return removeFiles(images as unknown as Parameters<typeof removeFiles>[0], this.storagePath)
   }
 }
 

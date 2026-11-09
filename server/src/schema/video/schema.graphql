@@ -29,7 +29,7 @@ extend type Query {
 
 extend type Mutation {
   "Загрузить видео в свой альбом без публикации"
-  createVideo(file: FILE!, title: String): Video!
+  createVideo(file: FILE!, title: String, communityId: Int): Video!
   "Удалить своё отдельно загруженное видео"
   removeVideo(id: Int!): Boolean!
   "Сохранить чужое видео в альбом или убрать его оттуда"

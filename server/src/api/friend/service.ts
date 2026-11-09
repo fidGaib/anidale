@@ -3,6 +3,7 @@ import { createGraphQLError } from 'graphql-yoga'
 import { publicUserSelect } from '@/api/user/service'
 import prisma from '@/db/db'
 import User from '@/db/models/user-model'
+import { isOnline } from '@/handlers/presence'
 
 export type FriendStatus = 'NONE' | 'FRIEND' | 'SUBSCRIBED' | 'SUBSCRIBER'
 
@@ -20,15 +21,19 @@ class FriendService {
    * Так счётчики не дублируют друг друга, как в ВК.
    */
   private async counts(id: number) {
-    const [friendsCount, subscribersCount] = await Promise.all([
+    const [friendsCount, subscribersCount, subscriptionsCount] = await Promise.all([
       prisma.subscription.count({
         where: { followerId: id, following: { subscriptionsMade: { some: { followingId: id } } } },
       }),
       prisma.subscription.count({
         where: { followingId: id, follower: { subscriptionsReceived: { none: { followerId: id } } } },
       }),
+      // Подписки: на кого подписан я, без взаимных (взаимные — это друзья)
+      prisma.subscription.count({
+        where: { followerId: id, following: { subscriptionsMade: { none: { followingId: id } } } },
+      }),
     ])
-    return { friendsCount, subscribersCount }
+    return { friendsCount, subscribersCount, subscriptionsCount }
   }
 
   /** Статус отношений зрителя с профилем и публичные счётчики профиля. */
@@ -61,6 +66,34 @@ class FriendService {
       select: { following: { select: publicUserSelect } },
     })
     return rows.map((row) => row.following)
+  }
+
+  /** На кого подписан человек, не считая друзей (с ними подписка взаимная). Новые подписки первыми. */
+  async subscriptions(id: number, limit?: number | null, offset?: number | null) {
+    await this.assertUser(id)
+    const rows = await prisma.subscription.findMany({
+      where: { followerId: id, following: { subscriptionsMade: { none: { followingId: id } } } },
+      orderBy: { createdAt: 'desc' },
+      take: clampLimit(limit),
+      skip: clampOffset(offset),
+      select: { following: { select: publicUserSelect } },
+    })
+    return rows.map((row) => row.following)
+  }
+
+  /** Друзья, которые сейчас в сети (есть открытое подключение). Среди последних 200 друзей, свежие знакомства первыми. */
+  async friendsOnline(id: number, limit?: number | null) {
+    await this.assertUser(id)
+    const rows = await prisma.subscription.findMany({
+      where: { followerId: id, following: { subscriptionsMade: { some: { followingId: id } } } },
+      orderBy: { createdAt: 'desc' },
+      take: 200,
+      select: { following: { select: publicUserSelect } },
+    })
+    return rows
+      .map((row) => row.following)
+      .filter((friend) => isOnline(friend.id))
+      .slice(0, clampLimit(limit))
   }
 
   async subscribers(id: number, limit?: number | null, offset?: number | null) {

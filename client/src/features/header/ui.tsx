@@ -19,7 +19,7 @@ export const MenuHeader = () => {
     { link: `/feed`, text: 'Лента', icon: 'feed.svg' },
     { link: `/messages`, text: 'Мессенджер', icon: 'chat.svg' },
     { link: `/friends`, text: 'Друзья', icon: 'friends.svg' },
-    { link: `/groups`, text: 'Сообщества', icon: 'groups.svg' },
+    { link: `/communities`, text: 'Сообщества', icon: 'groups.svg' },
     { link: `/bookmarks`, text: 'Закладки', icon: 'note.svg' },
     { link: `/music`, text: 'Музыка', icon: 'music.svg' },
     { link: `/anime`, text: 'Аниме', icon: 'manga.svg' },
@@ -32,7 +32,7 @@ export const MenuHeader = () => {
         <ImageLoading className={cl.headerMenuSvg} src={assetUrl('icons/menu.svg')} alt='anidale menu icon' />
       </button>
       <ul className={`playground ${cl.menu}`}>
-        {refreshData.id! > 0 ? (
+        {(refreshData.id ?? 0) > 0 ? (
           <>
             {linksAuth.map((item) => {
               return (
@@ -96,7 +96,7 @@ export const MenuHeader = () => {
           </>
         )}
       </ul>
-      {refreshData.id! > 0 ? (
+      {(refreshData.id ?? 0) > 0 ? (
         <Link to={`/profile/${refreshData.id}`} className={cl.userAvatar}>
           <ImageLoading src={useSrcAvatar(refreshData.avatar || '')} />
         </Link>

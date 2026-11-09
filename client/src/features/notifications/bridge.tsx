@@ -37,7 +37,13 @@ export const NotificationsBridge = () => {
       store().pushToast({
         title: n.actor.login || 'Уведомление',
         text: notificationText(n),
-        link: n.type === 'track' ? '/music' : n.postId ? `/feed?post=${n.postId}` : `/profile/${myId}`,
+        link: n.communityId
+          ? `/community/${n.communityId}`
+          : n.type === 'track'
+          ? '/music'
+          : n.postId
+          ? `/feed?post=${n.postId}`
+          : `/profile/${myId}`,
         avatar: n.actor.avatar,
       })
     }

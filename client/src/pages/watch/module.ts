@@ -1,4 +1,4 @@
-import { ChangeEvent } from 'react'
+import { ChangeEvent, RefObject } from 'react'
 import { create } from 'zustand'
 
 export interface DataTypes {
@@ -23,8 +23,19 @@ interface ControlVideoTypes {
   screenfull: boolean
   handle__play: () => void
   handle__volume: (e: ChangeEvent<HTMLInputElement>) => void
-  handle__progress: (e: any) => void
-  handle_prodress_track: (e: ChangeEvent<HTMLInputElement>, ref__player: any) => void
+  handle__progress: (state: ProgressState) => void
+  handle_prodress_track: (seconds: string | number, ref__player: RefObject<Seekable>) => void
+}
+
+/** Состояние воспроизведения, которое присылает плеер. */
+export interface ProgressState {
+  playedSeconds: number
+  loadedSeconds: number
+}
+
+/** Всё, что нужно от плеера для перемотки. */
+export interface Seekable {
+  seekTo: (seconds: number) => void
 }
 export const usePayerStore = create<ControlVideoTypes>()((set, get) => ({
   playing: false,
@@ -42,13 +53,10 @@ export const usePayerStore = create<ControlVideoTypes>()((set, get) => ({
       volume: Number(e.target.value),
     }))
   },
-  handle__progress(e) {
-    console.log(e)
-    set(() => ({
-      ...e,
-    }))
+  handle__progress({ playedSeconds, loadedSeconds }) {
+    set(() => ({ playedSeconds, loadedSeconds }))
   },
-  handle_prodress_track(e, ref__player) {
-    ref__player.current.seekTo(Number(e))
+  handle_prodress_track(seconds, ref__player) {
+    ref__player.current?.seekTo(Number(seconds))
   },
 }))

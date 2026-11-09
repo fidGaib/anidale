@@ -9,6 +9,7 @@ export const NOTIFICATIONS = graphql(`
       date
       read
       postId
+      communityId
       actor {
         id
         login

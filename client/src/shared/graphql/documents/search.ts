@@ -6,6 +6,14 @@ export const SEARCH = graphql(`
       usersTotal
       postsTotal
       musicTotal
+      communitiesTotal
+      communities {
+        id
+        name
+        avatar
+        status
+        membersCount
+      }
       users {
         id
         login

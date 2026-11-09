@@ -80,7 +80,7 @@ class AttachmentService {
         await new FileStorageService(this.storagePath).removeFiles({
           medium: attachment.file,
           small: attachment.thumb,
-        } as any)
+        })
         return
       }
       // Только внутри messages/, чтобы нельзя было выйти из каталога

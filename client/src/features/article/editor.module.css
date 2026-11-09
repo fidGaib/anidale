@@ -1,0 +1,301 @@
+.page {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  border-radius: 0;
+  color: var(--color-text-main);
+  font-family: var(--font-text-main);
+}
+
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 24px;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+  background: inherit;
+}
+
+.who {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+}
+
+.name {
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.sub {
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.barActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.publish {
+  padding: 8px 18px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-text-main);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.publish:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.close {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.close:hover:not(:disabled) {
+  background: rgba(128, 128, 128, 0.2);
+}
+
+.main {
+  width: min(720px, 100%);
+  margin: 0 auto;
+  padding: 24px 20px 120px;
+}
+
+.error {
+  margin: 0 0 12px;
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: bold;
+  white-space: pre-line;
+}
+
+.addCover {
+  margin-bottom: 14px;
+  padding: 6px 12px;
+  border: 1px dashed rgba(128, 128, 128, 0.5);
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font-family: var(--font-text-main);
+  font-size: 13px;
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+.addCover:hover {
+  opacity: 1;
+}
+
+.coverWrap {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.coverWrap img {
+  display: block;
+  width: 100%;
+  max-height: 320px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.coverButtons {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 6px;
+}
+
+.coverButtons button {
+  padding: 5px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.title {
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-family: var(--font-text-main);
+  font-size: 32px;
+  font-weight: bold;
+  outline: none;
+}
+
+.title::placeholder,
+.field::placeholder {
+  color: inherit;
+  opacity: 0.35;
+}
+
+.block {
+  position: relative;
+}
+
+.controls {
+  position: absolute;
+  top: 2px;
+  right: -4px;
+  z-index: 1;
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.block:hover .controls,
+.block:focus-within .controls {
+  opacity: 1;
+}
+
+.controls button {
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 6px;
+  background: rgba(128, 128, 128, 0.25);
+  color: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.controls button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.field {
+  display: block;
+  width: 100%;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-family: var(--font-text-main);
+  font-size: 18px;
+  line-height: 1.6;
+  outline: none;
+  overflow: hidden;
+  resize: none;
+}
+
+.field_h {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.field_quote {
+  padding-left: 14px;
+  border-left: 3px solid var(--accent);
+  font-style: italic;
+}
+
+.field_list {
+  padding-left: 14px;
+  border-left: 3px dotted rgba(128, 128, 128, 0.5);
+}
+
+.figure {
+  margin: 8px 0;
+  text-align: center;
+}
+
+.figure img {
+  max-width: 100%;
+  max-height: 420px;
+  border-radius: 8px;
+}
+
+.caption {
+  width: 100%;
+  margin-top: 6px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-family: var(--font-text-main);
+  font-size: 13px;
+  text-align: center;
+  outline: none;
+  opacity: 0.7;
+}
+
+.insert {
+  display: flex;
+  justify-content: center;
+  min-height: 22px;
+  opacity: 0.25;
+  transition: opacity 0.15s;
+}
+
+.insert:hover,
+.insert:focus-within {
+  opacity: 1;
+}
+
+.plus {
+  width: 22px;
+  height: 22px;
+  border: 1px solid rgba(128, 128, 128, 0.5);
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.insertOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.insertOptions button {
+  padding: 4px 12px;
+  border: 0;
+  border-radius: 14px;
+  background: rgba(128, 128, 128, 0.2);
+  color: inherit;
+  font-family: var(--font-text-main);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.insertOptions button:hover {
+  background: var(--accent);
+  color: #fff;
+}

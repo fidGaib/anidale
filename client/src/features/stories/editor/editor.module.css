@@ -1,0 +1,326 @@
+.editor {
+  display: flex;
+  width: 100%;
+  height: min(88vh, 860px);
+}
+
+.stage {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 9 / 16;
+  height: 100%;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.canvas {
+  max-width: 100%;
+  max-height: 100%;
+  aspect-ratio: 9 / 16;
+  border-radius: 10px;
+  touch-action: none;
+  cursor: grab;
+}
+
+.canvasBrush {
+  cursor: crosshair;
+}
+
+.drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  height: 100%;
+  border: 1px dashed rgba(128, 128, 128, 0.5);
+  border-radius: 10px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.dropActive {
+  border-color: var(--accent);
+  background: rgba(128, 128, 128, 0.12);
+}
+
+.dropIcon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 2px dashed currentColor;
+  border-radius: 12px;
+  font-size: 24px;
+}
+
+.primary,
+.publish {
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-text-main);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.link {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-family: var(--font-text-main);
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.side {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  padding: 16px;
+}
+
+.close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.close:hover {
+  background: rgba(128, 128, 128, 0.2);
+}
+
+.tools {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 24px;
+  overflow-y: auto;
+}
+
+.tool {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font-family: var(--font-text-main);
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.tool:hover:not(:disabled) {
+  background: rgba(128, 128, 128, 0.12);
+}
+
+.tool:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+.toolActive {
+  color: var(--accent);
+  font-weight: bold;
+}
+
+.toolIcon {
+  width: 24px;
+  text-align: center;
+  font-size: 16px;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 4px 0 10px 36px;
+}
+
+.panelButton,
+.panelDanger,
+.pill {
+  padding: 7px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(128, 128, 128, 0.18);
+  color: inherit;
+  font-family: var(--font-text-main);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.panelButton:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.panelDanger {
+  color: #ff6b6b;
+}
+
+.panelHint {
+  margin: 0;
+  font-size: 12px;
+  opacity: 0.55;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+}
+
+.textInput {
+  padding: 8px;
+  border: 1px solid rgba(128, 128, 128, 0.4);
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font-family: var(--font-text-main);
+  font-size: 14px;
+  outline: none;
+  resize: none;
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.swatch {
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(128, 128, 128, 0.5);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.swatchActive {
+  border-color: var(--accent);
+  outline: 2px solid var(--accent);
+}
+
+.slider {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.stickerGrid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 2px;
+}
+
+.sticker {
+  padding: 3px 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.sticker:hover {
+  background: rgba(128, 128, 128, 0.25);
+}
+
+.bgGrid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 6px;
+}
+
+.bgItem {
+  aspect-ratio: 1;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pillActive {
+  background: var(--accent);
+  color: #fff;
+}
+
+.bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(128, 128, 128, 0.2);
+}
+
+.author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.authorAvatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.ttl {
+  opacity: 0.55;
+}
+
+.error {
+  margin: 0;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.publish {
+  padding: 10px;
+}
+
+.publish:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+@media (max-width: 700px) {
+  .editor {
+    flex-direction: column;
+    height: 92vh;
+  }
+
+  .stage {
+    height: 55%;
+    aspect-ratio: auto;
+  }
+}

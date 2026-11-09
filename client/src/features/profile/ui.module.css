@@ -1,140 +1,161 @@
-.wrapper {
-  background: var(--playground);
-  margin-top: 5px;
-  border-radius: var(--playground-border);
+.drop {
   display: flex;
   flex-direction: column;
-  width: 100%;
-  margin: 0 auto;
-  margin-top: 10px;
-}
-
-.loading {
-  opacity: 0.7;
-}
-
-.wrapperForm {
-  width: 100%;
-  display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  margin: 0 auto;
-  margin-top: 10px;
+  justify-content: center;
+  gap: 10px;
+  min-height: 220px;
+  border: 1px dashed rgba(128, 128, 128, 0.5);
+  border-radius: 10px;
+  transition: background 0.2s, border-color 0.2s;
 }
 
-.avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+.dropActive {
+  border-color: var(--accent);
+  background: rgba(128, 128, 128, 0.12);
 }
 
-.avatar img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+.dropIcon {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border: 2px dashed currentColor;
+  border-radius: 12px;
+  font-size: 26px;
 }
 
-.textarea {
-  background: 0;
+.pick,
+.publish {
+  padding: 8px 16px;
   border: 0;
-  resize: none;
-  outline: 0;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-text-main);
   font-size: 14px;
-  width: 70%;
-  height: 40px;
-  margin-left: 10px;
-  font-family: calibri, sans-serif;
-  padding-top: 12px;
-  max-height: 200px;
-  overflow-y: hidden;
-}
-
-.svg {
-  height: 25px;
-  width: 25px;
   cursor: pointer;
 }
 
-.label {
-  display: flex;
-  margin-left: auto;
-  padding-right: 10px;
+.publish:disabled {
+  opacity: 0.45;
+  cursor: default;
 }
 
-.videoList {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: 5px;
-  border-radius: var(--playground-border);
+.hint {
+  font-size: 12px;
+  opacity: 0.55;
 }
 
-.videoItem {
-  display: flex;
-  align-items: center;
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 8px;
-  font-family: calibri, sans-serif;
-  font-size: 14px;
 }
 
-.videoIcon {
-  width: 22px;
-  height: 22px;
-}
-
-.videoName {
+.tile {
+  position: relative;
+  aspect-ratio: 1;
   overflow: hidden;
+  border-radius: 10px;
+  background: rgba(128, 128, 128, 0.15);
+}
+
+.tileMedia {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tileBadge {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  left: 4px;
+  overflow: hidden;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 11px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.videoRemove {
-  margin-left: auto;
-  width: 24px;
-  height: 24px;
-  padding: 0;
+.tileRemove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
   border: 0;
   border-radius: 50%;
-  background: rgba(128, 128, 128, 0.18);
-  color: inherit;
-  font-size: 17px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 16px;
   line-height: 1;
   cursor: pointer;
 }
 
-.videoRemove:hover {
-  background: rgba(128, 128, 128, 0.35);
+.tileAdd {
+  border: 1px dashed rgba(128, 128, 128, 0.5);
+  color: inherit;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.textWrap {
+  position: relative;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.textarea {
+  flex: 1;
+  min-height: 90px;
+  padding: 8px 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-family: var(--font-text-main);
+  font-size: 15px;
+  outline: none;
+  resize: none;
+}
+
+.emojiWrap {
+  position: relative;
+}
+
+.emojiButton {
+  border: 0;
+  background: transparent;
+  font-size: 20px;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.emojiButton:hover {
+  opacity: 1;
+}
+
+.counter {
+  font-size: 12px;
+  opacity: 0.55;
 }
 
 .error {
-  width: 70%;
-  font-size: 14px;
+  margin: 0;
   color: var(--accent);
-  font-family: calibri, sans-serif;
-  margin: 0 auto;
-  padding: 10px;
+  font-size: 13px;
   font-weight: bold;
-  padding-bottom: 0;
 }
 
-/* meshBlock */
-
-.wrapArts {
-  width: 100%;
-}
-
-@media (min-width: 1600px) and (max-width: 3000px) {
-  .wrapperForm {
-    width: 70%;
-  }
-}
-@media (min-width: 0px) and (max-width: 650px) {
-  .textarea {
-    width: 65%;
-  }
-}
-@media (min-width: 0px) and (max-width: 400px) {
-  .avatar {
-    display: none;
-  }
+/* Панель смайликов открывается вниз и прижата к правому краю окна */
+.emojiWrap > div {
+  top: 32px;
+  right: 0;
+  bottom: auto;
+  left: auto;
 }

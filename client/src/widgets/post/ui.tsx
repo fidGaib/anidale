@@ -4,9 +4,10 @@ import { useInView } from 'react-intersection-observer'
 import { useParams } from 'react-router-dom'
 
 import { useRefreshStore } from '@/app/providers/routes/model'
+import { ArticleCard } from '@/entities/article'
 import { PostActionWrapp, PostImages, PostOwner, PostVideos } from '@/entities/post'
 import { PostMenu, RepostCard, ViewMark, openShare, useOpenPost, usePostSync } from '@/features/post-viewer'
-import { Post } from '@/features/profile/types'
+import { Post, WallKind } from '@/features/profile/types'
 import { SET_LIKE } from '@/shared/graphql/schema'
 import { useSocket } from '@/shared/hooks/useSocket'
 import { formatDateTime, toTimestamp } from '@/shared/lib/time'
@@ -16,6 +17,7 @@ import { Plug } from '@/shared/ui/plug'
 import { RichText } from '@/shared/ui/rich-text'
 
 import cl from './ui.module.css'
+import { fitsWall, shouldDropAfterChange } from './wall'
 
 const POSTS_PAGE_SIZE = 10
 
@@ -26,8 +28,25 @@ const appendUniquePosts = (prev: Post[], next: Post[]) => {
   return unique.length ? [...prev, ...unique] : prev
 }
 
-export const Posts = ({ mode }: { mode?: 'bookmarks' }) => {
-  const profileUrlId = parseInt(useParams().id || '')
+interface PostsProps {
+  /** Занять всю ширину колонки (в профиле): без сужения до 70% на широких экранах. */
+  fill?: boolean
+  mode?: 'bookmarks'
+  /** Вид стены профиля (на ленте не используется). */
+  kind?: WallKind
+  /** Поиск по тексту постов на стене профиля. */
+  search?: string
+  /** Стена сообщества: показываются только его записи. */
+  communityId?: number
+  /** Просматривающий — администратор этого сообщества: управляет всеми записями на стене. */
+  canManage?: boolean
+}
+
+export const Posts = ({ mode, kind = 'all', search = '', fill = false, communityId, canManage = false }: PostsProps) => {
+  // На странице сообщества id в адресе — это сообщество, а не человек
+  const urlId = parseInt(useParams().id || '')
+  const profileUrlId = communityId ? 0 : urlId
+  const fetchPostsCommunity = usePostStore((state) => state.fetchPostsCommunity)
   const fetchPostsFeed = usePostStore((state) => state.fetchPostsFeed)
   const fetchPostsProfile = usePostStore((state) => state.fetchPostsProfile)
   const fetchBookmarks = usePostStore((state) => state.fetchBookmarks)
@@ -63,8 +82,10 @@ export const Posts = ({ mode }: { mode?: 'bookmarks' }) => {
       const fetchedPosts =
         mode === 'bookmarks'
           ? await fetchBookmarks(page, POSTS_PAGE_SIZE)
+          : communityId
+          ? await fetchPostsCommunity(communityId, page, POSTS_PAGE_SIZE)
           : profileUrlId
-          ? await fetchPostsProfile(profileUrlId, page, POSTS_PAGE_SIZE)
+          ? await fetchPostsProfile(profileUrlId, page, POSTS_PAGE_SIZE, kind, search)
           : await fetchPostsFeed(page, POSTS_PAGE_SIZE)
 
       // Пользователь уже ушёл на другой профиль — результат не нужен.
@@ -90,7 +111,17 @@ export const Posts = ({ mode }: { mode?: 'bookmarks' }) => {
         setLoading(false)
       }
     }
-  }, [fetchPostsFeed, fetchPostsProfile, fetchBookmarks, profileUrlId, mode])
+  }, [
+    fetchPostsFeed,
+    fetchPostsProfile,
+    fetchPostsCommunity,
+    fetchBookmarks,
+    profileUrlId,
+    communityId,
+    mode,
+    kind,
+    search,
+  ])
 
   // Сброс и загрузка первой страницы при смене профиля/ленты и при монтировании.
   useEffect(() => {
@@ -122,6 +153,8 @@ export const Posts = ({ mode }: { mode?: 'bookmarks' }) => {
     setPendingPosts([])
   }, [profileUrlId])
 
+  const fitsCurrentWall = useCallback((post: Post) => fitsWall(kind, search, post), [kind, search])
+
   const prependPost = useCallback((post: Post) => {
     setPosts((prev) => (prev.some((item) => item.id === post.id) ? prev : [post, ...prev]))
   }, [])
@@ -130,9 +163,13 @@ export const Posts = ({ mode }: { mode?: 'bookmarks' }) => {
     if (!socket || !isConnected) return
     const handleNewPost = ({ post }: { post: Post }) => {
       if (mode === 'bookmarks') return
+      if (communityId) {
+        if (post.community?.id === communityId) prependPost(post)
+        return
+      }
       if (profileUrlId) {
         // Профиль: интересны только посты его владельца, они появляются сразу.
-        if (post.user?.id === profileUrlId) prependPost(post)
+        if (post.user?.id === profileUrlId && fitsCurrentWall(post)) prependPost(post)
         return
       }
       // Лента: копим новые посты и предлагаем показать.
@@ -142,7 +179,7 @@ export const Posts = ({ mode }: { mode?: 'bookmarks' }) => {
     return () => {
       socket.off('newPost', handleNewPost)
     }
-  }, [socket, isConnected, profileUrlId, prependPost])
+  }, [socket, isConnected, profileUrlId, communityId, mode, prependPost, fitsCurrentWall])
 
   // Собственный пост, созданный в профиле: добавляем сразу по ответу мутации,
   // не дожидаясь сокета (дубль по id отсекается).
@@ -150,9 +187,18 @@ export const Posts = ({ mode }: { mode?: 'bookmarks' }) => {
   const clearCreatedPost = usePostStore((state) => state.clearCreatedPost)
   useEffect(() => {
     if (!createdPost) return
-    if (profileUrlId && createdPost.user.id === profileUrlId) prependPost(createdPost)
+    if (communityId) {
+      if (createdPost.community?.id === communityId) prependPost(createdPost)
+    } else if (
+      profileUrlId &&
+      createdPost.user.id === profileUrlId &&
+      !createdPost.community &&
+      fitsCurrentWall(createdPost)
+    ) {
+      prependPost(createdPost)
+    }
     clearCreatedPost()
-  }, [createdPost, profileUrlId, prependPost, clearCreatedPost])
+  }, [createdPost, profileUrlId, communityId, prependPost, clearCreatedPost, fitsCurrentWall])
 
   const showNewPosts = () => {
     setPosts((prev) => {
@@ -216,9 +262,24 @@ export const Posts = ({ mode }: { mode?: 'bookmarks' }) => {
   const syncVersion = usePostSync((s) => s.version)
   useEffect(() => {
     if (!syncPatch) return
-    const { id, removed, ...rest } = syncPatch
+    const { id, removed, removedVideoId, ...rest } = syncPatch
+    if (removedVideoId !== undefined) {
+      setPosts((prev) =>
+        prev.map((post) =>
+          post.id === id ? { ...post, videos: post.videos.filter((video) => video.id !== removedVideoId) } : post,
+        ),
+      )
+      return
+    }
     // В закладках пост пропадает, когда его убрали из закладок
-    if (removed || (rest.archived && !profileUrlId) || (mode === 'bookmarks' && rest.bookmarked === false)) {
+    // Пост ушёл в архив (кроме вкладки архива), вернулся из архива (на вкладке архива) или убран из закладок
+    if (
+      shouldDropAfterChange(
+        { removed, archived: rest.archived, bookmarked: rest.bookmarked },
+        kind,
+        mode === 'bookmarks',
+      )
+    ) {
       // Удалён, или убран в архив в ленте: в ленте архивных постов нет
       setPosts((prev) => prev.filter((post) => post.id !== id))
       return
@@ -250,7 +311,7 @@ export const Posts = ({ mode }: { mode?: 'bookmarks' }) => {
       )}
       {posts?.map((post: Post) => {
         return (
-          <div key={post.id} className={`playground ${cl.wrapper}`}>
+          <div key={post.id} className={`playground ${cl.wrapper} ${fill ? cl.fill : ''}`}>
             <div className={cl.owner}>
               <PostOwner post={post} />
               <span className={cl.dateLink} onClick={() => openPost(post.id)} title='Открыть пост'>
@@ -267,12 +328,20 @@ export const Posts = ({ mode }: { mode?: 'bookmarks' }) => {
                   pinned: !!post.pinned,
                   archived: !!post.archived,
                   bookmarked: !!post.bookmarked,
+                  articleId: post.article?.id,
+                  canManage: canManage && post.community?.id === communityId,
                 }}
               />
             </div>
-            <PostImages images={post.images} postId={post.id} ownerId={post.user.id} />
-            <PostVideos videos={post.videos} ownerId={post.user.id} />
-            {post.description ? (
+            {post.article ? (
+              <ArticleCard article={post.article} />
+            ) : (
+              <>
+                <PostImages images={post.images} postId={post.id} ownerId={post.user.id} />
+                <PostVideos videos={post.videos} ownerId={post.user.id} />
+              </>
+            )}
+            {post.description && !post.article ? (
               <div
                 className={`${cl.text} ${cl.clickable}`}
                 onClick={(e) => (e.target as HTMLElement).closest('a') || openPost(post.id)}
@@ -283,7 +352,7 @@ export const Posts = ({ mode }: { mode?: 'bookmarks' }) => {
               <></>
             )}
             <RepostCard source={post.repostOf} deleted={post.repostDeleted} />
-            <ViewMark postId={post.id} views={post.views ?? 0} />
+            <ViewMark postId={post.id} />
             <PostActionWrapp
               repostsCount={post.repostsCount}
               views={post.views}
@@ -301,6 +370,11 @@ export const Posts = ({ mode }: { mode?: 'bookmarks' }) => {
       })}
       {mode === 'bookmarks' && !loading && !error && posts.length === 0 && (
         <p className={cl.empty}>Здесь появятся записи, которые вы сохранили в закладки</p>
+      )}
+      {mode !== 'bookmarks' && (profileUrlId > 0 || !!communityId) && !loading && !error && posts.length === 0 && (
+        <p className={cl.empty}>
+          {search.trim() ? 'Ничего не найдено' : kind === 'archive' ? 'В архиве пока ничего нет' : 'Записей пока нет'}
+        </p>
       )}
       <div ref={ref}>
         {loading && <Plug />}

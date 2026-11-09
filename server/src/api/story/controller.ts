@@ -20,7 +20,7 @@ class StoryController {
     const storage = new FileStorageService(storagePath)
     for (const story of expired) {
       try {
-        await storage.removeFiles({ high: story.high, medium: story.medium, small: story.small } as never)
+        await storage.removeFiles({ high: story.high, medium: story.medium, small: story.small })
       } catch (error) {
         console.error('Не удалось удалить файлы истории', story.id, error)
       }
@@ -159,7 +159,7 @@ class StoryController {
         high: story.high,
         medium: story.medium,
         small: story.small,
-      } as never)
+      })
     } catch (error) {
       console.error('Не удалось удалить файлы истории', storyId, error)
     }

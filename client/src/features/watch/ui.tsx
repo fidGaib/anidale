@@ -1,10 +1,17 @@
+import { ChangeEvent, RefObject } from 'react'
+
 import { useDarkModeStore } from '@/app/module'
-import { usePayerStore } from '@/pages/watch/module'
+import { Seekable, usePayerStore } from '@/pages/watch/module'
 import Input from '@/shared/ui/input'
 
 import cl from './ui.module.css'
 
-export const ControlsVideo = ({ ref__player, handle_screenfull }: any) => {
+interface ControlsProps {
+  ref__player: RefObject<Seekable>
+  handle_screenfull: () => void
+}
+
+export const ControlsVideo = ({ ref__player, handle_screenfull }: ControlsProps) => {
   const handle__volume = usePayerStore((store) => store.handle__volume)
   const handle__play = usePayerStore((store) => store.handle__play)
   const handle_prodress_track = usePayerStore((store) => store.handle_prodress_track)
@@ -30,7 +37,7 @@ export const ControlsVideo = ({ ref__player, handle_screenfull }: any) => {
         />
         <input
           type='range'
-          onChange={(e: any) => {
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
             handle_prodress_track(e.target.value, ref__player)
           }}
           min={0}

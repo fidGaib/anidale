@@ -13,8 +13,8 @@ class VideoController {
   async listSaved(userId: number, limit?: number | null, offset?: number | null) {
     return await VideoService.listSaved(userId, limit, offset)
   }
-  async create(userId: number, file: File, title?: string | null) {
-    return await VideoService.create(userId, file, title)
+  async create(userId: number, file: File, title?: string | null, communityId?: number | null) {
+    return await VideoService.create(userId, file, title, communityId)
   }
   async remove(userId: number, id: number) {
     return await VideoService.remove(userId, id)

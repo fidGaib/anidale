@@ -1,9 +1,11 @@
+import { ReactNode } from 'react'
+
 import cl from './ui.module.less'
 
 interface ModalProps {
   active: boolean
   setActive: (arg: boolean) => void
-  children: any
+  children: ReactNode
 }
 export const Modal = ({ active, setActive, children }: ModalProps) => {
   return (

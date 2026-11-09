@@ -30,7 +30,7 @@ extend type Query {
 
 extend type Mutation {
   "Добавить фотографию в свой альбом"
-  createPhoto(image: FILE!): Photo!
+  createPhoto(image: FILE!, communityId: Int): Photo!
   "Удалить свою фотографию"
   removePhoto(id: Int!): Boolean!
   "Сохранить чужое фото (source: POST | ALBUM) или убрать его из сохранённых"

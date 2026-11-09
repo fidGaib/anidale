@@ -18,7 +18,7 @@ export const FormSignin = () => {
   const { register, handleSubmit } = useForm<InputValues>()
   const [LOGIN, { data, error }] = useMutation(SIGNIN)
 
-  const [_, setRefreshData] = useRefreshStore((state) => [state.refreshData, state.setRefreshData])
+  const setRefreshData = useRefreshStore((state) => state.setRefreshData)
   const onSubmit: SubmitHandler<InputValues> = async (variables) => {
     await LOGIN({ variables, fetchPolicy: 'network-only' })
   }

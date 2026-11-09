@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 
 import { client } from '@/app/providers/apollo-client'
 import { useRefreshStore } from '@/app/providers/routes/model'
+import { CommunityAvatar, membersLabel } from '@/entities/community'
 import { Track, toTrack, useMusicStore } from '@/features/music/module'
 import { useOpenPost } from '@/features/post-viewer'
 import { assetUrl, storageUrl } from '@/shared/config'
@@ -13,13 +14,14 @@ import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
 
 import cl from './search.module.css'
 
-type Tab = 'all' | 'users' | 'posts' | 'music' | 'anime'
+type Tab = 'all' | 'users' | 'posts' | 'music' | 'communities' | 'anime'
 
 const TABS: { key: Tab; title: string }[] = [
   { key: 'all', title: 'Все' },
   { key: 'users', title: 'Люди' },
   { key: 'posts', title: 'Посты' },
   { key: 'music', title: 'Музыка' },
+  { key: 'communities', title: 'Сообщества' },
   { key: 'anime', title: 'Аниме' },
 ]
 
@@ -41,6 +43,13 @@ interface FoundUser {
   id: number
   login: string
   avatar: string
+}
+interface FoundCommunity {
+  id: number
+  name: string
+  avatar: string
+  status: string
+  membersCount: number
 }
 interface FoundPost {
   id: number
@@ -183,7 +192,8 @@ const SearchBody = ({ onClose }: { onClose: () => void }) => {
   const [users, setUsers] = useState<FoundUser[]>([])
   const [posts, setPosts] = useState<FoundPost[]>([])
   const [music, setMusic] = useState<Track[]>([])
-  const [totals, setTotals] = useState({ users: 0, posts: 0, music: 0 })
+  const [communities, setCommunities] = useState<FoundCommunity[]>([])
+  const [totals, setTotals] = useState({ users: 0, posts: 0, music: 0, communities: 0 })
   const [page, setPage] = useState(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -242,6 +252,16 @@ const SearchBody = ({ onClose }: { onClose: () => void }) => {
         comments: p.commentsCount ?? 0,
       }))
       const foundMusic = r.music.map(toTrack)
+      const foundCommunities: FoundCommunity[] = r.communities.map((c) => ({
+        id: c.id,
+        name: c.name,
+        avatar: c.avatar,
+        status: c.status,
+        membersCount: c.membersCount,
+      }))
+      setCommunities((prev) =>
+        append ? [...prev, ...foundCommunities.filter((c) => !prev.some((x) => x.id === c.id))] : foundCommunities,
+      )
       const append = pageNum > 0
       setUsers((prev) =>
         append ? [...prev, ...foundUsers.filter((u) => !prev.some((x) => x.id === u.id))] : foundUsers,
@@ -252,7 +272,7 @@ const SearchBody = ({ onClose }: { onClose: () => void }) => {
       setMusic((prev) =>
         append ? [...prev, ...foundMusic.filter((m) => !prev.some((x) => x.id === m.id))] : foundMusic,
       )
-      setTotals({ users: r.usersTotal, posts: r.postsTotal, music: r.musicTotal })
+      setTotals({ users: r.usersTotal, posts: r.postsTotal, music: r.musicTotal, communities: r.communitiesTotal })
       setPage(pageNum)
       setSearched(value)
     } catch (e) {
@@ -269,7 +289,8 @@ const SearchBody = ({ onClose }: { onClose: () => void }) => {
       setUsers([])
       setPosts([])
       setMusic([])
-      setTotals({ users: 0, posts: 0, music: 0 })
+      setCommunities([])
+      setTotals({ users: 0, posts: 0, music: 0, communities: 0 })
       setSearched('')
       setLoading(false)
       return
@@ -288,6 +309,7 @@ const SearchBody = ({ onClose }: { onClose: () => void }) => {
     users: tab === 'all' || tab === 'users',
     posts: tab === 'all' || tab === 'posts',
     music: tab === 'all' || tab === 'music',
+    communities: tab === 'all' || tab === 'communities',
     anime: tab === 'all' || tab === 'anime',
   }
   const tabTotal = (key: Tab) =>
@@ -297,6 +319,8 @@ const SearchBody = ({ onClose }: { onClose: () => void }) => {
       ? totals.posts
       : key === 'music'
       ? totals.music
+      : key === 'communities'
+      ? totals.communities
       : key === 'anime'
       ? animeFound.length
       : 0
@@ -304,6 +328,7 @@ const SearchBody = ({ onClose }: { onClose: () => void }) => {
   const showUsers = shown.users && tab !== 'anime'
   const showPosts = shown.posts && tab !== 'anime'
   const showMusic = shown.music && tab !== 'anime'
+  const showCommunities = shown.communities && tab !== 'anime'
   const nothing =
     !!text &&
     !loading &&
@@ -311,9 +336,18 @@ const SearchBody = ({ onClose }: { onClose: () => void }) => {
     (!showUsers || users.length === 0) &&
     (!showPosts || posts.length === 0) &&
     (!showMusic || music.length === 0) &&
+    (!showCommunities || communities.length === 0) &&
     (!shown.anime || animeFound.length === 0)
   const loadedForTab =
-    tab === 'users' ? users.length : tab === 'posts' ? posts.length : tab === 'music' ? music.length : 0
+    tab === 'users'
+      ? users.length
+      : tab === 'posts'
+      ? posts.length
+      : tab === 'music'
+      ? music.length
+      : tab === 'communities'
+      ? communities.length
+      : 0
   const canMore = tab !== 'all' && tab !== 'anime' && !loading && loadedForTab > 0 && loadedForTab < tabTotal(tab)
 
   return (
@@ -398,7 +432,9 @@ const SearchBody = ({ onClose }: { onClose: () => void }) => {
         )}
 
         {error && <p className={cl.hint}>{error}</p>}
-        {text && loading && users.length + posts.length + music.length === 0 && <p className={cl.hint}>Поиск…</p>}
+        {text && loading && users.length + posts.length + music.length + communities.length === 0 && (
+          <p className={cl.hint}>Поиск…</p>
+        )}
         {nothing && <p className={cl.hint}>Ничего не найдено</p>}
 
         {text && showUsers && users.length > 0 && (
@@ -428,6 +464,27 @@ const SearchBody = ({ onClose }: { onClose: () => void }) => {
           <Section title='Музыка' total={totals.music} onAll={tab === 'all' ? () => setTab('music') : undefined}>
             {music.map((m) => (
               <MusicRow key={m.id} track={m} queue={music} query={text} />
+            ))}
+          </Section>
+        )}
+        {text && showCommunities && communities.length > 0 && (
+          <Section
+            title='Сообщества'
+            total={totals.communities}
+            onAll={tab === 'all' ? () => setTab('communities') : undefined}
+          >
+            {communities.map((c) => (
+              <Link key={c.id} to={`/community/${c.id}`} className={cl.row} onClick={pick}>
+                <span className={cl.rowMain}>
+                  <CommunityAvatar name={c.name} avatar={c.avatar} size={36} />
+                  <span className={cl.postBody}>
+                    <span className={cl.name}>
+                      <Mark text={c.name} query={text} />
+                    </span>
+                    <span className={cl.meta}>{c.status || membersLabel(c.membersCount)}</span>
+                  </span>
+                </span>
+              </Link>
             ))}
           </Section>
         )}
@@ -461,7 +518,9 @@ const SearchBody = ({ onClose }: { onClose: () => void }) => {
             Показать ещё
           </button>
         )}
-        {text && loading && users.length + posts.length + music.length > 0 && <p className={cl.hint}>Загрузка…</p>}
+        {text && loading && users.length + posts.length + music.length + communities.length > 0 && (
+          <p className={cl.hint}>Загрузка…</p>
+        )}
       </div>
     </div>
   )

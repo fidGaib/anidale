@@ -5,6 +5,7 @@ import prisma from '@/db/db'
 import User from '@/db/models/user-model'
 import Video from '@/db/models/video-model'
 
+import { canViewCommunity, isCommunityAdmin } from '../community/access'
 import VideoStorageService from './video-service'
 
 const MAX_PAGE_LIMIT = 100
@@ -24,6 +25,16 @@ const withSaved = async <T extends { id: number }>(videos: T[], viewerId?: numbe
   return videos.map((video) => ({ ...video, saved: map.has(video.id), savedAt: map.get(video.id) ?? null }))
 }
 
+/** Видео личной страницы: без альбомов сообществ и роликов из записей сообществ; чужие архивные посты скрыты. */
+const personalWhere = (ownerId: number | null, viewerId?: number) => ({
+  ...(ownerId === null ? {} : { ownerId }),
+  communityId: null,
+  AND: [
+    { OR: [{ postId: null }, { post: { communityId: null } }] },
+    viewerId !== undefined && viewerId === ownerId ? {} : { OR: [{ postId: null }, { post: { archived: false } }] },
+  ],
+})
+
 class VideoService {
   private async assertUser(id: number) {
     const user = await User.findUnique({ where: { id }, select: { id: true } })
@@ -34,11 +45,7 @@ class VideoService {
   async list(id: number, limit?: number | null, offset?: number | null, viewerId?: number) {
     await this.assertUser(id)
     const videos = await Video.findMany({
-      where: {
-        ownerId: id,
-        // Гостю и другим пользователям архивные посты не показываем
-        ...(viewerId === id ? {} : { OR: [{ postId: null }, { post: { archived: false } }] }),
-      },
+      where: personalWhere(id, viewerId),
       orderBy: [{ date: 'desc' }, { id: 'desc' }],
       take: clampLimit(limit),
       skip: clampOffset(offset),
@@ -50,7 +57,7 @@ class VideoService {
   /** Видео всех пользователей для ленты. Ролики из архивных постов скрыты даже от автора: лента публичная. */
   async listAll(limit?: number | null, offset?: number | null, viewerId?: number) {
     const videos = await Video.findMany({
-      where: { OR: [{ postId: null }, { post: { archived: false } }] },
+      where: personalWhere(null),
       orderBy: [{ date: 'desc' }, { id: 'desc' }],
       take: clampLimit(limit),
       skip: clampOffset(offset),
@@ -61,12 +68,20 @@ class VideoService {
 
   async count(id: number, viewerId?: number) {
     await this.assertUser(id)
-    return await Video.count({
-      where: {
-        ownerId: id,
-        ...(viewerId === id ? {} : { OR: [{ postId: null }, { post: { archived: false } }] }),
-      },
+    return await Video.count({ where: personalWhere(id, viewerId) })
+  }
+
+  /** Видео сообщества: альбом и ролики из его записей. Закрытое сообщество показывает их только участникам. */
+  async listCommunity(communityId: number, limit?: number | null, offset?: number | null, viewerId?: number) {
+    if (!(await canViewCommunity(communityId, viewerId))) return []
+    const videos = await Video.findMany({
+      where: { OR: [{ communityId }, { post: { communityId, archived: false, suggested: false } }] },
+      orderBy: [{ date: 'desc' }, { id: 'desc' }],
+      take: clampLimit(limit),
+      skip: clampOffset(offset),
+      include: { user: userSelect },
     })
+    return await withSaved(videos, viewerId)
   }
 
   /** Альбом сохранённых видео текущего пользователя. */
@@ -86,14 +101,18 @@ class VideoService {
   }
 
   /** Загрузка видео в свой альбом. Публикации поста при этом не происходит. */
-  async create(userId: number, file: File, title?: string | null) {
+  async create(userId: number, file: File, title?: string | null, communityId?: number | null) {
     if (!file) throw createGraphQLError('Выберите видео')
+    if (communityId && !(await isCommunityAdmin(communityId, userId))) {
+      throw createGraphQLError('Добавлять видео в сообщество могут только администраторы')
+    }
     const storage = new VideoStorageService(storagePath)
     const saved = await storage.save(file)
     try {
       return await Video.create({
         data: {
           ownerId: userId,
+          communityId: communityId || null,
           title: title?.trim().slice(0, 120) || saved.title,
           file: saved.file,
           size: saved.size,
@@ -108,12 +127,19 @@ class VideoService {
     }
   }
 
-  /** Удалить можно только отдельно загруженное видео: ролики из постов живут вместе с постами. */
+  /** Автор удаляет своё видео, в том числе ролик из поста: пост остаётся, но целиком опустеть он не может. */
   async remove(userId: number, id: number) {
     const video = await Video.findUnique({ where: { id } })
     if (!video) throw createGraphQLError('Видео не найдено')
     if (video.ownerId !== userId) throw createGraphQLError('Нет доступа')
-    if (video.postId !== null) throw createGraphQLError('Видео из поста удаляется вместе с постом')
+    if (video.postId !== null) {
+      const post = await prisma.post.findUnique({
+        where: { id: video.postId },
+        select: { description: true, _count: { select: { images: true, videos: true } } },
+      })
+      const onlyContent = post && !post.description.trim() && post._count.images === 0 && post._count.videos <= 1
+      if (onlyContent) throw createGraphQLError('Это единственное содержимое поста. Удалите сам пост')
+    }
 
     await Video.delete({ where: { id } })
     try {

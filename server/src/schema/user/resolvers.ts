@@ -1,15 +1,13 @@
 import UserController from '@/api/user/controller'
-import { Resolvers } from '@/schema/resolvers-types'
+import { Resolvers, TypeUpdateUser, User } from '@/schema/resolvers-types'
 
 const UserResolvers: Resolvers = {
   Query: {
-    //@ts-ignore
     async getUsers(_, { limit, offset, search }) {
-      return await UserController.list(limit, offset, search)
+      return (await UserController.list(limit, offset, search)) as unknown as User[]
     },
-    //@ts-ignore
     async getUser(_, { id }) {
-      return await UserController.find(id)
+      return (await UserController.find(id)) as unknown as User
     },
     async logout(_, __, { req, res }) {
       return await UserController.logout(req, res)
@@ -25,10 +23,9 @@ const UserResolvers: Resolvers = {
     async login(_, args, { req, res }) {
       return await UserController.login(args.user, req, res)
     },
-    //@ts-ignore
     async updateUser(_, { user }, { req, res }) {
       const tokienData = await UserController.refresh(res, req.cookies.refreshToken)
-      return await UserController.updateUser(tokienData.id, user)
+      return (await UserController.updateUser(tokienData.id, user)) as unknown as TypeUpdateUser
     },
     async remove(_, __, { req, res }) {
       const tokienData = await UserController.refresh(res, req.cookies.refreshToken)

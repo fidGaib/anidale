@@ -13,7 +13,16 @@ import { AppNotification, useNotificationsStore } from './module'
 import { notificationText } from './text'
 import cl from './ui.module.css'
 
-const ICONS: Record<AppNotification['type'], string> = { like: '❤️', comment: '💬', track: '🎵', repost: '↪' }
+const ICONS: Record<AppNotification['type'], string> = {
+  like: '❤️',
+  comment: '💬',
+  track: '🎵',
+  repost: '↪',
+  community_request: '👥',
+  community_accept: '✅',
+  community_suggest: '📝',
+  community_invite: '✉️',
+}
 
 const Item = ({ n, onOpen }: { n: AppNotification; onOpen: (n: AppNotification) => void }) => (
   <li className={`${cl.item} ${n.read ? '' : cl.unread}`} onClick={() => onOpen(n)}>
@@ -70,7 +79,8 @@ export const NotificationBell = () => {
   const openItem = (n: AppNotification) => {
     setOpen(false)
     // Лайк или комментарий: пост открывается окном поверх текущей страницы, как в ВК; трек ведёт в музыку
-    if (n.type !== 'track' && n.postId) openPost(n.postId)
+    if (n.communityId) navigate(`/community/${n.communityId}`)
+    else if (n.type !== 'track' && n.postId) openPost(n.postId)
     else navigate(n.type === 'track' ? '/music' : `/profile/${myId}`)
   }
 

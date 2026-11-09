@@ -95,6 +95,7 @@ export const MessageBubble = ({
 }: BubbleProps) => {
   const images = message.attachments.filter((a) => a.kind === 'image')
   const others = message.attachments.filter((a) => a.kind !== 'image')
+  const replyId = message.replyTo?.id ?? 0
   // На телефоне правой кнопки нет: меню открывается долгим нажатием
   const pressTimer = useRef<number | undefined>(undefined)
   const cancelPress = () => window.clearTimeout(pressTimer.current)
@@ -124,7 +125,7 @@ export const MessageBubble = ({
       >
         {message.replyToId > 0 &&
           (message.replyTo ? (
-            <div className={cl.quote} title='Перейти к сообщению' onClick={() => onJump(message.replyTo!.id)}>
+            <div className={cl.quote} title='Перейти к сообщению' onClick={() => onJump(replyId)}>
               <div className={cl.quoteAuthor}>
                 {message.replyTo.senderId === myId ? 'Вы' : peerLogin || 'Собеседник'}
               </div>

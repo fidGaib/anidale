@@ -33,6 +33,8 @@ export interface ViewedPost {
   repostsCount: number
   bookmarked: boolean
   repostDeleted: boolean
+  article: { id: number; title: string; cover: string; excerpt: string } | null
+  community: { id: number; name: string; avatar: string } | null
   repostOf: {
     id: number
     description: string
@@ -112,6 +114,8 @@ export const usePost = (postId: number) => {
           repostsCount: p.repostsCount ?? 0,
           bookmarked: !!p.bookmarked,
           repostDeleted: !!p.repostDeleted,
+          article: p.article ?? null,
+          community: p.community ?? null,
           repostOf: p.repostOf
             ? {
                 id: p.repostOf.id ?? 0,

@@ -4,28 +4,30 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 
 import { useRefreshStore } from '@/app/providers/routes/model'
 import { ProfileMusicList } from '@/features/music'
-import { MakePost } from '@/features/profile'
+import { PostDialog } from '@/features/profile'
+import type { WallKind } from '@/features/profile/types'
 import { useStoriesStore } from '@/features/stories'
+import { VideoUploadDialog } from '@/features/video-upload'
 import { assetUrl } from '@/shared/config'
 import { PROFILE, SUBSCRIBE, UNSUBSCRIBE } from '@/shared/graphql/schema'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
 import { openPhotos } from '@/shared/lib/photo-viewer'
-import { toTimestamp } from '@/shared/lib/time'
+import { formatLastSeen, toTimestamp } from '@/shared/lib/time'
 import ButtonUI from '@/shared/ui/button'
 import { ContextMenu, ContextMenuItem } from '@/shared/ui/context-menu'
 
 import Posts from '../post'
+import { CreateButton } from './create-button'
+import { ProfileDetails } from './details'
+import { buildDetails } from './details-model'
+import { MediaPreview } from './media-preview'
 import { ProfilePhotos } from './photos'
+import { ProfileSide } from './side'
 import cl from './ui.module.css'
+import { useOnline } from './use-online'
 import { ProfileVideos } from './videos'
-
-const tabs = [
-  { icon: assetUrl('icons/arts.svg'), text: 'Стена', layout: 1 },
-  { icon: assetUrl('icons/add_photo.svg'), text: 'Фото', layout: 4 },
-  { icon: assetUrl('icons/music.svg'), text: 'Музыка', layout: 2 },
-  { icon: assetUrl('icons/video.svg'), text: 'Видео', layout: 3 },
-]
+import { WallTabs } from './wall-tabs'
 
 type RelationStatus = 'NONE' | 'FRIEND' | 'SUBSCRIBED' | 'SUBSCRIBER'
 
@@ -33,6 +35,7 @@ interface FriendStateData {
   status: string
   friendsCount: number
   subscribersCount: number
+  subscriptionsCount: number
 }
 
 export const ArtWork = () => {
@@ -45,6 +48,10 @@ export const ArtWork = () => {
     avatar: data?.getUser?.avatar,
     status: data?.getUser?.status,
     city: data?.getUser?.city,
+    work: data?.getUser?.work,
+    education: data?.getUser?.education,
+    about: data?.getUser?.about,
+    website: data?.getUser?.website,
     birthDate: data?.getUser?.birthDate,
     backgroundImage: data?.getUser?.backgroundImage,
   }
@@ -52,6 +59,7 @@ export const ArtWork = () => {
 
   const [refreshData] = useRefreshStore((state) => [state.refreshData])
   const isOwn = refreshData.id === id
+  const presence = useOnline(id, isOwn)
 
   // Отношения с профилем: локальное состояние поверх ответа getFriendState,
   // чтобы кнопка и счётчики обновлялись сразу после подписки/отписки.
@@ -80,8 +88,8 @@ export const ArtWork = () => {
   const counters = [
     { label: 'друзья', value: friendState?.friendsCount ?? 0 },
     { label: 'подписчики', value: friendState?.subscribersCount ?? 0 },
-    { label: 'фото', value: Math.max(0, (data?.photosCount ?? 0) + photosDelta) },
-    { label: 'видео', value: Math.max(0, (data?.videosCount ?? 0) + videosDelta) },
+    { label: 'фото', layout: 4, value: Math.max(0, (data?.photosCount ?? 0) + photosDelta) },
+    { label: 'видео', layout: 3, value: Math.max(0, (data?.videosCount ?? 0) + videosDelta) },
   ]
 
   const toggleSubscription = async () => {
@@ -139,6 +147,20 @@ export const ArtWork = () => {
   }, [loadStories, id])
 
   const [layout, isLayout] = useState(1)
+  // Вкладка стены и поиск по постам: при смене профиля начинаем с «Главной»
+  const [wallKind, setWallKind] = useState<WallKind>('all')
+  const [wallSearch, setWallSearch] = useState('')
+  // Окно нового поста открывается из меню «Создать»
+  const [composerOpen, setComposerOpen] = useState(false)
+  // Окно загрузки видео; videosKey обновляет вкладку «Видео» после загрузки
+  const [videoDialog, setVideoDialog] = useState(false)
+  const [videosKey, setVideosKey] = useState(0)
+  useEffect(() => {
+    setWallKind('all')
+    setWallSearch('')
+    setComposerOpen(false)
+    setVideoDialog(false)
+  }, [id])
 
   return (
     <>
@@ -154,15 +176,18 @@ export const ArtWork = () => {
         </div>
 
         <div className={cl.head}>
-          <ImageLoading
-            onClick={() => {
-              if (storyGroup) openStory(id)
-              else if (avatar) openPhotos([{ src: avatar, name: user.login || 'avatar' }])
-            }}
-            title={storyGroup ? 'Смотреть историю' : undefined}
-            className={`${cl.avatar} ${storyGroup ? (storyGroup.allSeen ? cl.storySeen : cl.storyNew) : ''}`}
-            src={avatar}
-          />
+          <div className={cl.avatarWrap}>
+            <ImageLoading
+              onClick={() => {
+                if (storyGroup) openStory(id)
+                else if (avatar) openPhotos([{ src: avatar, name: user.login || 'avatar' }])
+              }}
+              title={storyGroup ? 'Смотреть историю' : undefined}
+              className={`${cl.avatar} ${storyGroup ? (storyGroup.allSeen ? cl.storySeen : cl.storyNew) : ''}`}
+              src={avatar}
+            />
+            {presence.online && <span className={cl.onlineDot} title='В сети' />}
+          </div>
 
           <div className={cl.identity}>
             <h1 className={cl.name}>
@@ -173,6 +198,9 @@ export const ArtWork = () => {
                 </Link>
               )}
             </h1>
+            <span className={`${cl.presence} ${presence.online ? cl.presenceOnline : ''}`}>
+              {formatLastSeen(presence.online, presence.lastSeenAt)}
+            </span>
             {user.status ? (
               <p className={cl.status}>{user.status}</p>
             ) : isOwn ? (
@@ -181,12 +209,6 @@ export const ArtWork = () => {
               </Link>
             ) : (
               <span className={cl.statusMuted}>Без статуса</span>
-            )}
-            {(user.city || birthLabel) && (
-              <div className={cl.meta}>
-                {user.city && <span>{user.city}</span>}
-                {birthLabel && <span>{birthLabel}</span>}
-              </div>
             )}
           </div>
 
@@ -226,40 +248,82 @@ export const ArtWork = () => {
 
         <div className={cl.counters}>
           {counters.map((counter) => (
-            <div key={counter.label} className={cl.counter}>
+            <button
+              key={counter.label}
+              type='button'
+              className={`${cl.counter} ${counter.layout ? cl.counterLink : ''}`}
+              disabled={!counter.layout}
+              onClick={() => counter.layout && isLayout(counter.layout)}
+            >
               <b>{counter.value}</b>
               <span>{counter.label}</span>
-            </div>
-          ))}
-        </div>
-
-        <nav className={cl.tabs}>
-          {tabs.map((tab) => (
-            <button
-              key={tab.layout}
-              className={`${cl.tab} ${layout === tab.layout ? cl.tabActive : ''}`}
-              onClick={() => isLayout(tab.layout)}
-            >
-              <ImageLoading src={tab.icon} className={cl.tabIcon} />
-              <span>{tab.text}</span>
             </button>
           ))}
-        </nav>
+        </div>
+        <ProfileDetails rows={buildDetails({ ...user, birth: birthLabel })} isOwn={isOwn} />
       </div>
 
-      {layout === 1 && (
-        <>
-          <MakePost />
-          <Posts />
-        </>
+      <div className={cl.layout}>
+        <div className={cl.main}>
+          {layout !== 1 && (
+            <button type='button' className={cl.backToWall} onClick={() => isLayout(1)}>
+              ← К стене
+            </button>
+          )}
+          {layout === 1 && (
+            <>
+              <MediaPreview id={id} onShowAll={isLayout} />
+              {isOwn && (
+                <CreateButton
+                  onPost={() => setComposerOpen(true)}
+                  onVideo={() => setVideoDialog(true)}
+                  onOpenTab={isLayout}
+                />
+              )}
+              <WallTabs
+                isOwn={isOwn}
+                kind={wallKind}
+                onKind={setWallKind}
+                search={wallSearch}
+                onSearch={setWallSearch}
+              />
+              <Posts kind={wallKind} search={wallSearch} fill />
+            </>
+          )}
+          {layout === 2 && <ProfileMusicList scope={id} canAdd={isOwn} />}
+          {layout === 4 && (
+            <ProfilePhotos id={id} isOwn={isOwn} onCountChange={(delta) => setPhotosDelta((value) => value + delta)} />
+          )}
+          {layout === 3 && (
+            <ProfileVideos
+              key={videosKey}
+              id={id}
+              isOwn={isOwn}
+              onAdd={() => setVideoDialog(true)}
+              onCountChange={(delta) => setVideosDelta((value) => value + delta)}
+            />
+          )}
+        </div>
+        <aside className={cl.aside}>
+          <ProfileSide
+            id={id}
+            isOwn={isOwn}
+            friendsCount={friendState?.friendsCount ?? 0}
+            subscriptionsCount={friendState?.subscriptionsCount ?? 0}
+          />
+        </aside>
+      </div>
+      {isOwn && videoDialog && (
+        <VideoUploadDialog
+          onClose={() => setVideoDialog(false)}
+          onUploaded={(count) => {
+            setVideosDelta((value) => value + count)
+            setVideosKey((key) => key + 1)
+            isLayout(3)
+          }}
+        />
       )}
-      {layout === 2 && <ProfileMusicList scope={id} canAdd={isOwn} />}
-      {layout === 4 && (
-        <ProfilePhotos id={id} isOwn={isOwn} onCountChange={(delta) => setPhotosDelta((value) => value + delta)} />
-      )}
-      {layout === 3 && (
-        <ProfileVideos id={id} isOwn={isOwn} onCountChange={(delta) => setVideosDelta((value) => value + delta)} />
-      )}
+      {isOwn && composerOpen && <PostDialog onClose={() => setComposerOpen(false)} />}
       {menu && <ContextMenu x={menu.x} y={menu.y} items={menuItems} onClose={() => setMenu(null)} />}
     </>
   )

@@ -19,6 +19,11 @@ model User {
   // Публичные поля профиля
   status          String    @default("")
   city            String    @default("")
+  // Блок «Подробнее» в профиле
+  work            String    @default("")
+  education       String    @default("")
+  about           String    @default("")
+  website         String    @default("")
   birthDate       DateTime?
   backgroundImage String    @default("")
   activationLink String?
@@ -43,6 +48,11 @@ model User {
   postReports PostReport[]
   stories     Story[]
   storyViews  StoryView[]
+  postViews   PostView[]
+  communitiesOwned Community[] @relation("CommunityOwner")
+  communityMemberships CommunityMember[]
+  communityRequests CommunityRequest[]
+  communityBans CommunityBan[]
   notifications    Notification[] @relation("NotificationOwner")
   notificationsMade Notification[] @relation("NotificationActor")
   // Подписки: кого подписан я и кто подписан на меня
@@ -205,10 +215,18 @@ model Post {
   // Репост: id исходного поста (всегда корневого). После удаления оригинала становится null, repostDeleted = true
   repostOfId  Int?
   repostDeleted Boolean @default(false)
+  // Статья: пост-обёртка с заголовком и блоками (лайки, комментарии, архив и закладки работают как у поста)
+  article     Article?
+  // Пост на стене сообщества: owner — администратор, который его написал
+  communityId Int?
+  community   Community? @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  // Запись участника ждёт одобрения администратора и пока скрыта от всех, кроме автора и администраторов
+  suggested   Boolean  @default(false)
   repostOf    Post?    @relation("Reposts", fields: [repostOfId], references: [id], onDelete: SetNull)
   reposts     Post[]   @relation("Reposts")
   bookmarks   Bookmark[]
   reports     PostReport[]
+  viewedBy    PostView[]
 
   @@index([owner])
 }
@@ -243,6 +261,9 @@ model Video {
   user    User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   postId  Int?
   post    Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  // Видео из альбома сообщества (загрузил администратор)
+  communityId Int?
+  community   Community? @relation(fields: [communityId], references: [id], onDelete: Cascade)
   savedBy SavedVideo[]
 
   @@index([ownerId, id])
@@ -273,6 +294,9 @@ model Photo {
   date      DateTime @default(now())
   userId    Int
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Фото из альбома сообщества (загрузил администратор)
+  communityId Int?
+  community   Community? @relation(fields: [communityId], references: [id], onDelete: Cascade)
   savedBy   SavedPhoto[]
 
   @@index([userId, id])
@@ -315,6 +339,8 @@ model Notification {
   userId    Int
   actorId   Int
   postId    Int?
+  communityId Int?
+  community Community? @relation(fields: [communityId], references: [id], onDelete: Cascade)
   user      User      @relation("NotificationOwner", fields: [userId], references: [id], onDelete: Cascade)
   actor     User      @relation("NotificationActor", fields: [actorId], references: [id], onDelete: Cascade)
   post      Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
@@ -376,4 +402,112 @@ model StoryView {
   user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([storyId, userId])
+}
+
+// Просмотр поста вошедшим пользователем: один человек — один просмотр. Счётчик Post.views растёт только при новой записи
+model PostView {
+  id     Int      @id @default(autoincrement())
+  date   DateTime @default(now())
+  postId Int
+  userId Int
+  post   Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@index([postId])
+}
+
+// Статья: хранится вместе с постом, который её публикует
+model Article {
+  id         Int      @id @default(autoincrement())
+  title      String
+  // Обложка: пути medium и small; пусто — без обложки
+  cover      String   @default("")
+  coverSmall String   @default("")
+  // Начало текста для карточки на стене
+  excerpt    String   @default("")
+  // JSON-массив блоков (см. api/article/content.ts)
+  content    String
+  date       DateTime @default(now())
+  editedAt   DateTime?
+  postId     Int      @unique
+  post       Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+// Сообщество: страница с описанием, участниками и стеной
+model Community {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String   @default("")
+  status      String   @default("")
+  website     String   @default("")
+  // Пути картинок (medium) без расширения; пусто — без картинки
+  avatar      String   @default("")
+  cover       String   @default("")
+  createdAt   DateTime @default(now())
+  ownerId     Int
+  owner       User     @relation("CommunityOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  // Закрытое сообщество: стену и участников видят только участники, вступить можно по заявке
+  isClosed    Boolean  @default(false)
+  members     CommunityMember[]
+  posts       Post[]
+  links       CommunityLink[]
+  requests    CommunityRequest[]
+  bans        CommunityBan[]
+  videos      Video[]
+  photos      Photo[]
+  notifications Notification[]
+
+  @@index([name])
+}
+
+// Участник сообщества. role: member | admin (создатель тоже admin, он же Community.ownerId)
+model CommunityMember {
+  id          Int      @id @default(autoincrement())
+  role        String   @default("member")
+  date        DateTime @default(now())
+  communityId Int
+  userId      Int
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([communityId, userId])
+  @@index([userId])
+}
+
+// Ссылка в карточке сообщества
+model CommunityLink {
+  id          Int       @id @default(autoincrement())
+  title       String
+  url         String
+  position    Int       @default(0)
+  communityId Int
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+
+  @@index([communityId])
+}
+
+// Заявка на вступление в закрытое сообщество
+model CommunityRequest {
+  id          Int       @id @default(autoincrement())
+  date        DateTime  @default(now())
+  communityId Int
+  userId      Int
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([communityId, userId])
+}
+
+// Чёрный список сообщества
+model CommunityBan {
+  id          Int       @id @default(autoincrement())
+  reason      String    @default("")
+  date        DateTime  @default(now())
+  communityId Int
+  userId      Int
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([communityId, userId])
 }

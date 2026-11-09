@@ -1,0 +1,92 @@
+.wrap {
+  margin-bottom: 10px;
+  color: var(--color-text-main);
+  font-family: var(--font-text-main);
+}
+
+.toolbar {
+  margin-bottom: 12px;
+}
+
+.primary,
+.more {
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-text-main);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.primary:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.more {
+  display: block;
+  margin: 12px auto 0;
+  background: rgba(128, 128, 128, 0.2);
+  color: inherit;
+}
+
+.error {
+  margin: 0 0 8px;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.empty {
+  padding: 24px 0;
+  text-align: center;
+  opacity: 0.6;
+}
+
+.photoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 6px;
+}
+
+.photo {
+  aspect-ratio: 1;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(128, 128, 128, 0.15);
+  cursor: pointer;
+}
+
+.photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.videoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.video {
+  margin: 0;
+}
+
+.video video {
+  width: 100%;
+  border-radius: 8px;
+  background: #000;
+}
+
+.video figcaption {
+  margin-top: 4px;
+  overflow: hidden;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -17,8 +17,8 @@ const PhotoResolvers: Resolvers = {
     },
   },
   Mutation: {
-    async createPhoto(_, { image }, { req }) {
-      return await PhotoController.create(await getOptionalUserId(req), image)
+    async createPhoto(_, { image, communityId }, { req }) {
+      return await PhotoController.create(await getOptionalUserId(req), image, communityId)
     },
     async removePhoto(_, { id }, { req }) {
       return await PhotoController.remove(await getOptionalUserId(req), id)

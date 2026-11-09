@@ -9,6 +9,12 @@ class FriendController {
   async friends(id: number, limit?: number | null, offset?: number | null) {
     return await FriendService.friends(id, limit, offset)
   }
+  async subscriptions(id: number, limit?: number | null, offset?: number | null) {
+    return await FriendService.subscriptions(id, limit, offset)
+  }
+  async friendsOnline(id: number, limit?: number | null) {
+    return await FriendService.friendsOnline(id, limit)
+  }
   async subscribers(id: number, limit?: number | null, offset?: number | null) {
     return await FriendService.subscribers(id, limit, offset)
   }

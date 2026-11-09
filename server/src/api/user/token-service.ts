@@ -23,7 +23,7 @@ class TokenService {
     this.refreshSecret = process.env.JWT_REFRESH_SECRET
   }
 
-  async generateTokens({ avatar, id, login }: any) {
+  async generateTokens({ avatar, id, login }: { avatar: string; id: number; login: string }) {
     const accessToken = jwt.sign({ avatar, id, login }, this.accessSecret, { expiresIn: '15m' })
     const refreshToken = jwt.sign({ avatar, id, login }, this.refreshSecret, { expiresIn: '14d' })
     return {

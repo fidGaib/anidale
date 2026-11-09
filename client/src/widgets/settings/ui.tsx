@@ -20,6 +20,10 @@ type ProfileData = {
   login?: string | null
   status?: string | null
   city?: string | null
+  work?: string | null
+  education?: string | null
+  about?: string | null
+  website?: string | null
   birthDate?: unknown
   backgroundImage?: string | null
 }
@@ -49,6 +53,10 @@ const EditProfile = ({ user }: { user?: ProfileData }) => {
   const [login, setLogin] = useState('')
   const [status, setStatus] = useState('')
   const [city, setCity] = useState('')
+  const [work, setWork] = useState('')
+  const [education, setEducation] = useState('')
+  const [about, setAbout] = useState('')
+  const [website, setWebsite] = useState('')
   const [birthDate, setBirthDate] = useState('')
   const [saved, setSaved] = useState(false)
   const [updateProfile, { loading, error }] = useMutation(UPDATE_PROFILE)
@@ -62,6 +70,10 @@ const EditProfile = ({ user }: { user?: ProfileData }) => {
     setLogin(user.login ?? '')
     setStatus(user.status ?? '')
     setCity(user.city ?? '')
+    setWork(user.work ?? '')
+    setEducation(user.education ?? '')
+    setAbout(user.about ?? '')
+    setWebsite(user.website ?? '')
     const timestamp = toTimestamp(user.birthDate)
     setBirthDate(timestamp ? new Date(timestamp).toISOString().slice(0, 10) : '')
   }, [user])
@@ -71,7 +83,7 @@ const EditProfile = ({ user }: { user?: ProfileData }) => {
     const timestamp = birthDate ? new Date(`${birthDate}T00:00:00.000Z`).getTime() : null
     try {
       const result = await updateProfile({
-        variables: { login: login.trim() || null, status, city, birthDate: timestamp },
+        variables: { login: login.trim() || null, status, city, work, education, about, website, birthDate: timestamp },
       })
       const updated = result.data?.updateUser
       if (updated?.login) setRefreshData({ login: updated.login })
@@ -107,6 +119,46 @@ const EditProfile = ({ user }: { user?: ProfileData }) => {
         <label>
           Дата рождения
           <Input type='date' value={birthDate} onChange={(e) => setBirthDate(e.target.value)} />
+        </label>
+        <label>
+          Место работы
+          <Input
+            type='text'
+            maxLength={100}
+            placeholder='Где вы работаете'
+            value={work}
+            onChange={(e) => setWork(e.target.value)}
+          />
+        </label>
+        <label>
+          Образование
+          <Input
+            type='text'
+            maxLength={100}
+            placeholder='Где вы учились'
+            value={education}
+            onChange={(e) => setEducation(e.target.value)}
+          />
+        </label>
+        <label>
+          О себе
+          <Input
+            type='text'
+            maxLength={500}
+            placeholder='Расскажите о себе'
+            value={about}
+            onChange={(e) => setAbout(e.target.value)}
+          />
+        </label>
+        <label>
+          Сайт
+          <Input
+            type='text'
+            maxLength={200}
+            placeholder='https://'
+            value={website}
+            onChange={(e) => setWebsite(e.target.value)}
+          />
         </label>
         <ButtonUI onClick={save} disabled={loading}>
           Сохранить

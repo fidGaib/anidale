@@ -11,6 +11,7 @@ import { useSocket } from '@/shared/hooks/useSocket'
 import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
 import { formatDateTime, toTimestamp } from '@/shared/lib/time'
 
+import { AddStory } from './add-story'
 import { StoryGroup, useStoriesStore } from './module'
 import cl from './ui.module.css'
 
@@ -45,33 +46,10 @@ const Item = ({ group, onOpen }: { group: StoryGroup; onOpen: () => void }) => (
 export const StoriesRow = () => {
   const myId = useRefreshStore((s) => s.refreshData.id) ?? 0
   const groups = useStoriesStore((s) => s.groups)
-  const uploading = useStoriesStore((s) => s.uploading)
   const error = useStoriesStore((s) => s.error)
   const load = useStoriesStore((s) => s.load)
-  const create = useStoriesStore((s) => s.create)
   const open = useStoriesStore((s) => s.open)
   const { socket, isConnected } = useSocket()
-  const input = useRef<HTMLInputElement>(null)
-  // Выбранная картинка ждёт подтверждения: можно добавить подпись и посмотреть превью
-  const [pending, setPending] = useState<File | null>(null)
-  const [caption, setCaption] = useState('')
-  const [preview, setPreview] = useState('')
-  useEffect(() => {
-    if (!pending) return setPreview('')
-    const url = URL.createObjectURL(pending)
-    setPreview(url)
-    return () => URL.revokeObjectURL(url)
-  }, [pending])
-  const cancelPending = () => {
-    setPending(null)
-    setCaption('')
-  }
-  const publish = async () => {
-    if (!pending) return
-    const ok = await create(pending, caption)
-    if (ok) cancelPending()
-  }
-
   useEffect(() => {
     void load()
   }, [load, myId])
@@ -93,55 +71,21 @@ export const StoriesRow = () => {
   return (
     <div className={` ${cl.row}`}>
       {myId > 0 && (
-        <button type='button' className={cl.item} onClick={() => input.current?.click()} disabled={uploading}>
-          <span className={`${cl.ring} ${cl.ringAdd}`}>
-            <span className={cl.plus}>{uploading ? '…' : '+'}</span>
-          </span>
-          <span className={cl.name}>{uploading ? 'Загрузка' : 'Добавить'}</span>
-        </button>
+        <AddStory>
+          {(openPicker, uploading) => (
+            <button type='button' className={cl.item} onClick={openPicker} disabled={uploading}>
+              <span className={`${cl.ring} ${cl.ringAdd}`}>
+                <span className={cl.plus}>{uploading ? '…' : '+'}</span>
+              </span>
+              <span className={cl.name}>{uploading ? 'Загрузка' : 'Добавить'}</span>
+            </button>
+          )}
+        </AddStory>
       )}
-      <input
-        ref={input}
-        type='file'
-        accept='image/*'
-        hidden
-        onChange={(e) => {
-          const file = e.target.files?.[0]
-          e.target.value = ''
-          if (file) setPending(file)
-        }}
-      />
       {groups.map((g) => (
         <Item key={g.user.id} group={g} onOpen={() => open(g.user.id)} />
       ))}
       {error && <p className={cl.error}>{error}</p>}
-      {pending && (
-        <div
-          className={cl.dialogOverlay}
-          onMouseDown={(e) => e.target === e.currentTarget && !uploading && cancelPending()}
-        >
-          <div className={`playground ${cl.dialog}`} role='dialog' aria-label='Новая история'>
-            <p className={cl.dialogTitle}>Новая история</p>
-            {preview && <img className={cl.dialogPreview} src={preview} alt='' />}
-            <input
-              className={cl.dialogInput}
-              placeholder='Подпись (необязательно)'
-              maxLength={200}
-              value={caption}
-              onChange={(e) => setCaption(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && void publish()}
-            />
-            <div className={cl.dialogButtons}>
-              <button type='button' className={cl.dialogPrimary} disabled={uploading} onClick={() => void publish()}>
-                {uploading ? 'Загрузка…' : 'Опубликовать'}
-              </button>
-              <button type='button' className={cl.dialogButton} disabled={uploading} onClick={cancelPending}>
-                Отмена
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

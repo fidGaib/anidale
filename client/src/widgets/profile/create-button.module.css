@@ -1,0 +1,29 @@
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 12px;
+  border: 0;
+  border-radius: var(--playground-border);
+  color: var(--color-text-main);
+  font-family: var(--font-text-main);
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.button:hover {
+  filter: brightness(1.12);
+}
+
+.plus {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.arrow {
+  font-size: 16px;
+  line-height: 1;
+}

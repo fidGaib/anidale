@@ -19,6 +19,10 @@ type UpdateUser = {
   pass?: string
   status?: string
   city?: string
+  work?: string
+  education?: string
+  about?: string
+  website?: string
   birthDate?: Date | null
   activationLink?: string
 }
@@ -29,6 +33,10 @@ export type PublicUser = {
   avatar: string
   status: string
   city: string
+  work: string
+  education: string
+  about: string
+  website: string
   birthDate: Date | null
   backgroundImage: string
   createdAt: Date
@@ -39,10 +47,29 @@ export const publicUserSelect = {
   avatar: true,
   status: true,
   city: true,
+  work: true,
+  education: true,
+  about: true,
+  website: true,
   birthDate: true,
   backgroundImage: true,
   createdAt: true,
 } as const
+/** Предельная длина полей блока «Подробнее». */
+export const DETAIL_LIMITS = { work: 100, education: 100, about: 500, website: 200 } as const
+
+/** Сайт: только http(s); адрес без схемы дополняется https://. Пустая строка стирает поле. */
+export const normalizeWebsite = (value: string): string => {
+  const text = value.trim()
+  if (!text) return ''
+  const isHttp = /^https?:\/\//i.test(text)
+  if (/^[a-z][a-z0-9+.-]*:(?!\d)/i.test(text) && !isHttp) {
+    throw createGraphQLError('Сайт должен начинаться с http:// или https://')
+  }
+  const full = isHttp ? text : `https://${text}`
+  return full.slice(0, DETAIL_LIMITS.website)
+}
+
 // | ----------------> UserService <---------------- |
 
 class UserService {
@@ -152,6 +179,10 @@ class UserService {
       login?: string
       status?: string
       city?: string
+      work?: string
+      education?: string
+      about?: string
+      website?: string
       birthDate?: Date | null
     } = {}
     let newAvatarPath: string | undefined
@@ -175,6 +206,10 @@ class UserService {
       if (typeof user.login === 'string' && user.login.trim()) data.login = user.login.trim()
       if (typeof user.status === 'string') data.status = user.status.trim()
       if (typeof user.city === 'string') data.city = user.city.trim()
+      if (typeof user.work === 'string') data.work = user.work.trim().slice(0, DETAIL_LIMITS.work)
+      if (typeof user.education === 'string') data.education = user.education.trim().slice(0, DETAIL_LIMITS.education)
+      if (typeof user.about === 'string') data.about = user.about.trim().slice(0, DETAIL_LIMITS.about)
+      if (typeof user.website === 'string') data.website = normalizeWebsite(user.website)
       // Дату рождения можно стереть, передав null
       const birthDate = user.birthDate as Date | null | undefined
       if (birthDate === null) data.birthDate = null
@@ -193,6 +228,10 @@ class UserService {
           avatar: true,
           status: true,
           city: true,
+          work: true,
+          education: true,
+          about: true,
+          website: true,
           birthDate: true,
           backgroundImage: true,
         },

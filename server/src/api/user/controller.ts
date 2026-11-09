@@ -8,7 +8,7 @@ import UserService from './service'
 import tokenService from './token-service'
 
 class UserController {
-  async registration({ email, pass, pass2 }: Registration, req: any, res: http.ServerResponse) {
+  async registration({ email, pass, pass2 }: Registration, req: http.IncomingMessage, res: http.ServerResponse) {
     if (!email.trim() || !pass.trim() || !pass2.trim()) throw createGraphQLError('У вас пустые поля')
     else if (pass.trim() !== pass2.trim()) throw createGraphQLError('Пароли не совпадают')
     await validateEmail(email.trim())
@@ -27,7 +27,7 @@ class UserController {
       ...user,
     }
   }
-  async login({ email, pass }: Login, req: any, res: http.ServerResponse) {
+  async login({ email, pass }: Login, req: http.IncomingMessage, res: http.ServerResponse) {
     if (!email.trim() || !pass.trim()) throw createGraphQLError('У вас пустые поля')
 
     await validateEmail(email.trim())
@@ -68,7 +68,7 @@ class UserController {
   async remove(id: number) {
     return await UserService.remove(id)
   }
-  async logout({ cookies: { refreshToken } }: any, res: http.ServerResponse) {
+  async logout({ cookies: { refreshToken } }: { cookies: Record<string, string> }, res: http.ServerResponse) {
     const result = await UserService.logout(refreshToken)
     tokenService.setCookie(res, 'refreshToken', '', { maxAge: 0, httpOnly: true })
     tokenService.setCookie(res, 'accessToken', '', { maxAge: 0, httpOnly: true })

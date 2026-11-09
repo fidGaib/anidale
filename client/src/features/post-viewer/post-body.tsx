@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 
 import { useRefreshStore } from '@/app/providers/routes/model'
+import { ArticleCard } from '@/entities/article'
+import { CommunityAvatar } from '@/entities/community'
 import { PostActionWrapp, PostImages, PostVideos } from '@/entities/post'
 import { PostComments } from '@/features/comments'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
@@ -35,10 +37,18 @@ const Header = ({
   onRemoved?: () => void
 }) => (
   <div className={cl.postHead}>
-    <Link to={`/profile/${post.user.id}`} className={cl.author} onClick={onNavigate}>
-      <ImageLoading className={cl.avatar} src={useSrcAvatar(post.user.avatar)} />
+    <Link
+      to={post.community ? `/community/${post.community.id}` : `/profile/${post.user.id}`}
+      className={cl.author}
+      onClick={onNavigate}
+    >
+      {post.community ? (
+        <CommunityAvatar name={post.community.name} avatar={post.community.avatar} size={40} />
+      ) : (
+        <ImageLoading className={cl.avatar} src={useSrcAvatar(post.user.avatar)} />
+      )}
       <span className={cl.authorText}>
-        <span className={cl.login}>{post.user.login}</span>
+        <span className={cl.login}>{post.community ? post.community.name : post.user.login}</span>
         <span className={cl.date}>
           {formatDateTime(post.date)}
           {post.editedAt ? ' · изменено' : ''}
@@ -53,6 +63,7 @@ const Header = ({
         pinned: post.pinned,
         archived: post.archived,
         bookmarked: post.bookmarked,
+        articleId: post.article?.id,
       }}
       onRemoved={onRemoved}
     />
@@ -73,17 +84,18 @@ export const PostBody = ({ postId, withImages = true, onNavigate, onRemoved }: P
       {(post.pinned || post.archived) && (
         <div className={cl.label}>{post.archived ? '🗄 В архиве: виден только вам' : '📌 Закреплённая запись'}</div>
       )}
+      {post.article && <ArticleCard article={post.article} />}
       {withImages && post.images.length > 0 && (
         <PostImages images={post.images} postId={post.id} ownerId={post.user.id} />
       )}
       {withImages && post.videos.length > 0 && <PostVideos videos={post.videos} ownerId={post.user.id} />}
-      {post.description && (
+      {post.description && !post.article && (
         <div className={cl.text}>
           <RichText text={post.description} />
         </div>
       )}
       <RepostCard source={post.repostOf} deleted={post.repostDeleted} />
-      <ViewMark postId={post.id} views={post.views} />
+      <ViewMark postId={post.id} />
       <PostActionWrapp
         repostsCount={post.repostsCount}
         views={post.views}

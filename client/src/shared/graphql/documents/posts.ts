@@ -1,8 +1,8 @@
 import { graphql } from '../gql/gql'
 
 export const POST_BY_USER = graphql(`
-  query POST_BY_USER($id: Int!, $limit: Int!, $page: Int!) {
-    getPostsByUser(id: $id, limit: $limit, page: $page) {
+  query POST_BY_USER($id: Int!, $limit: Int!, $page: Int!, $search: String, $kind: String) {
+    getPostsByUser(id: $id, limit: $limit, page: $page, search: $search, kind: $kind) {
       id
       description
       date
@@ -39,6 +39,17 @@ export const POST_BY_USER = graphql(`
       repostsCount
       bookmarked
       repostDeleted
+      article {
+        id
+        title
+        cover
+        excerpt
+      }
+      community {
+        id
+        name
+        avatar
+      }
       repostOf {
         id
         description
@@ -108,6 +119,17 @@ export const POSTS = graphql(`
       repostsCount
       bookmarked
       repostDeleted
+      article {
+        id
+        title
+        cover
+        excerpt
+      }
+      community {
+        id
+        name
+        avatar
+      }
       repostOf {
         id
         description
@@ -177,6 +199,17 @@ export const GET_POST = graphql(`
       repostsCount
       bookmarked
       repostDeleted
+      article {
+        id
+        title
+        cover
+        excerpt
+      }
+      community {
+        id
+        name
+        avatar
+      }
       repostOf {
         id
         description
@@ -208,8 +241,10 @@ export const GET_POST = graphql(`
 `)
 
 export const CREATE_POST = graphql(`
-  mutation CREATE_POST($owner: Int!, $description: String, $images: [File!], $videos: [File!]) {
-    createPost(post: { owner: $owner, description: $description, images: $images, videos: $videos }) {
+  mutation CREATE_POST($owner: Int!, $description: String, $images: [File!], $videos: [File!], $communityId: Int) {
+    createPost(
+      post: { owner: $owner, description: $description, images: $images, videos: $videos, communityId: $communityId }
+    ) {
       id
       description
       date
@@ -246,6 +281,17 @@ export const CREATE_POST = graphql(`
       repostsCount
       bookmarked
       repostDeleted
+      article {
+        id
+        title
+        cover
+        excerpt
+      }
+      community {
+        id
+        name
+        avatar
+      }
       repostOf {
         id
         description
@@ -355,6 +401,17 @@ export const BOOKMARKS = graphql(`
       repostsCount
       bookmarked
       repostDeleted
+      article {
+        id
+        title
+        cover
+        excerpt
+      }
+      community {
+        id
+        name
+        avatar
+      }
       repostOf {
         id
         description
@@ -424,6 +481,17 @@ export const REPOST_POST = graphql(`
       repostsCount
       bookmarked
       repostDeleted
+      article {
+        id
+        title
+        cover
+        excerpt
+      }
+      community {
+        id
+        name
+        avatar
+      }
       repostOf {
         id
         description
@@ -456,7 +524,10 @@ export const REPOST_POST = graphql(`
 
 export const VIEW_POSTS = graphql(`
   mutation VIEW_POSTS($ids: [Int!]!) {
-    viewPosts(ids: $ids)
+    viewPosts(ids: $ids) {
+      id
+      views
+    }
   }
 `)
 
@@ -504,5 +575,165 @@ export const ADD_COMMENT = graphql(`
 export const REMOVE_COMMENT = graphql(`
   mutation REMOVE_COMMENT($id: Int!) {
     removeComment(id: $id)
+  }
+`)
+
+export const POSTS_BY_COMMUNITY = graphql(`
+  query POSTS_BY_COMMUNITY($id: Int!, $limit: Int!, $page: Int!) {
+    getCommunityPosts(id: $id, limit: $limit, page: $page) {
+      id
+      description
+      date
+      images {
+        id
+        high
+        small
+        medium
+        saved
+        type
+      }
+      videos {
+        id
+        title
+        file
+        size
+        type
+        date
+        postId
+        saved
+      }
+      user {
+        id
+        login
+        avatar
+      }
+      likesCount
+      liked
+      commentsCount
+      editedAt
+      pinned
+      archived
+      views
+      repostsCount
+      bookmarked
+      repostDeleted
+      article {
+        id
+        title
+        cover
+        excerpt
+      }
+      community {
+        id
+        name
+        avatar
+      }
+      repostOf {
+        id
+        description
+        date
+        user {
+          id
+          login
+          avatar
+        }
+        images {
+          id
+          high
+          small
+          medium
+          saved
+        }
+        videos {
+          id
+          title
+          file
+          size
+          type
+          postId
+          saved
+        }
+      }
+    }
+  }
+`)
+
+export const SUGGESTED_POSTS = graphql(`
+  query SUGGESTED_POSTS($id: Int!, $limit: Int!, $page: Int!) {
+    getSuggestedPosts(id: $id, limit: $limit, page: $page) {
+      id
+      description
+      date
+      images {
+        id
+        high
+        small
+        medium
+        saved
+        type
+      }
+      videos {
+        id
+        title
+        file
+        size
+        type
+        date
+        postId
+        saved
+      }
+      user {
+        id
+        login
+        avatar
+      }
+      likesCount
+      liked
+      commentsCount
+      editedAt
+      pinned
+      archived
+      views
+      repostsCount
+      bookmarked
+      repostDeleted
+      article {
+        id
+        title
+        cover
+        excerpt
+      }
+      community {
+        id
+        name
+        avatar
+      }
+      repostOf {
+        id
+        description
+        date
+        user {
+          id
+          login
+          avatar
+        }
+        images {
+          id
+          high
+          small
+          medium
+          saved
+        }
+        videos {
+          id
+          title
+          file
+          size
+          type
+          postId
+          saved
+        }
+      }
+    }
   }
 `)

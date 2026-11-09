@@ -4,7 +4,15 @@ import { io } from '@/index'
 const MAX_PAGE_LIMIT = 50
 const SNIPPET_LENGTH = 120
 
-export type NotificationType = 'like' | 'comment' | 'track' | 'repost'
+export type NotificationType =
+  | 'like'
+  | 'comment'
+  | 'track'
+  | 'repost'
+  | 'community_request'
+  | 'community_accept'
+  | 'community_suggest'
+  | 'community_invite'
 
 const actorSelect = { select: { id: true, avatar: true, login: true } }
 
@@ -15,6 +23,7 @@ interface DbNotification {
   date: Date
   readAt: Date | null
   postId: number | null
+  communityId: number | null
   actor: { id: number; avatar: string; login: string }
 }
 
@@ -26,6 +35,7 @@ const toView = (n: DbNotification) => ({
   date: n.date,
   read: n.readAt !== null,
   postId: n.postId,
+  communityId: n.communityId,
   actor: n.actor,
 })
 
@@ -34,7 +44,12 @@ class NotificationController {
    * Создаёт уведомление и сразу отправляет его адресату по сокету.
    * О собственных действиях не уведомляем. Повторный лайк того же человека к тому же посту не дублируется.
    */
-  async notify(userId: number, actorId: number, type: NotificationType, data: { postId?: number; text?: string } = {}) {
+  async notify(
+    userId: number,
+    actorId: number,
+    type: NotificationType,
+    data: { postId?: number; text?: string; communityId?: number } = {},
+  ) {
     if (userId === actorId) return
     try {
       if (type === 'like') {
@@ -50,6 +65,7 @@ class NotificationController {
           actorId,
           type,
           postId: data.postId ?? null,
+          communityId: data.communityId ?? null,
           text: (data.text ?? '').trim().slice(0, SNIPPET_LENGTH),
         },
         include: { actor: actorSelect },

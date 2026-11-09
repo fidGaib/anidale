@@ -1,0 +1,84 @@
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 4px 12px;
+  border-radius: var(--playground-border);
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+}
+
+.tab {
+  flex-shrink: 0;
+  padding: 10px 12px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: gray;
+  font-family: var(--font-text-main);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: var(--color-text-main);
+}
+
+.tabActive {
+  border-bottom-color: var(--accent);
+  color: var(--color-text-main);
+  font-weight: bold;
+}
+
+.searchBox {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 6px;
+  min-width: 140px;
+  max-width: 280px;
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 0;
+  padding: 7px 10px;
+  border: 1px solid rgba(128, 128, 128, 0.4);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--color-text-main);
+  font-family: var(--font-text-main);
+  font-size: 14px;
+  outline: none;
+}
+
+.searchInput:focus {
+  border-color: var(--accent);
+}
+
+.iconButton {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text-main);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.iconButton:hover {
+  background: rgba(128, 128, 128, 0.2);
+}
+
+.searchIcon {
+  width: 20px;
+  height: 20px;
+}

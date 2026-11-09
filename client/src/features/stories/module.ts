@@ -34,8 +34,8 @@ interface StoriesStore {
   /** Добавить историю-картинку (подпись необязательна). */
   create: (image: File, text?: string) => Promise<boolean>
   remove: (storyId: number) => Promise<void>
-  /** Открыть просмотр с группы пользователя; с первой непросмотренной истории. */
-  open: (userId: number) => void
+  /** Открыть просмотр с группы пользователя: с указанной истории или, если не указана, с первой непросмотренной. */
+  open: (userId: number, storyId?: number) => void
   close: () => void
   /** Перейти на историю вперёд (1) или назад (-1); за краем группы — к соседней, в конце закрывает. */
   step: (delta: 1 | -1) => void
@@ -100,10 +100,12 @@ export const useStoriesStore = create<StoriesStore>()((set, get) => ({
     await get().load()
   },
 
-  open: (userId) => {
+  open: (userId, storyId) => {
     const group = get().groups.findIndex((g) => g.user.id === userId)
     if (group < 0) return
-    const first = get().groups[group].stories.findIndex((s) => !s.seen)
+    const stories = get().groups[group].stories
+    const chosen = storyId === undefined ? -1 : stories.findIndex((s) => s.id === storyId)
+    const first = chosen >= 0 ? chosen : stories.findIndex((s) => !s.seen)
     set({ viewer: { group, story: first < 0 ? 0 : first } })
   },
 

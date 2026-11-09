@@ -8,6 +8,12 @@ const FriendResolvers: Resolvers = {
       // Публичная выборка не содержит email, но GraphQL запрашивает только id/login/avatar
       return (await FriendController.friends(id, limit, offset)) as unknown as User[]
     },
+    async getFriendsOnline(_, { id, limit }) {
+      return (await FriendController.friendsOnline(id, limit)) as unknown as User[]
+    },
+    async getSubscriptions(_, { id, limit, offset }) {
+      return (await FriendController.subscriptions(id, limit, offset)) as unknown as User[]
+    },
     async getSubscribers(_, { id, limit, offset }) {
       return (await FriendController.subscribers(id, limit, offset)) as unknown as User[]
     },

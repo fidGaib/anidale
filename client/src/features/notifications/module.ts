@@ -8,7 +8,28 @@ import { toTimestamp } from '@/shared/lib/time'
 export const PAGE_SIZE = 20
 const TOAST_MS = 5000
 
-export type NotificationKind = 'like' | 'comment' | 'track' | 'repost'
+export type NotificationKind =
+  | 'like'
+  | 'comment'
+  | 'track'
+  | 'repost'
+  | 'community_request'
+  | 'community_accept'
+  | 'community_suggest'
+  | 'community_invite'
+
+const KINDS: NotificationKind[] = [
+  'comment',
+  'track',
+  'repost',
+  'community_request',
+  'community_accept',
+  'community_suggest',
+  'community_invite',
+]
+
+/** Уведомления о сообществах: ведут на страницу сообщества. */
+export const isCommunityKind = (type: NotificationKind) => type.startsWith('community_')
 
 export interface AppNotification {
   id: number
@@ -18,6 +39,8 @@ export interface AppNotification {
   date: number
   read: boolean
   postId: number
+  /** Сообщество, о котором уведомление; 0 — не о сообществе. */
+  communityId: number
   actor: { id: number; login: string; avatar: string }
 }
 
@@ -38,17 +61,19 @@ interface RawNotification {
   date?: unknown
   read?: boolean | null
   postId?: number | null
+  communityId?: number | null
   actor?: { id?: number | null; login?: string | null; avatar?: string | null } | null
 }
 
 /** Приводит уведомление с сервера (GraphQL или сокет) к виду для интерфейса. */
 export const toNotification = (n: RawNotification): AppNotification => ({
   id: n.id ?? 0,
-  type: n.type === 'comment' || n.type === 'track' || n.type === 'repost' ? n.type : 'like',
+  type: KINDS.find((kind) => kind === n.type) ?? 'like',
   text: n.text ?? '',
   date: toTimestamp(n.date),
   read: !!n.read,
   postId: n.postId ?? 0,
+  communityId: n.communityId ?? 0,
   actor: { id: n.actor?.id ?? 0, login: n.actor?.login ?? '', avatar: n.actor?.avatar ?? '' },
 })
 

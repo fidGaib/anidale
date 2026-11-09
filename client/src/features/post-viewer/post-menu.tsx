@@ -1,4 +1,5 @@
 import { ReactNode, useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 import { useRefreshStore } from '@/app/providers/routes/model'
 import { assetUrl } from '@/shared/config'
@@ -21,6 +22,10 @@ export interface MenuPost {
   pinned: boolean
   archived: boolean
   bookmarked: boolean
+  /** Пост — статья: правится в редакторе статей, а не текстом. */
+  articleId?: number
+  /** Просматривающий управляет записью как администратор сообщества. */
+  canManage?: boolean
 }
 
 /** Окно поверх всего, включая окно поста (у общего Modal z-index ниже). */
@@ -126,9 +131,10 @@ const ReportDialog = ({ post, onClose }: { post: MenuPost; onClose: () => void }
 /** Меню «⋯» поста, как в ВК: свои посты — править, закрепить, архив, удалить; чужие — закладки и жалоба. */
 export const PostMenu = ({ post, onRemoved }: { post: MenuPost; onRemoved?: () => void }) => {
   const myId = useRefreshStore((s) => s.refreshData.id) ?? 0
+  const navigate = useNavigate()
   const [dialog, setDialog] = useState<'edit' | 'report' | null>(null)
   const [error, setError] = useState('')
-  const mine = myId > 0 && myId === post.ownerId
+  const mine = (myId > 0 && myId === post.ownerId) || !!post.canManage
   const close = () => setDialog(null)
 
   const act = async (action: () => Promise<{ ok: boolean; error?: string }>) => {
@@ -148,7 +154,7 @@ export const PostMenu = ({ post, onRemoved }: { post: MenuPost; onRemoved?: () =
         </Dropdown.Header>
         <Dropdown.Body className={cl.wrapBody}>
           {mine && (
-            <li onClick={() => setDialog('edit')}>
+            <li onClick={() => (post.articleId ? navigate(`/article/${post.articleId}/edit`) : setDialog('edit'))}>
               {' '}
               <ImageLoading className={cl.dropIcon} src={assetUrl('/icons/edit.svg')} />
               Редактировать

@@ -143,3 +143,9 @@
   text-align: center;
   color: gray;
 }
+
+/* Профиль: карточка на всю ширину колонки, правило «70% на широких экранах» здесь не нужно */
+.wrapper.fill {
+  width: 100%;
+  max-height: none;
+}

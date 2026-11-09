@@ -21,7 +21,7 @@
     "outDir": "dist",
     "ignoreDeprecations": "6.0"
   },
-  "include": ["src/**/*", "generate-env.ts", "codegen.ts"],
+  "include": ["src/**/*", "tests/**/*", "vitest.config.ts", "generate-env.ts", "codegen.ts"],
   "ts-node": {
     "esm": true,
     "swc": true

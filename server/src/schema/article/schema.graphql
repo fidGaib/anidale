@@ -1,0 +1,44 @@
+type Query {
+  "Статья целиком; архивные видит только автор. null, если её нет или она недоступна"
+  getArticle(id: Int!): Article
+}
+type Mutation {
+  createArticle(article: CreateArticle!): Post
+  "Править свою статью: заголовок, обложку и содержимое"
+  editArticle(article: EditArticle!): Post
+}
+"content — JSON-массив блоков: {type: p|h|quote, text}, {type: list, items}, {type: image, file: номер в images, caption}"
+input CreateArticle {
+  "Опубликовать на стене сообщества (нужны права администратора)"
+  communityId: Int
+  title: String!
+  content: String!
+  cover: FILE
+  images: [FILE!]
+}
+"В content старая картинка передаётся как {type: image, src}, новая — как {type: image, file}"
+input EditArticle {
+  id: Int!
+  title: String!
+  content: String!
+  cover: FILE
+  removeCover: Boolean
+  images: [FILE!]
+}
+type Article {
+  id: Int!
+  title: String!
+  cover: String!
+  content: String!
+  date: Date!
+  editedAt: Date
+  postId: Int!
+  user: Owner!
+}
+"Краткое описание статьи для карточки поста"
+type ArticleCard {
+  id: Int!
+  title: String!
+  cover: String!
+  excerpt: String!
+}

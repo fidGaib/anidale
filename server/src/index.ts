@@ -35,7 +35,7 @@ server.on('request', async (req, res) => {
     }
     // Парсим куки и добавляем в req
     const cookies = parseCookies(req)
-    ;(req as any).cookies = cookies // Расширяем тип req
+    ;(req as http.IncomingMessage & { cookies: Record<string, string> }).cookies = cookies // Расширяем тип req
     // GraphQL через Yoga
     if (req.url?.startsWith('/graphql')) {
       await yoga(req, res)

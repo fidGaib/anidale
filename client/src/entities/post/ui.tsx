@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 
 import { useDarkModeStore } from '@/app/module'
 import { useRefreshStore } from '@/app/providers/routes/model'
+import { CommunityAvatar } from '@/entities/community'
 import { assetUrl, storageUrl } from '@/shared/config'
 import { SAVE_VIDEO } from '@/shared/graphql/schema'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
@@ -14,17 +15,32 @@ import cl from './ui.module.css'
 
 interface PostOwnerData {
   user?: { id?: number | null; login?: string | null; avatar?: string | null } | null
+  /** Запись на стене сообщества: автором показывается сообщество. */
+  community?: { id: number; name: string; avatar: string } | null
 }
 
 export const PostOwner = ({ post }: { post: PostOwnerData }) => {
   const theme = useDarkModeStore((store) => store.theme)
+  const avatar = useSrcAvatar(post?.user?.avatar || '')
+  if (post.community) {
+    return (
+      <Link
+        to={`/community/${post.community.id}`}
+        className={cl.wrappOwner}
+        style={{ color: `${theme === 'dark' ? 'gray' : '#000'}` }}
+      >
+        <CommunityAvatar name={post.community.name} avatar={post.community.avatar} size={40} />
+        {post.community.name}
+      </Link>
+    )
+  }
   return (
     <Link
       to={`/profile/${post?.user?.id}`}
       className={cl.wrappOwner}
       style={{ color: `${theme === 'dark' ? 'gray' : '#000'}` }}
     >
-      <ImageLoading src={useSrcAvatar(post?.user?.avatar || '')} alt='anidale' />
+      <ImageLoading src={avatar} alt='anidale' />
       {post?.user?.login}
     </Link>
   )
@@ -76,12 +92,10 @@ export const PostActionWrapp = ({
           <span className={cl.count}>{repostsCount > 0 ? repostsCount : ''}</span>
         </div>
       )}
-      {views > 0 && (
-        <div className={`${cl.icon} ${cl.views}`} title='Просмотры'>
-          <span className={cl.glyph}>👁</span>
-          <span className={cl.count}>{views}</span>
-        </div>
-      )}
+      <div className={`${cl.icon} ${cl.views}`} title='Просмотры'>
+        <span className={cl.glyph}>👁</span>
+        <span className={cl.count}>{views}</span>
+      </div>
     </div>
   )
 }
