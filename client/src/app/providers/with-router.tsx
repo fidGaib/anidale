@@ -4,6 +4,10 @@ import { BrowserRouter } from 'react-router-dom'
 import { ThemeProvider } from 'styled-components'
 
 import { MessagesBridge } from '@/features/messages'
+import { NotificationsBridge } from '@/features/notifications'
+import { StoryViewerHost } from '@/features/stories'
+import { PhotoViewerHost } from '@/features/photo-viewer'
+import { PostModalHost, ShareDialogHost } from '@/features/post-viewer'
 import { GlobalPlayer } from '@/features/music'
 import Loader from '@/shared/loader'
 import Header from '@/widgets/header'
@@ -29,6 +33,11 @@ export const withRouter = (Component: () => React.ReactElement) =>
               </Suspense>
               <GlobalPlayer />
               <MessagesBridge />
+              <NotificationsBridge />
+              <PostModalHost />
+              <ShareDialogHost />
+              <PhotoViewerHost />
+              <StoryViewerHost />
             </ThemeProvider>
           </BrowserRouter>
         </SocketProvider>
