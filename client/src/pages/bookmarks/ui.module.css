@@ -1,0 +1,9 @@
+#content {
+  background: 0;
+}
+
+.title {
+  margin: 10px 0;
+  color: var(--color-text-main);
+  font-family: var(--font-text-main);
+}

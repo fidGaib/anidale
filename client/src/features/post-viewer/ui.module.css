@@ -1,0 +1,275 @@
+/* окно поста */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1500;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 12px;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.card {
+  position: relative;
+  width: min(640px, 100%);
+  padding: 14px 14px 10px;
+  border-radius: var(--playground-border);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
+}
+
+.close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  z-index: 2;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(128, 128, 128, 0.25);
+  color: var(--color-text-main);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.close:hover {
+  background: rgba(128, 128, 128, 0.45);
+}
+
+.hint {
+  padding: 30px 15px;
+  text-align: center;
+  color: gray;
+  font-family: var(--font-text-main);
+  font-size: var(--size-text-main);
+}
+
+/* содержимое поста (окно и боковая панель просмотра фото) */
+.postBody {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  color: var(--color-text-main);
+  font-family: var(--font-text-main);
+  font-size: var(--size-text-main);
+}
+
+.postHead {
+  display: flex;
+  align-items: center;
+  padding-right: 40px;
+}
+
+.author {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.avatar {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+}
+
+.avatar img {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.authorText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.login {
+  font-weight: bold;
+  overflow-wrap: anywhere;
+}
+
+.date {
+  color: gray;
+  font-size: 12px;
+}
+
+.text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.text a {
+  color: var(--accent);
+}
+
+/* Меню и диалоги действий над постом */
+.postHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.menuWrap {
+  position: relative;
+  margin-left: auto;
+}
+.wrapBody {
+  background: #fff;
+  width: 200px;
+}
+.wrapBody li {
+  display: flex;
+}
+.wrapBody .dropIcon img {
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
+}
+.menuIcon img {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}
+
+.menuError {
+  margin: 4px 0;
+  color: red;
+  font-size: 13px;
+}
+
+.label {
+  margin: 4px 0;
+  color: gray;
+  font-size: 12px;
+}
+
+.dialogOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.dialog {
+  width: min(460px, 92vw);
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+.dialogTitle {
+  margin: 0 0 10px;
+  font-weight: bold;
+  color: var(--color-text-main);
+}
+
+.dialogText {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid rgba(128, 128, 128, 0.4);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--color-text-main);
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+}
+
+.dialogError {
+  margin: 6px 0 0;
+  color: red;
+  font-size: 13px;
+}
+
+.dialogHint {
+  color: var(--color-text-main);
+}
+
+.dialogButtons {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.reason {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  color: var(--color-text-main);
+  cursor: pointer;
+}
+
+/* Репост и «Поделиться» */
+.repost {
+  margin: 8px 10px;
+  padding: 8px 12px;
+  border-left: 3px solid var(--accent);
+  border-radius: 4px;
+  background: rgba(128, 128, 128, 0.08);
+  cursor: pointer;
+}
+
+.repostGone {
+  color: gray;
+  cursor: default;
+}
+
+.repostAuthor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.repostAvatar img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.repostText {
+  margin-top: 6px;
+  color: var(--color-text-main);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.repostImages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+.repostImages img {
+  max-width: 160px;
+  max-height: 160px;
+  border-radius: 8px;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.shareMenu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.shareList {
+  max-height: 240px;
+  margin-top: 8px;
+  overflow-y: auto;
+}

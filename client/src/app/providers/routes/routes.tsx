@@ -11,6 +11,7 @@ const Music = lazy(() => import('@/pages/music'))
 const Messages = lazy(() => import('@/pages/messages'))
 const Anime = lazy(() => import('@/pages/anime'))
 const Watch = lazy(() => import('@/pages/watch'))
+const Bookmarks = lazy(() => import('@/pages/bookmarks'))
 
 // private routes
 export const privateRoutes = [
@@ -24,6 +25,7 @@ export const privateRoutes = [
   { path: '/messages/:userId', element: Messages },
   { path: '/anime', element: Anime },
   { path: '/watch', element: Watch },
+  { path: '/bookmarks', element: Bookmarks },
 ]
 // public routes
 export const publicRoutes = [

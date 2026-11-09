@@ -4,16 +4,15 @@ import { useInView } from 'react-intersection-observer'
 import { useParams } from 'react-router-dom'
 
 import { useRefreshStore } from '@/app/providers/routes/model'
-import { PostActionWrapp, PostImages, PostOwner } from '@/entities/post'
+import { PostActionWrapp, PostImages, PostOwner, PostVideos } from '@/entities/post'
 import { Post } from '@/features/profile/types'
-import { assetUrl } from '@/shared/config'
-import { PostComments } from '@/features/comments'
-import { REMOVE_POST, SET_LIKE } from '@/shared/graphql/schema'
-import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
+import { formatDateTime, toTimestamp } from '@/shared/lib/time'
+import { RichText } from '@/shared/ui/rich-text'
+import { PostMenu, RepostCard, ViewMark, openShare, usePostSync, useOpenPost } from '@/features/post-viewer'
+import { SET_LIKE } from '@/shared/graphql/schema'
 import { useSocket } from '@/shared/hooks/useSocket'
 import { usePostStore } from '@/shared/store'
 import ButtonUI from '@/shared/ui/button'
-import Dropdown from '@/shared/ui/dropdown'
 import { Plug } from '@/shared/ui/plug'
 
 import cl from './ui.module.css'
@@ -27,10 +26,11 @@ const appendUniquePosts = (prev: Post[], next: Post[]) => {
   return unique.length ? [...prev, ...unique] : prev
 }
 
-export const Posts = () => {
+export const Posts = ({ mode }: { mode?: 'bookmarks' }) => {
   const profileUrlId = parseInt(useParams().id || '')
   const fetchPostsFeed = usePostStore((state) => state.fetchPostsFeed)
   const fetchPostsProfile = usePostStore((state) => state.fetchPostsProfile)
+  const fetchBookmarks = usePostStore((state) => state.fetchBookmarks)
   const [posts, setPosts] = useState<Post[]>([])
   const [hasMore, setHasMore] = useState(true)
   const [loading, setLoading] = useState(false)
@@ -60,9 +60,12 @@ export const Posts = () => {
     const page = pageRef.current
 
     try {
-      const fetchedPosts = profileUrlId
-        ? await fetchPostsProfile(profileUrlId, page, POSTS_PAGE_SIZE)
-        : await fetchPostsFeed(page, POSTS_PAGE_SIZE)
+      const fetchedPosts =
+        mode === 'bookmarks'
+          ? await fetchBookmarks(page, POSTS_PAGE_SIZE)
+          : profileUrlId
+            ? await fetchPostsProfile(profileUrlId, page, POSTS_PAGE_SIZE)
+            : await fetchPostsFeed(page, POSTS_PAGE_SIZE)
 
       // Пользователь уже ушёл на другой профиль — результат не нужен.
       if (requestId !== requestRef.current) return
@@ -87,7 +90,7 @@ export const Posts = () => {
         setLoading(false)
       }
     }
-  }, [fetchPostsFeed, fetchPostsProfile, profileUrlId])
+  }, [fetchPostsFeed, fetchPostsProfile, fetchBookmarks, profileUrlId, mode])
 
   // Сброс и загрузка первой страницы при смене профиля/ленты и при монтировании.
   useEffect(() => {
@@ -126,6 +129,7 @@ export const Posts = () => {
   useEffect(() => {
     if (!socket || !isConnected) return
     const handleNewPost = ({ post }: { post: Post }) => {
+      if (mode === 'bookmarks') return
       if (profileUrlId) {
         // Профиль: интересны только посты его владельца, они появляются сразу.
         if (post.user?.id === profileUrlId) prependPost(post)
@@ -159,7 +163,6 @@ export const Posts = () => {
     topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
-  const [remove] = useMutation(REMOVE_POST)
   const [setLikeMutation] = useMutation(SET_LIKE)
   const refreshData = useRefreshStore((state) => state.refreshData)
 
@@ -191,23 +194,49 @@ export const Posts = () => {
   const toggleLike = async (post: Post) => {
     const liked = !post.liked
     // Оптимистично: интерфейс реагирует сразу, при ошибке возвращаем как было
-    patchPost(post.id, { liked, likesCount: Math.max(post.likesCount + (liked ? 1 : -1), 0) })
+    const optimistic = { liked, likesCount: Math.max(post.likesCount + (liked ? 1 : -1), 0) }
+    patchPost(post.id, optimistic)
+    usePostSync.getState().publish({ id: post.id, ...optimistic })
     try {
       const { data } = await setLikeMutation({ variables: { id: post.id, liked } })
-      if (data?.setLike) patchPost(post.id, { liked: data.setLike.liked, likesCount: data.setLike.likesCount })
+      if (data?.setLike) {
+        const real = { liked: data.setLike.liked, likesCount: data.setLike.likesCount }
+        patchPost(post.id, real)
+        usePostSync.getState().publish({ id: post.id, ...real })
+      }
     } catch (err) {
       console.error('Не удалось поставить лайк', err)
       patchPost(post.id, { liked: post.liked, likesCount: post.likesCount })
+      usePostSync.getState().publish({ id: post.id, liked: post.liked, likesCount: post.likesCount })
     }
   }
 
-  // Какие посты сейчас с раскрытыми комментариями
-  const [openComments, setOpenComments] = useState<number[]>([])
-  const toggleComments = (postId: number) =>
-    setOpenComments((prev) => (prev.includes(postId) ? prev.filter((id) => id !== postId) : [...prev, postId]))
-  const deletePost = (postId: number) => {
-    setPosts((prev) => prev.filter((post) => post.id !== postId))
-  }
+  // Лайк или комментарий, сделанный в окне поста или просмотре фото, сразу виден и в ленте
+  const syncPatch = usePostSync((s) => s.patch)
+  const syncVersion = usePostSync((s) => s.version)
+  useEffect(() => {
+    if (!syncPatch) return
+    const { id, removed, ...rest } = syncPatch
+    // В закладках пост пропадает, когда его убрали из закладок
+    if (removed || (rest.archived && !profileUrlId) || (mode === 'bookmarks' && rest.bookmarked === false)) {
+      // Удалён, или убран в архив в ленте: в ленте архивных постов нет
+      setPosts((prev) => prev.filter((post) => post.id !== id))
+      return
+    }
+    // Закрепить можно один пост: у остальных закреп снимается, а закреплённый поднимается наверх
+    if (rest.pinned) {
+      setPosts((prev) => {
+        const target = prev.find((post) => post.id === id)
+        if (!target) return prev
+        return [{ ...target, ...rest }, ...prev.filter((post) => post.id !== id).map((post) => ({ ...post, pinned: false }))]
+      })
+      return
+    }
+    patchPost(id, Object.fromEntries(Object.entries(rest).filter(([, v]) => v !== undefined)))
+  }, [syncPatch, syncVersion])
+
+  const openPost = useOpenPost()
+
   return (
     <>
       <div ref={topRef} />
@@ -220,57 +249,56 @@ export const Posts = () => {
         return (
           <div
             key={post.id}
-            className={`playground ${cl.wrapper} ${openComments.includes(post.id) ? cl.wrapperOpen : ''}`}
+            className={`playground ${cl.wrapper}`}
           >
             <div className={cl.owner}>
               <PostOwner post={post} />
-              <Dropdown className={cl.pizdez}>
-                <Dropdown.Header>
-                  <ImageLoading className={cl.menuPost} src={assetUrl('icons/menu_post.svg')} />
-                </Dropdown.Header>
-                {refreshData.id === post.user.id ? (
-                  <Dropdown.Body>
-                    <div className='playground' style={{ padding: '0' }}>
-                      <li>Сохранить в закладках</li>
-                      <li>Редактировать</li>
-                      <li>Скопировать ссылку</li>
-                      <li>Архивировать запись</li>
-                      <li
-                        onClick={() => {
-                          remove({
-                            variables: { id: post.id },
-                          })
-                          deletePost(post.id)
-                        }}
-                      >
-                        Удалить
-                      </li>
-                    </div>
-                  </Dropdown.Body>
-                ) : (
-                  <Dropdown.Body>
-                    <li>Сохранить в закладках</li>
-                    <li>Скопировать ссылку</li>
-                    <li>Пожаловаться</li>
-                  </Dropdown.Body>
-                )}
-              </Dropdown>
+              <span className={cl.dateLink} onClick={() => openPost(post.id)} title='Открыть пост'>
+                {post.pinned ? '📌 ' : ''}
+                {post.archived ? '🗄 В архиве · ' : ''}
+                {formatDateTime(toTimestamp(post.date))}
+                {post.editedAt ? ' · изменено' : ''}
+              </span>
+              <PostMenu
+                post={{
+                  id: post.id,
+                  ownerId: post.user.id,
+                  description: post.description,
+                  pinned: !!post.pinned,
+                  archived: !!post.archived,
+                  bookmarked: !!post.bookmarked,
+                }}
+              />
             </div>
-            <PostImages images={post.images} />
-            {post.description ? <div className={cl.text}>{post.description}</div> : <></>}
+            <PostImages images={post.images} postId={post.id} ownerId={post.user.id} />
+            <PostVideos videos={post.videos} ownerId={post.user.id} />
+            {post.description ? (
+              <div className={`${cl.text} ${cl.clickable}`} onClick={(e) => (e.target as HTMLElement).closest('a') || openPost(post.id)}>
+                <RichText text={post.description} />
+              </div>
+            ) : (
+              <></>
+            )}
+            <RepostCard source={post.repostOf} deleted={post.repostDeleted} />
+            <ViewMark postId={post.id} views={post.views ?? 0} />
             <PostActionWrapp
+              repostsCount={post.repostsCount}
+              views={post.views}
+              onShare={() => openShare(post.id, post.repostsCount ?? 0)}
               liked={post.liked}
               likesCount={post.likesCount}
               commentsCount={post.commentsCount}
-              commentsOpen={openComments.includes(post.id)}
+              commentsOpen={false}
               canLike={!!refreshData.id}
               onLike={() => void toggleLike(post)}
-              onToggleComments={() => toggleComments(post.id)}
+              onToggleComments={() => openPost(post.id)}
             />
-            {openComments.includes(post.id) && <PostComments postId={post.id} postOwnerId={post.user.id} />}
           </div>
         )
       })}
+      {mode === 'bookmarks' && !loading && !error && posts.length === 0 && (
+        <p className={cl.empty}>Здесь появятся записи, которые вы сохранили в закладки</p>
+      )}
       <div ref={ref}>
         {loading && <Plug />}
         {error && (

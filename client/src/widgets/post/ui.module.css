@@ -120,3 +120,26 @@
   white-space: normal;
   hyphens: auto;
 }
+
+/* Открытие поста по клику, как в ВК */
+.clickable {
+  cursor: pointer;
+}
+
+.dateLink {
+  margin-left: auto;
+  padding: 0 10px;
+  color: gray;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.dateLink:hover {
+  text-decoration: underline;
+}
+
+.empty {
+  padding: 30px 10px;
+  text-align: center;
+  color: gray;
+}

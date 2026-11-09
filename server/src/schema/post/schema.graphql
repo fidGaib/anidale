@@ -1,26 +1,63 @@
 type Query {
   getPosts(limit: Int!, page: Int!): [Post!]
   getPostsByUser(id: Int!, limit: Int!, page: Int!): [Post!]
+  "Один пост по id (для открытия по ссылке); null, если его нет"
+  getPost(id: Int!): Post
+  "Сохранённые в закладки посты текущего пользователя, новые сверху"
+  getBookmarks(limit: Int!, page: Int!): [Post!]!
 }
 type Mutation {
   createPost(post: CreatePost!): Post
   removePost(id: Int!): Boolean
+  "Править текст своего поста"
+  editPost(id: Int!, description: String!): Post
+  "Закрепить пост на своей странице (один) или открепить"
+  pinPost(id: Int!, pinned: Boolean!): Boolean!
+  "В архив (виден только автору) или обратно"
+  archivePost(id: Int!, archived: Boolean!): Boolean!
+  bookmarkPost(id: Int!, bookmarked: Boolean!): Boolean!
+  "reason: spam | abuse | adult | violence | other"
+  reportPost(id: Int!, reason: String!): Boolean!
+  "Репост на свою страницу с необязательным комментарием"
+  repostPost(id: Int!, comment: String): Post
+  "Засчитать просмотр постов (до 50 за раз)"
+  viewPosts(ids: [Int!]!): Boolean!
 }
 input CreatePost {
   owner: Int!
   description: String
   images: [FILE]
+  videos: [FILE]
 }
 type Post {
   id: Int
   description: String
   images: [PostImages]
+  videos: [Video!]
   date: Date
   user: Owner
   likesCount: Int
   "Поставил ли лайк текущий пользователь (для гостя всегда false)"
   liked: Boolean
   commentsCount: Int
+  editedAt: Date
+  pinned: Boolean
+  archived: Boolean
+  views: Int
+  repostsCount: Int
+  "Сохранил ли пост в закладки текущий пользователь"
+  bookmarked: Boolean
+  "Исходный пост репоста; null, если это не репост или оригинал удалён"
+  repostOf: RepostSource
+  repostDeleted: Boolean
+}
+type RepostSource {
+  id: Int
+  description: String
+  date: Date
+  user: Owner
+  images: [PostImages]
+  videos: [Video!]
 }
 type Owner {
   id: Int
@@ -36,4 +73,6 @@ type PostImages {
   type: String
   postId: Int
   date: Date
+  "Сохранил ли картинку в «Сохранённые» текущий пользователь"
+  saved: Boolean
 }

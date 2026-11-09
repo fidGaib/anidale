@@ -1,6 +1,7 @@
 import { useMutation } from '@apollo/client'
 
 import { useRefreshStore } from '@/app/providers/routes/model'
+import { assetUrl } from '@/shared/config'
 import { REMOVE_POST } from '@/shared/graphql/schema'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import Dropdown from '@/shared/ui/dropdown'
@@ -22,7 +23,10 @@ export const PostDropdownMenu = ({ postId, userId }: PorepsMenu) => {
       {refreshData.id === userId ? (
         <Dropdown.Body>
           <div className='playground' style={{ padding: '0' }}>
-            <li>Сохранить в закладках</li>
+            <li>
+              <ImageLoading className={cl.dropIcon} src={assetUrl('/icons/emoji.svg')} />
+              Сохранить в закладках
+            </li>
             <li>Редактировать</li>
             <li>Скопировать ссылку</li>
             <li>Архивировать запись</li>
@@ -34,6 +38,7 @@ export const PostDropdownMenu = ({ postId, userId }: PorepsMenu) => {
                 })
               }}
             >
+              <ImageLoading className={cl.dropIcon} src={assetUrl('/icons/delete.svg')} />
               Удалить
             </li>
           </div>
