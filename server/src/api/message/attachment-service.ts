@@ -1,8 +1,7 @@
+import { createGraphQLError } from 'graphql-yoga'
 import { randomUUID } from 'node:crypto'
 import { mkdir, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
-
-import { createGraphQLError } from 'graphql-yoga'
 
 import { detectAudio } from '../music/audio-service'
 import FileStorageService from '../post/file-service'

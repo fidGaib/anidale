@@ -5,15 +5,15 @@ import { useParams } from 'react-router-dom'
 
 import { useRefreshStore } from '@/app/providers/routes/model'
 import { PostActionWrapp, PostImages, PostOwner, PostVideos } from '@/entities/post'
+import { PostMenu, RepostCard, ViewMark, openShare, useOpenPost, usePostSync } from '@/features/post-viewer'
 import { Post } from '@/features/profile/types'
-import { formatDateTime, toTimestamp } from '@/shared/lib/time'
-import { RichText } from '@/shared/ui/rich-text'
-import { PostMenu, RepostCard, ViewMark, openShare, usePostSync, useOpenPost } from '@/features/post-viewer'
 import { SET_LIKE } from '@/shared/graphql/schema'
 import { useSocket } from '@/shared/hooks/useSocket'
+import { formatDateTime, toTimestamp } from '@/shared/lib/time'
 import { usePostStore } from '@/shared/store'
 import ButtonUI from '@/shared/ui/button'
 import { Plug } from '@/shared/ui/plug'
+import { RichText } from '@/shared/ui/rich-text'
 
 import cl from './ui.module.css'
 
@@ -64,8 +64,8 @@ export const Posts = ({ mode }: { mode?: 'bookmarks' }) => {
         mode === 'bookmarks'
           ? await fetchBookmarks(page, POSTS_PAGE_SIZE)
           : profileUrlId
-            ? await fetchPostsProfile(profileUrlId, page, POSTS_PAGE_SIZE)
-            : await fetchPostsFeed(page, POSTS_PAGE_SIZE)
+          ? await fetchPostsProfile(profileUrlId, page, POSTS_PAGE_SIZE)
+          : await fetchPostsFeed(page, POSTS_PAGE_SIZE)
 
       // Пользователь уже ушёл на другой профиль — результат не нужен.
       if (requestId !== requestRef.current) return
@@ -228,7 +228,10 @@ export const Posts = ({ mode }: { mode?: 'bookmarks' }) => {
       setPosts((prev) => {
         const target = prev.find((post) => post.id === id)
         if (!target) return prev
-        return [{ ...target, ...rest }, ...prev.filter((post) => post.id !== id).map((post) => ({ ...post, pinned: false }))]
+        return [
+          { ...target, ...rest },
+          ...prev.filter((post) => post.id !== id).map((post) => ({ ...post, pinned: false })),
+        ]
       })
       return
     }
@@ -247,10 +250,7 @@ export const Posts = ({ mode }: { mode?: 'bookmarks' }) => {
       )}
       {posts?.map((post: Post) => {
         return (
-          <div
-            key={post.id}
-            className={`playground ${cl.wrapper}`}
-          >
+          <div key={post.id} className={`playground ${cl.wrapper}`}>
             <div className={cl.owner}>
               <PostOwner post={post} />
               <span className={cl.dateLink} onClick={() => openPost(post.id)} title='Открыть пост'>
@@ -273,7 +273,10 @@ export const Posts = ({ mode }: { mode?: 'bookmarks' }) => {
             <PostImages images={post.images} postId={post.id} ownerId={post.user.id} />
             <PostVideos videos={post.videos} ownerId={post.user.id} />
             {post.description ? (
-              <div className={`${cl.text} ${cl.clickable}`} onClick={(e) => (e.target as HTMLElement).closest('a') || openPost(post.id)}>
+              <div
+                className={`${cl.text} ${cl.clickable}`}
+                onClick={(e) => (e.target as HTMLElement).closest('a') || openPost(post.id)}
+              >
                 <RichText text={post.description} />
               </div>
             ) : (

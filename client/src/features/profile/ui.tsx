@@ -3,8 +3,8 @@ import { useParams } from 'react-router-dom'
 
 import { useRefreshStore } from '@/app/providers/routes/model'
 import { MakePostImages } from '@/entities/profile/ui'
-import { CREATE_POST } from '@/shared/graphql/schema'
 import { assetUrl } from '@/shared/config'
+import { CREATE_POST } from '@/shared/graphql/schema'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
 import { usePostStore } from '@/shared/store'
@@ -16,20 +16,31 @@ import cl from './ui.module.css'
 export const MakePost = () => {
   const id = parseInt(useParams().id || '')
   const uploadProgress = usePostStore((state) => state.uploadProgress)
-  const [error_create, description, images, videos, removeImage, removeVideo, handleHeight, handleKeydown, setFiles, setVideoFiles, send] =
-    usePostStore((state) => [
-      state.error_create,
-      state.description,
-      state.images,
-      state.videos,
-      state.removeImage,
-      state.removeVideo,
-      state.handleHeight,
-      state.handleKeydown,
-      state.setFiles,
-      state.setVideoFiles,
-      state.send,
-    ])
+  const [
+    error_create,
+    description,
+    images,
+    videos,
+    removeImage,
+    removeVideo,
+    handleHeight,
+    handleKeydown,
+    setFiles,
+    setVideoFiles,
+    send,
+  ] = usePostStore((state) => [
+    state.error_create,
+    state.description,
+    state.images,
+    state.videos,
+    state.removeImage,
+    state.removeVideo,
+    state.handleHeight,
+    state.handleKeydown,
+    state.setFiles,
+    state.setVideoFiles,
+    state.send,
+  ])
   const [refreshData] = useRefreshStore((state) => [state.refreshData])
   const [createPost, { error, loading }] = useMutation(CREATE_POST)
   if (id !== refreshData.id) return <></>

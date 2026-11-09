@@ -34,12 +34,7 @@ class NotificationController {
    * Создаёт уведомление и сразу отправляет его адресату по сокету.
    * О собственных действиях не уведомляем. Повторный лайк того же человека к тому же посту не дублируется.
    */
-  async notify(
-    userId: number,
-    actorId: number,
-    type: NotificationType,
-    data: { postId?: number; text?: string } = {},
-  ) {
+  async notify(userId: number, actorId: number, type: NotificationType, data: { postId?: number; text?: string } = {}) {
     if (userId === actorId) return
     try {
       if (type === 'like') {

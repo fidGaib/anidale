@@ -1,8 +1,8 @@
 import { createGraphQLError } from 'graphql-yoga'
 
-import { Comment, Like } from '@/db/models/reaction-model'
-import { Post } from '@/db/models/post-model'
 import NotificationController from '@/api/notification/controller'
+import { Post } from '@/db/models/post-model'
+import { Comment, Like } from '@/db/models/reaction-model'
 import { io } from '@/index'
 
 const MAX_PAGE_LIMIT = 50

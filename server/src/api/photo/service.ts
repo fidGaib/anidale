@@ -46,7 +46,9 @@ const withSaved = async (photos: Omit<PhotoView, 'saved' | 'savedAt'>[], viewerI
     },
     select: { postImageId: true, photoId: true, date: true },
   })
-  const postMap = new Map(saved.filter((item) => item.postImageId !== null).map((item) => [item.postImageId, item.date]))
+  const postMap = new Map(
+    saved.filter((item) => item.postImageId !== null).map((item) => [item.postImageId, item.date]),
+  )
   const albumMap = new Map(saved.filter((item) => item.photoId !== null).map((item) => [item.photoId, item.date]))
 
   return photos.map((photo) => {
@@ -115,9 +117,7 @@ class PhotoService {
       })),
     ]
 
-    const page = photos
-      .sort((a, b) => b.date.getTime() - a.date.getTime() || b.id - a.id)
-      .slice(skip, skip + take)
+    const page = photos.sort((a, b) => b.date.getTime() - a.date.getTime() || b.id - a.id).slice(skip, skip + take)
     return await withSaved(page, viewerId)
   }
 

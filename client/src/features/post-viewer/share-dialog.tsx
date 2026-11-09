@@ -7,8 +7,8 @@ import { GET_USERS, REPOST_POST, SEND_MESSAGE } from '@/shared/graphql/schema'
 import { copyText } from '@/shared/lib/clipboard'
 import ButtonUI from '@/shared/ui/button'
 
-import { Dialog } from './post-menu'
 import { postLink } from './post-link'
+import { Dialog } from './post-menu'
 import { useShareStore } from './share-store'
 import { usePostSync } from './sync'
 import cl from './ui.module.css'
@@ -92,7 +92,11 @@ const Message = ({ id, onDone }: { id: number; onDone: () => void }) => {
 
   const toggle = (userId: number) =>
     setSelected((prev) =>
-      prev.includes(userId) ? prev.filter((x) => x !== userId) : prev.length < MAX_RECIPIENTS ? [...prev, userId] : prev,
+      prev.includes(userId)
+        ? prev.filter((x) => x !== userId)
+        : prev.length < MAX_RECIPIENTS
+        ? [...prev, userId]
+        : prev,
     )
 
   const send = async () => {

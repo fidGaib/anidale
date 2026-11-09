@@ -52,7 +52,13 @@ export const NotificationsBridge = () => {
       const conversation = messages.conversations.find((c) => c.user.id === senderId)
       if (conversation?.muted) return
       const first = message.attachments?.[0]
-      const label = first ? (first.kind === 'image' ? 'Фото' : first.kind === 'audio' ? 'Аудио' : (first.name ?? 'Файл')) : ''
+      const label = first
+        ? first.kind === 'image'
+          ? 'Фото'
+          : first.kind === 'audio'
+          ? 'Аудио'
+          : first.name ?? 'Файл'
+        : ''
       store().pushToast({
         title: conversation?.user.login ?? 'Новое сообщение',
         text: message.text || label,
@@ -74,4 +80,3 @@ export const NotificationsBridge = () => {
 
   return myId ? <Toasts /> : null
 }
-

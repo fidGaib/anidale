@@ -242,9 +242,7 @@
   cursor: pointer;
   font-family: var(--font-text-main);
   font-size: var(--size-text-main);
-  transition:
-    border-color 0.2s,
-    opacity 0.2s;
+  transition: border-color 0.2s, opacity 0.2s;
 }
 
 .coverDrop:hover {
@@ -256,4 +254,3 @@
   width: 24px;
   height: 24px;
 }
-

@@ -4,8 +4,8 @@ import { client } from '@/app/providers/apollo-client'
 import { SEARCH_MESSAGES } from '@/shared/graphql/schema'
 import { formatDateTime } from '@/shared/lib/time'
 
-import { ChatMessage, REACTIONS, toMessage } from './module'
 import { messageLabel } from './message-label'
+import { ChatMessage, REACTIONS, toMessage } from './module'
 import cl from './ui.module.css'
 
 const SEARCH_PAGE = 20
@@ -96,7 +96,13 @@ export const SearchPanel = ({ userId, myId, peerLogin, onPick, onClose }: Search
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={(e) => e.key === 'Escape' && onClose()}
         />
-        <img className={cl.chipRemove} src='/icons/close.svg' alt='Закрыть поиск' title='Закрыть поиск' onClick={onClose} />
+        <img
+          className={cl.chipRemove}
+          src='/icons/close.svg'
+          alt='Закрыть поиск'
+          title='Закрыть поиск'
+          onClick={onClose}
+        />
       </div>
       {error && <p className={cl.error}>{error}</p>}
       {query.trim() && !loading && results.length === 0 && !error && <p className={cl.hint}>Ничего не найдено</p>}

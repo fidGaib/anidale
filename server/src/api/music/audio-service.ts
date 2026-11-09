@@ -1,8 +1,7 @@
+import { createGraphQLError } from 'graphql-yoga'
 import { randomUUID } from 'node:crypto'
 import { mkdir, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
-
-import { createGraphQLError } from 'graphql-yoga'
 
 export const MAX_AUDIO_SIZE = 15 * 1024 * 1024
 const MUSIC_DIR = 'music'

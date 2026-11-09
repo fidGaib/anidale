@@ -8,87 +8,24 @@ import { isOnline } from '@/handlers/presence'
 import { io } from '@/index'
 
 import AttachmentService, { MAX_ATTACHMENTS, MAX_TOTAL_SIZE, SavedAttachment } from './attachment-service'
-
-const MAX_TEXT_LENGTH = 2000
-const MAX_PAGE_LIMIT = 50
-const MAX_CONVERSATIONS = 50
-const MAX_FORWARD_RECIPIENTS = 10
-const MAX_SELECTION = 30
-
-const userSelect = { id: true, avatar: true, login: true } as const
-
-/** Пара участников в каноническом порядке: меньший id всегда userA. */
-const pair = (x: number, y: number) => (x < y ? ([x, y] as const) : ([y, x] as const))
-
-interface DbAttachment {
-  id: number
-  kind: string
-  name: string
-  size: number
-  file: string
-  thumb: string
-  high: string
-}
-
-/** Что подгружать вместе с сообщением: вложения и реакции. */
-const messageInclude = {
-  attachments: true,
-  reactions: { select: { userId: true, emoji: true } },
-} as const
-
-/** Реакции, которые можно ставить (как в панели клиента). */
-export const ALLOWED_REACTIONS = ['👍', '❤️', '😂', '😮', '😢', '🔥', '👎', '🎉']
-const MAX_PINNED = 10
-
-interface DbMessage {
-  id: number
-  text: string
-  date: Date
-  senderId: number
-  editedAt: Date | null
-  replyToId: number | null
-  fwdUserId: number | null
-  fwdLogin: string
-  attachments: DbAttachment[]
-  reactions?: { userId: number; emoji: string }[]
-}
-
-/** Краткое содержимое сообщения, на которое ответили. */
-interface ReplyPreview {
-  id: number
-  senderId: number
-  text: string
-  attachmentKind: string | null
-  attachmentName: string | null
-}
-
-/** Сообщение в виде для GraphQL и сокета: добавляем получателя, которого в таблице нет. */
-const toMessage = (message: DbMessage, userA: number, userB: number) => ({
-  id: message.id,
-  text: message.text,
-  date: message.date,
-  senderId: message.senderId,
-  recipientId: message.senderId === userA ? userB : userA,
-  editedAt: message.editedAt,
-  replyToId: message.replyToId,
-  forwardedFrom: message.fwdLogin || null,
-  forwardedFromId: message.fwdUserId,
-  attachments: message.attachments,
-  reactions: message.reactions ?? [],
-})
-
-const room = (userId: number) => `user:${userId}`
-
-/** Данные нового сообщения: текст, вложения и (для пересылки) автор оригинала. */
-interface NewMessage {
-  text: string
-  attachments: { kind: string; name: string; size: number; file: string; thumb: string; high: string }[]
-  fwdUserId?: number | null
-  fwdLogin?: string
-  replyToId?: number | null
-}
-
-const PREVIEW_LENGTH = 200
+import {
+  ALLOWED_REACTIONS,
+  DbAttachment,
+  MAX_CONVERSATIONS,
+  MAX_FORWARD_RECIPIENTS,
+  MAX_PAGE_LIMIT,
+  MAX_PINNED,
+  MAX_SELECTION,
+  MAX_TEXT_LENGTH,
+  NewMessage,
+  PREVIEW_LENGTH,
+  ReplyPreview,
+  messageInclude,
+  pair,
+  room,
+  toMessage,
+  userSelect,
+} from './mappers'
 
 class MessageController {
   private service() {
@@ -208,13 +145,7 @@ class MessageController {
     return result
   }
 
-  async send(
-    from: number,
-    to: number,
-    text: string | undefined,
-    files: File[] | undefined,
-    replyTo?: number,
-  ) {
+  async send(from: number, to: number, text: string | undefined, files: File[] | undefined, replyTo?: number) {
     if (from === to) throw createGraphQLError('Нельзя написать самому себе')
     const clean = (text ?? '').trim()
     if (clean.length > MAX_TEXT_LENGTH) throw createGraphQLError(`Сообщение длиннее ${MAX_TEXT_LENGTH} символов`)

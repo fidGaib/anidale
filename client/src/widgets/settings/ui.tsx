@@ -154,10 +154,7 @@ const CoverEditor = ({ user }: { user?: ProfileData }) => {
       <h2>Обложка профиля</h2>
       <p className={cl.error}>{loading ? 'Сохранение...' : error?.message || errorInStore}</p>
 
-      <div
-        className={cl.coverPreview}
-        style={shownCover ? { backgroundImage: `url(${shownCover})` } : undefined}
-      >
+      <div className={cl.coverPreview} style={shownCover ? { backgroundImage: `url(${shownCover})` } : undefined}>
         {!shownCover && <span>Обложка пока не загружена</span>}
       </div>
 

@@ -2,7 +2,7 @@ import { CodegenConfig } from '@graphql-codegen/cli'
 
 const config: CodegenConfig = {
   schema: process.env.API_URL || 'http://localhost:5000/graphql',
-  documents: ['src/shared/graphql/schema.ts'],
+  documents: ['src/shared/graphql/documents/*.ts'],
   // verbose: true,
   // debug: true,
   ignoreNoDocuments: true, // for better experience with the watcher

@@ -1,6 +1,6 @@
 import PhotoController from '@/api/photo/controller'
-import { getOptionalUserId } from '@/api/user/optional-user'
 import UserController from '@/api/user/controller'
+import { getOptionalUserId } from '@/api/user/optional-user'
 import { Resolvers } from '@/schema/resolvers-types'
 
 const PhotoResolvers: Resolvers = {

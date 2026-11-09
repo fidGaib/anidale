@@ -14,7 +14,15 @@ export interface ViewedPost {
   date: number
   user: { id: number; login: string; avatar: string }
   images: { id: number; high: string; small: string; medium: string; type: string; saved: boolean }[]
-  videos: { id: number; title: string; file: string; size: number; type: string; postId: number | null; saved: boolean }[]
+  videos: {
+    id: number
+    title: string
+    file: string
+    size: number
+    type: string
+    postId: number | null
+    saved: boolean
+  }[]
   likesCount: number
   liked: boolean
   commentsCount: number
@@ -66,7 +74,18 @@ export const usePost = (postId: number) => {
           date: toTimestamp(p.date),
           user: { id: p.user?.id ?? 0, login: p.user?.login ?? '', avatar: p.user?.avatar ?? '' },
           images: (p.images ?? []).flatMap((i) =>
-            i ? [{ id: i.id ?? 0, high: i.high ?? '', small: i.small ?? '', medium: i.medium ?? '', type: i.type ?? '', saved: !!i.saved }] : [],
+            i
+              ? [
+                  {
+                    id: i.id ?? 0,
+                    high: i.high ?? '',
+                    small: i.small ?? '',
+                    medium: i.medium ?? '',
+                    type: i.type ?? '',
+                    saved: !!i.saved,
+                  },
+                ]
+              : [],
           ),
           videos: (p.videos ?? []).flatMap((v) =>
             v
@@ -128,10 +147,20 @@ export const usePost = (postId: number) => {
   // Счётчики от других пользователей
   useEffect(() => {
     if (!socket || !isConnected) return
-    const onStats = ({ postId: id, likesCount, commentsCount }: { postId: number; likesCount?: number; commentsCount?: number }) => {
+    const onStats = ({
+      postId: id,
+      likesCount,
+      commentsCount,
+    }: {
+      postId: number
+      likesCount?: number
+      commentsCount?: number
+    }) => {
       if (id !== postId) return
       setPost((prev) =>
-        prev ? { ...prev, likesCount: likesCount ?? prev.likesCount, commentsCount: commentsCount ?? prev.commentsCount } : prev,
+        prev
+          ? { ...prev, likesCount: likesCount ?? prev.likesCount, commentsCount: commentsCount ?? prev.commentsCount }
+          : prev,
       )
     }
     socket.on('postStats', onStats)

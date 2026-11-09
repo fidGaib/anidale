@@ -17,8 +17,8 @@ import { ContextMenu, ContextMenuItem } from '@/shared/ui/context-menu'
 
 import Posts from '../post'
 import { ProfilePhotos } from './photos'
-import { ProfileVideos } from './videos'
 import cl from './ui.module.css'
+import { ProfileVideos } from './videos'
 
 const tabs = [
   { icon: assetUrl('icons/arts.svg'), text: 'Стена', layout: 1 },
@@ -255,18 +255,10 @@ export const ArtWork = () => {
       )}
       {layout === 2 && <ProfileMusicList scope={id} canAdd={isOwn} />}
       {layout === 4 && (
-        <ProfilePhotos
-          id={id}
-          isOwn={isOwn}
-          onCountChange={(delta) => setPhotosDelta((value) => value + delta)}
-        />
+        <ProfilePhotos id={id} isOwn={isOwn} onCountChange={(delta) => setPhotosDelta((value) => value + delta)} />
       )}
       {layout === 3 && (
-        <ProfileVideos
-          id={id}
-          isOwn={isOwn}
-          onCountChange={(delta) => setVideosDelta((value) => value + delta)}
-        />
+        <ProfileVideos id={id} isOwn={isOwn} onCountChange={(delta) => setVideosDelta((value) => value + delta)} />
       )}
       {menu && <ContextMenu x={menu.x} y={menu.y} items={menuItems} onClose={() => setMenu(null)} />}
     </>

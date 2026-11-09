@@ -11,9 +11,9 @@ import { RichText } from '@/shared/ui/rich-text'
 import { PostMenu } from './post-menu'
 import { RepostCard } from './repost-card'
 import { openShare } from './share-store'
-import { ViewMark } from './views'
-import { ViewedPost, usePost } from './use-post'
 import cl from './ui.module.css'
+import { ViewedPost, usePost } from './use-post'
+import { ViewMark } from './views'
 
 interface Props {
   postId: number
@@ -25,7 +25,15 @@ interface Props {
   onRemoved?: () => void
 }
 
-const Header = ({ post, onNavigate, onRemoved }: { post: ViewedPost; onNavigate?: () => void; onRemoved?: () => void }) => (
+const Header = ({
+  post,
+  onNavigate,
+  onRemoved,
+}: {
+  post: ViewedPost
+  onNavigate?: () => void
+  onRemoved?: () => void
+}) => (
   <div className={cl.postHead}>
     <Link to={`/profile/${post.user.id}`} className={cl.author} onClick={onNavigate}>
       <ImageLoading className={cl.avatar} src={useSrcAvatar(post.user.avatar)} />
@@ -65,7 +73,9 @@ export const PostBody = ({ postId, withImages = true, onNavigate, onRemoved }: P
       {(post.pinned || post.archived) && (
         <div className={cl.label}>{post.archived ? '🗄 В архиве: виден только вам' : '📌 Закреплённая запись'}</div>
       )}
-      {withImages && post.images.length > 0 && <PostImages images={post.images} postId={post.id} ownerId={post.user.id} />}
+      {withImages && post.images.length > 0 && (
+        <PostImages images={post.images} postId={post.id} ownerId={post.user.id} />
+      )}
       {withImages && post.videos.length > 0 && <PostVideos videos={post.videos} ownerId={post.user.id} />}
       {post.description && (
         <div className={cl.text}>

@@ -1,5 +1,5 @@
-import { getOptionalUserId } from '@/api/user/optional-user'
 import UserController from '@/api/user/controller'
+import { getOptionalUserId } from '@/api/user/optional-user'
 import VideoController from '@/api/video/controller'
 import { Resolvers } from '@/schema/resolvers-types'
 

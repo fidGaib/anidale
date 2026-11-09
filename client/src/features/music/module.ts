@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 
-import { RefreshStore } from '@/app/providers/routes/model'
 import { client } from '@/app/providers/apollo-client'
+import { RefreshStore } from '@/app/providers/routes/model'
 import { storageUrl } from '@/shared/config'
 import {
   ADD_MUSIC,
@@ -130,7 +130,9 @@ export const useMusicStore = create<MusicStore>()((set, get) => {
     player.addEventListener('play', () => set({ isPlaying: true }))
     player.addEventListener('pause', () => set({ isPlaying: false }))
     player.addEventListener('timeupdate', () => set({ currentTime: player.currentTime }))
-    player.addEventListener('loadedmetadata', () => set({ duration: Number.isFinite(player.duration) ? player.duration : 0 }))
+    player.addEventListener('loadedmetadata', () =>
+      set({ duration: Number.isFinite(player.duration) ? player.duration : 0 }),
+    )
     player.addEventListener('ended', () => {
       // Автопереход к следующему треку; на последнем останавливаемся.
       if (!step(1, false)) set({ isPlaying: false, currentTime: 0 })

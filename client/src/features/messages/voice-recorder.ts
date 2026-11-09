@@ -5,9 +5,11 @@ export const MAX_VOICE_SECONDS = 5 * 60
 
 const pickMime = () => {
   if (typeof MediaRecorder === 'undefined') return ''
-  return ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg;codecs=opus'].find((t) =>
-    MediaRecorder.isTypeSupported(t),
-  ) ?? ''
+  return (
+    ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg;codecs=opus'].find((t) =>
+      MediaRecorder.isTypeSupported(t),
+    ) ?? ''
+  )
 }
 
 const extension = (mime: string) => (mime.includes('mp4') ? 'm4a' : mime.includes('ogg') ? 'ogg' : 'webm')

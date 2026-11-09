@@ -17,7 +17,9 @@ export const validateUpload = (incoming: File[], already: File[] = []): string =
   }
   const total = [...already, ...incoming].reduce((sum, file) => sum + file.size, 0)
   if (total > MAX_REQUEST_BYTES - REQUEST_MARGIN) {
-    return `Файлы вместе занимают ${formatFileSize(total)}, а за один раз можно отправить не больше ${MAX_REQUEST_BYTES / 1024 / 1024} МБ. Уберите часть файлов или опубликуйте в несколько постов`
+    return `Файлы вместе занимают ${formatFileSize(total)}, а за один раз можно отправить не больше ${
+      MAX_REQUEST_BYTES / 1024 / 1024
+    } МБ. Уберите часть файлов или опубликуйте в несколько постов`
   }
   return ''
 }

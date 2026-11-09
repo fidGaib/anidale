@@ -1,12 +1,5 @@
 import { client } from '@/app/providers/apollo-client'
-import {
-  ARCHIVE_POST,
-  BOOKMARK_POST,
-  EDIT_POST,
-  PIN_POST,
-  REMOVE_POST,
-  REPORT_POST,
-} from '@/shared/graphql/schema'
+import { ARCHIVE_POST, BOOKMARK_POST, EDIT_POST, PIN_POST, REMOVE_POST, REPORT_POST } from '@/shared/graphql/schema'
 import { toTimestamp } from '@/shared/lib/time'
 
 import { usePostSync } from './sync'

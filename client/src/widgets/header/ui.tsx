@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom'
 
+import { useDarkModeStore } from '@/app/module'
 import darkLogo from '@/assets/images/dark_logo.png'
 import lightLogo from '@/assets/images/ligth_logo.png'
-import { useDarkModeStore } from '@/app/module'
 import { MenuHeader, NotificationHeader, Search } from '@/features/header'
 import Content from '@/shared/content'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
@@ -14,10 +14,7 @@ export const Header = () => {
   return (
     <Content id={cl.wrapper}>
       <Link to={'/feed'}>
-        <ImageLoading
-          className={cl.logo}
-          src={darkMode === 'dark' ? darkLogo : lightLogo}
-        />
+        <ImageLoading className={cl.logo} src={darkMode === 'dark' ? darkLogo : lightLogo} />
       </Link>
       <NotificationHeader />
       <Search />

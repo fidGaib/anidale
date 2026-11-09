@@ -2,9 +2,9 @@ import { create } from 'zustand'
 
 import { client } from '@/app/providers/apollo-client'
 import { BOOKMARKS, POSTS, POST_BY_USER } from '@/shared/graphql/schema'
+import { UploadProgressEvent, toPercent } from '@/shared/lib/progress-fetch'
 import { toTimestamp } from '@/shared/lib/time'
 import { validateUpload } from '@/shared/lib/upload-limits'
-import { UploadProgressEvent, toPercent } from '@/shared/lib/progress-fetch'
 
 import { Post, PostStore } from './types'
 
@@ -59,7 +59,16 @@ interface RawVideo {
 const toImages = (images?: (RawImage | null)[] | null) =>
   (images ?? []).flatMap((image) =>
     image
-      ? [{ id: image.id ?? 0, high: image.high ?? '', small: image.small ?? '', medium: image.medium ?? '', type: image.type ?? '', saved: !!image.saved }]
+      ? [
+          {
+            id: image.id ?? 0,
+            high: image.high ?? '',
+            small: image.small ?? '',
+            medium: image.medium ?? '',
+            type: image.type ?? '',
+            saved: !!image.saved,
+          },
+        ]
       : [],
   )
 
@@ -197,9 +206,12 @@ export const usePostStore = create<PostStore>()((set, get) => ({
     try {
       const res: any = await schemaFn({
         variables: { owner, description: get().description, images: get().images, videos: get().videos },
-        context: hasImages || hasVideos
-          ? { fetchOptions: { onProgress: (event: UploadProgressEvent) => set({ uploadProgress: toPercent(event) }) } }
-          : undefined,
+        context:
+          hasImages || hasVideos
+            ? {
+                fetchOptions: { onProgress: (event: UploadProgressEvent) => set({ uploadProgress: toPercent(event) }) },
+              }
+            : undefined,
       })
       const created = res?.data?.createPost
       set(() => ({
@@ -244,11 +256,7 @@ async function compress(file: File, maxSide = 1920, quality = 0.8): Promise<File
   bitmap.close()
 
   const blob = await new Promise<Blob>((resolve, reject) =>
-    canvas.toBlob(
-      (b) => (b ? resolve(b) : reject(new Error('не удалось сжать изображение'))),
-      'image/webp',
-      quality,
-    ),
+    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('не удалось сжать изображение'))), 'image/webp', quality),
   )
   return new File([blob], file.name, { type: 'image/webp' })
 }

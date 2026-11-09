@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { useOpenPost } from '@/features/post-viewer/post-link'
 import { useRefreshStore } from '@/app/providers/routes/model'
+import { useOpenPost } from '@/features/post-viewer/post-link'
 import { assetUrl } from '@/shared/config'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import useOutsideClick from '@/shared/hooks/useOutsideClick'

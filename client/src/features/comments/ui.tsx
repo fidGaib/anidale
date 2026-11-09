@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 
-import { useRefreshStore } from '@/app/providers/routes/model'
 import { client } from '@/app/providers/apollo-client'
+import { useRefreshStore } from '@/app/providers/routes/model'
 import { ADD_COMMENT, COMMENTS, REMOVE_COMMENT } from '@/shared/graphql/schema'
-import { formatDateTime, toTimestamp } from '@/shared/lib/time'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { useSocket } from '@/shared/hooks/useSocket'
 import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
+import { formatDateTime, toTimestamp } from '@/shared/lib/time'
 import ButtonUI from '@/shared/ui/button'
 
 import cl from './ui.module.css'

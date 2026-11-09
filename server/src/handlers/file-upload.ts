@@ -92,7 +92,8 @@ export const serveStatic = (req: http.IncomingMessage, res: http.ServerResponse)
       ? {
           'Content-Disposition': `attachment; filename*=UTF-8''${encodeURIComponent(
             // eslint-disable-next-line no-control-regex
-            (requestUrl.searchParams.get('name') ?? 'file').replace(/[\u0000-\u001f\u007f]/g, '').slice(0, 150) || 'file',
+            (requestUrl.searchParams.get('name') ?? 'file').replace(/[\u0000-\u001f\u007f]/g, '').slice(0, 150) ||
+              'file',
           )}`,
           'Content-Security-Policy': 'sandbox',
         }

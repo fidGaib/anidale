@@ -30,4 +30,3 @@ export const useOpenPost = () => {
     [navigate, location.pathname, location.search],
   )
 }
-

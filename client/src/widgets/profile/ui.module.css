@@ -24,8 +24,7 @@
 .coverGradient {
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(circle at 18% 20%, rgba(255, 255, 255, 0.3), transparent 45%),
+  background: radial-gradient(circle at 18% 20%, rgba(255, 255, 255, 0.3), transparent 45%),
     radial-gradient(circle at 82% 30%, rgba(255, 220, 180, 0.35), transparent 50%),
     linear-gradient(135deg, #6d3b1e 0%, #a52a2a 55%, #d98b4a 100%);
 }
@@ -91,9 +90,7 @@
   overflow: hidden;
   background: #fff;
   cursor: pointer;
-  box-shadow:
-    0 0 0 4px #fff,
-    0 4px 18px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 0 0 4px #fff, 0 4px 18px rgba(0, 0, 0, 0.28);
 }
 
 .avatar img {
@@ -267,9 +264,7 @@
   white-space: nowrap;
   cursor: pointer;
   opacity: 0.6;
-  transition:
-    background 0.2s,
-    opacity 0.2s;
+  transition: background 0.2s, opacity 0.2s;
 }
 
 .tab:hover {

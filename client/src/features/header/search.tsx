@@ -3,8 +3,8 @@ import { Link, useNavigate } from 'react-router-dom'
 
 import { client } from '@/app/providers/apollo-client'
 import { useRefreshStore } from '@/app/providers/routes/model'
+import { Track, toTrack, useMusicStore } from '@/features/music/module'
 import { useOpenPost } from '@/features/post-viewer'
-import { toTrack, Track, useMusicStore } from '@/features/music/module'
 import { assetUrl, storageUrl } from '@/shared/config'
 import { SEARCH } from '@/shared/graphql/schema'
 import { Modal } from '@/shared/hooks/Modal'
@@ -219,7 +219,12 @@ const SearchBody = ({ onClose }: { onClose: () => void }) => {
     try {
       const { data } = await client.query({
         query: SEARCH,
-        variables: { query: value, type: serverType, limit: kind === 'all' || kind === 'anime' ? PREVIEW : PAGE, page: pageNum },
+        variables: {
+          query: value,
+          type: serverType,
+          limit: kind === 'all' || kind === 'anime' ? PREVIEW : PAGE,
+          page: pageNum,
+        },
         fetchPolicy: 'network-only',
       })
       // Ответ устаревшего запроса не должен перезаписать свежий
@@ -238,9 +243,15 @@ const SearchBody = ({ onClose }: { onClose: () => void }) => {
       }))
       const foundMusic = r.music.map(toTrack)
       const append = pageNum > 0
-      setUsers((prev) => (append ? [...prev, ...foundUsers.filter((u) => !prev.some((x) => x.id === u.id))] : foundUsers))
-      setPosts((prev) => (append ? [...prev, ...foundPosts.filter((p) => !prev.some((x) => x.id === p.id))] : foundPosts))
-      setMusic((prev) => (append ? [...prev, ...foundMusic.filter((m) => !prev.some((x) => x.id === m.id))] : foundMusic))
+      setUsers((prev) =>
+        append ? [...prev, ...foundUsers.filter((u) => !prev.some((x) => x.id === u.id))] : foundUsers,
+      )
+      setPosts((prev) =>
+        append ? [...prev, ...foundPosts.filter((p) => !prev.some((x) => x.id === p.id))] : foundPosts,
+      )
+      setMusic((prev) =>
+        append ? [...prev, ...foundMusic.filter((m) => !prev.some((x) => x.id === m.id))] : foundMusic,
+      )
       setTotals({ users: r.usersTotal, posts: r.postsTotal, music: r.musicTotal })
       setPage(pageNum)
       setSearched(value)
@@ -283,12 +294,12 @@ const SearchBody = ({ onClose }: { onClose: () => void }) => {
     key === 'users'
       ? totals.users
       : key === 'posts'
-        ? totals.posts
-        : key === 'music'
-          ? totals.music
-          : key === 'anime'
-            ? animeFound.length
-            : 0
+      ? totals.posts
+      : key === 'music'
+      ? totals.music
+      : key === 'anime'
+      ? animeFound.length
+      : 0
   // На вкладке «Аниме» разделы сервера не показываются, даже если они подгружены для счётчиков
   const showUsers = shown.users && tab !== 'anime'
   const showPosts = shown.posts && tab !== 'anime'
@@ -301,7 +312,8 @@ const SearchBody = ({ onClose }: { onClose: () => void }) => {
     (!showPosts || posts.length === 0) &&
     (!showMusic || music.length === 0) &&
     (!shown.anime || animeFound.length === 0)
-  const loadedForTab = tab === 'users' ? users.length : tab === 'posts' ? posts.length : tab === 'music' ? music.length : 0
+  const loadedForTab =
+    tab === 'users' ? users.length : tab === 'posts' ? posts.length : tab === 'music' ? music.length : 0
   const canMore = tab !== 'all' && tab !== 'anime' && !loading && loadedForTab > 0 && loadedForTab < tabTotal(tab)
 
   return (

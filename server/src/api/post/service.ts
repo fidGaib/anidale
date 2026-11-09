@@ -1,11 +1,12 @@
+// import { io } from '@/index'
+import { createGraphQLError } from 'graphql-yoga'
+
 import { storagePath } from '@/config'
 import prisma from '@/db/db'
 import { Post, PostImage } from '@/db/models/post-model'
 
-import FileStorageService, { SaveImage } from './file-service'
 import VideoStorageService from '../video/video-service'
-// import { io } from '@/index'
-import { createGraphQLError } from 'graphql-yoga'
+import FileStorageService, { SaveImage } from './file-service'
 
 const MAX_PAGE_LIMIT = 50
 
@@ -118,7 +119,10 @@ class PostService {
   }
 
   private async own(userId: number, id: number) {
-    const post = await Post.findUnique({ where: { id }, include: { images: { select: { id: true } }, videos: { select: { id: true } } } })
+    const post = await Post.findUnique({
+      where: { id },
+      include: { images: { select: { id: true } }, videos: { select: { id: true } } },
+    })
     if (!post) throw createGraphQLError('Пост не найден')
     if (post.owner !== userId) throw createGraphQLError('Нет доступа')
     return post
@@ -128,7 +132,8 @@ class PostService {
     const post = await this.own(userId, id)
     const clean = description.trim()
     if (clean.length > MAX_DESCRIPTION) throw createGraphQLError(`Текст длиннее ${MAX_DESCRIPTION} символов`)
-    if (!clean && post.images.length === 0 && post.videos.length === 0 && !post.repostOfId) throw createGraphQLError('Пост не может быть пустым')
+    if (!clean && post.images.length === 0 && post.videos.length === 0 && !post.repostOfId)
+      throw createGraphQLError('Пост не может быть пустым')
     await Post.update({ where: { id }, data: { description: clean, editedAt: new Date() } })
     return await this.findOne(id, userId)
   }
@@ -194,7 +199,8 @@ class PostService {
   /** Считает просмотры: каждый вызов — один просмотр для каждого поста из списка. */
   async view(ids: number[]) {
     const list = [...new Set(ids)].slice(0, MAX_VIEW_IDS)
-    if (list.length) await Post.updateMany({ where: { id: { in: list }, archived: false }, data: { views: { increment: 1 } } })
+    if (list.length)
+      await Post.updateMany({ where: { id: { in: list }, archived: false }, data: { views: { increment: 1 } } })
     return true
   }
 
@@ -205,12 +211,8 @@ class PostService {
     let postImages: SaveImage[] = []
     let postVideos: Awaited<ReturnType<VideoStorageService['save']>>[] = []
     try {
-      postImages = images?.length
-        ? await Promise.all(images.map((image) => storage.saveImage(image, 'posts/')))
-        : []
-      postVideos = videos?.length
-        ? await Promise.all(videos.map((video) => videoStorage.save(video)))
-        : []
+      postImages = images?.length ? await Promise.all(images.map((image) => storage.saveImage(image, 'posts/'))) : []
+      postVideos = videos?.length ? await Promise.all(videos.map((video) => videoStorage.save(video))) : []
       // Пост, картинки и видео создаются одним вложенным запросом, Prisma выполняет его атомарно
       const post = await Post.create({
         data: {
@@ -274,44 +276,44 @@ class PostService {
   // }
 
   async remove(post_id: number, userId: number): Promise<boolean> {
-    const storageService = new FileStorageService(storagePath);
+    const storageService = new FileStorageService(storagePath)
     const post = await Post.findUnique({
       where: { id: post_id },
-      include: { images: true, videos: true }
-    });
-    if (!post) throw createGraphQLError('Пост не найден');
+      include: { images: true, videos: true },
+    })
+    if (!post) throw createGraphQLError('Пост не найден')
     // Удалять можно только свои посты
-    if (post.owner !== userId) throw createGraphQLError('Нет доступа');
+    if (post.owner !== userId) throw createGraphQLError('Нет доступа')
     try {
       // Видео из поста не переиспользуются, поэтому удаляем файлы вместе с записью
       if (post.videos && post.videos.length > 0) {
-        const videoStorage = new VideoStorageService(storagePath);
-        await Promise.all(post.videos.map((video) => videoStorage.remove(video.file)));
+        const videoStorage = new VideoStorageService(storagePath)
+        await Promise.all(post.videos.map((video) => videoStorage.remove(video.file)))
       }
       if (post.images && post.images.length > 0) {
         const removalPromises = post.images.map(async (item) => {
           const otherPostsWithImage = await PostImage.findMany({
             where: {
               medium: item.medium,
-              postId: { not: post_id } 
-            }
-          });
-          if (otherPostsWithImage.length === 0) await storageService.removeFiles(item);
-        });
-        await Promise.all(removalPromises);
+              postId: { not: post_id },
+            },
+          })
+          if (otherPostsWithImage.length === 0) await storageService.removeFiles(item)
+        })
+        await Promise.all(removalPromises)
         await PostImage.deleteMany({
-          where: { postId: post_id }
-        });
+          where: { postId: post_id },
+        })
       }
       // Репосты этого поста остаются, но показывают «исходный пост удалён»
-      await Post.updateMany({ where: { repostOfId: post_id }, data: { repostDeleted: true } });
+      await Post.updateMany({ where: { repostOfId: post_id }, data: { repostDeleted: true } })
       await Post.delete({
-        where: { id: post_id }
-      });
-      return true;
+        where: { id: post_id },
+      })
+      return true
     } catch (error) {
-      console.error('Error removing post:', error);
-      throw error;
+      console.error('Error removing post:', error)
+      throw error
     }
   }
 }

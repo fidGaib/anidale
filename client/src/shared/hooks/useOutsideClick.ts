@@ -9,11 +9,7 @@ type ElementRef = RefObject<HTMLElement>
  * В прежней версии добавлялся анонимный обработчик, а удалялся handler с capture=true,
  * поэтому слушатель не снимался никогда.
  */
-const useOutsideClick = (
-  ref: ElementRef,
-  handler: (event: MouseEvent) => void,
-  notOutRef?: ElementRef | null,
-) => {
+const useOutsideClick = (ref: ElementRef, handler: (event: MouseEvent) => void, notOutRef?: ElementRef | null) => {
   useEffect(() => {
     const listener = (event: MouseEvent) => {
       const el = ref.current

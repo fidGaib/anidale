@@ -5,9 +5,9 @@ import { Link } from 'react-router-dom'
 import { useDarkModeStore } from '@/app/module'
 import { useRefreshStore } from '@/app/providers/routes/model'
 import { assetUrl, storageUrl } from '@/shared/config'
+import { SAVE_VIDEO } from '@/shared/graphql/schema'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
-import { SAVE_VIDEO } from '@/shared/graphql/schema'
 import { openPhotos } from '@/shared/lib/photo-viewer'
 
 import cl from './ui.module.css'
@@ -66,11 +66,7 @@ export const PostActionWrapp = ({
         <ImageLoading src={assetUrl('icons/like.svg')} alt='anidale like icon' />
         <span className={cl.count}>{likesCount > 0 ? likesCount : ''}</span>
       </div>
-      <div
-        className={`${cl.icon} ${commentsOpen ? cl.iconActive : ''}`}
-        title='Комментарии'
-        onClick={onToggleComments}
-      >
+      <div className={`${cl.icon} ${commentsOpen ? cl.iconActive : ''}`} title='Комментарии' onClick={onToggleComments}>
         <ImageLoading src={assetUrl('icons/comm.svg')} alt='anidale comments icon' />
         <span className={cl.count}>{commentsCount > 0 ? commentsCount : ''}</span>
       </div>
@@ -90,7 +86,15 @@ export const PostActionWrapp = ({
   )
 }
 interface PostImagesProps {
-  images?: ({ id?: number | null; high?: string | null; small?: string | null; medium?: string | null; saved?: boolean | null } | null)[] | null
+  images?:
+    | ({
+        id?: number | null
+        high?: string | null
+        small?: string | null
+        medium?: string | null
+        saved?: boolean | null
+      } | null)[]
+    | null
   /** Автор поста: чужие картинки можно сохранить в «Сохранённые». */
   ownerId?: number
   /** Пост, которому принадлежат картинки: в просмотре рядом покажутся описание, лайки и комментарии. */
@@ -98,7 +102,15 @@ interface PostImagesProps {
 }
 
 interface PostVideosProps {
-  videos?: ({ id?: number | null; title?: string | null; file?: string | null; type?: string | null; saved?: boolean | null } | null)[] | null
+  videos?:
+    | ({
+        id?: number | null
+        title?: string | null
+        file?: string | null
+        type?: string | null
+        saved?: boolean | null
+      } | null)[]
+    | null
   /** Автор поста: чужие видео можно сохранить. */
   ownerId?: number
 }
@@ -161,7 +173,12 @@ export const SaveVideoButton = ({ id, saved }: { id: number; saved: boolean }) =
   }
   return (
     <>
-      <button type='button' className={`${cl.saveVideo} ${state ? cl.saveVideoActive : ''}`} disabled={loading} onClick={() => void toggle()}>
+      <button
+        type='button'
+        className={`${cl.saveVideo} ${state ? cl.saveVideoActive : ''}`}
+        disabled={loading}
+        onClick={() => void toggle()}
+      >
         {state ? '★ В сохранённых' : '☆ Сохранить'}
       </button>
       {error && <span className={cl.saveVideoError}>{error.message}</span>}
@@ -224,7 +241,15 @@ export const PostImages = ({ images, postId, ownerId }: PostImagesProps) => {
       {
         src: storageUrl(`${path}.webp`),
         ...(canSave
-          ? { save: { source: 'POST', id: image?.id as number, postId: postId ?? null, ownerId: ownerId as number, saved: savedOverride[image?.id as number] ?? !!image?.saved } }
+          ? {
+              save: {
+                source: 'POST',
+                id: image?.id as number,
+                postId: postId ?? null,
+                ownerId: ownerId as number,
+                saved: savedOverride[image?.id as number] ?? !!image?.saved,
+              },
+            }
           : {}),
       },
     ]

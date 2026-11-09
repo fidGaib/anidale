@@ -55,7 +55,16 @@ class StoryController {
 
   /** Вид истории для клиента: seen — смотрел ли её просматривающий; число зрителей видит только автор. */
   private view(
-    story: { id: number; medium: string; small: string; high: string; text: string; date: Date; expiresAt: Date; userId: number },
+    story: {
+      id: number
+      medium: string
+      small: string
+      high: string
+      text: string
+      date: Date
+      expiresAt: Date
+      userId: number
+    },
     viewerId: number | undefined,
     seen: boolean,
     viewsCount?: number,
@@ -88,7 +97,14 @@ class StoryController {
         ...(viewerId ? { views: { where: { userId: viewerId }, select: { id: true }, take: 1 } } : {}),
       },
     })
-    const groups = new Map<number, { user: { id: number; avatar: string; login: string }; stories: ReturnType<StoryController['view']>[]; lastId: number }>()
+    const groups = new Map<
+      number,
+      {
+        user: { id: number; avatar: string; login: string }
+        stories: ReturnType<StoryController['view']>[]
+        lastId: number
+      }
+    >()
     for (const story of stories) {
       const seen = viewerId === story.userId || ((story as { views?: { id: number }[] }).views?.length ?? 0) > 0
       const group = groups.get(story.userId) ?? { user: story.user, stories: [], lastId: 0 }

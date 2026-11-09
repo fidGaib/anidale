@@ -1,8 +1,8 @@
 import { createGraphQLError } from 'graphql-yoga'
 
+import NotificationController from '@/api/notification/controller'
 import { storagePath } from '@/config'
 import { Music } from '@/db/models/music-model'
-import NotificationController from '@/api/notification/controller'
 import { io } from '@/index'
 
 import AudioStorageService from './audio-service'

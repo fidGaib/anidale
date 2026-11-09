@@ -66,7 +66,13 @@ const Player = () => {
         {track.title} <span className={cl.artist}>— {track.artist}</span>
       </div>
       <div className={cl.playerControls}>
-        <img className={cl.control} src='/icons/skip_music_rotate.svg' alt='Предыдущий' title='Предыдущий' onClick={prev} />
+        <img
+          className={cl.control}
+          src='/icons/skip_music_rotate.svg'
+          alt='Предыдущий'
+          title='Предыдущий'
+          onClick={prev}
+        />
         <img
           className={cl.control}
           src={isPlaying ? '/icons/pause.svg' : '/icons/play.svg'}
@@ -180,30 +186,30 @@ export const ProfileMusicList = ({ scope, canAdd }: Props) => {
                 </div>
               </div>
               {/* Чужой трек можно добавить к себе (нужен вход) */}
-              {myId && scope !== myId
-                ? myFilesSet.has(track.file) || track.ownerId === myId || addedIds.includes(track.id) ? (
-                    <span className={cl.added} title='Этот трек уже есть в вашем профиле'>
-                      ✓ уже у вас
-                      <img
-                        className={cl.removeMine}
-                        src='/icons/close.svg'
-                        alt='Удалить из моего профиля'
-                        title='Удалить из моего профиля'
-                        onClick={() => {
-                          if (window.confirm('Удалить трек из вашего профиля?')) void removeMine(track.file, myId)
-                        }}
-                      />
-                    </span>
-                  ) : (
+              {myId && scope !== myId ? (
+                myFilesSet.has(track.file) || track.ownerId === myId || addedIds.includes(track.id) ? (
+                  <span className={cl.added} title='Этот трек уже есть в вашем профиле'>
+                    ✓ уже у вас
                     <img
-                      className={cl.addToMine}
-                      src='/icons/plus.png'
-                      alt='Добавить к себе'
-                      title='Добавить к себе'
-                      onClick={() => void addToMine(track.id, myId)}
+                      className={cl.removeMine}
+                      src='/icons/close.svg'
+                      alt='Удалить из моего профиля'
+                      title='Удалить из моего профиля'
+                      onClick={() => {
+                        if (window.confirm('Удалить трек из вашего профиля?')) void removeMine(track.file, myId)
+                      }}
                     />
-                  )
-                : null}
+                  </span>
+                ) : (
+                  <img
+                    className={cl.addToMine}
+                    src='/icons/plus.png'
+                    alt='Добавить к себе'
+                    title='Добавить к себе'
+                    onClick={() => void addToMine(track.id, myId)}
+                  />
+                )
+              ) : null}
               {canAdd && (
                 <img
                   className={cl.remove}

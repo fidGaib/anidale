@@ -1,8 +1,7 @@
+import { createGraphQLError } from 'graphql-yoga'
 import { randomUUID } from 'node:crypto'
 import { mkdir, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
-
-import { createGraphQLError } from 'graphql-yoga'
 
 export const MAX_VIDEO_SIZE = 100 * 1024 * 1024
 const VIDEO_DIR = 'videos'
@@ -35,7 +34,10 @@ export const detectVideo = (buf: Buffer): VideoFormat | null => {
 
 /** Заголовок видео: имя файла без расширения, обрезанное до разумной длины. */
 export const videoTitle = (file: File) => {
-  const name = file.name.replace(/\.[^.]+$/, '').trim().slice(0, 120)
+  const name = file.name
+    .replace(/\.[^.]+$/, '')
+    .trim()
+    .slice(0, 120)
   return name || 'Видео'
 }
 

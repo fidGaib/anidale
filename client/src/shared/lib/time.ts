@@ -14,7 +14,12 @@ export const toTimestamp = (value: unknown): number => {
 /** «5 мая, 14:07». Пустая строка, если даты нет. */
 export const formatDateTime = (timestamp: number) => {
   if (!timestamp) return ''
-  return new Date(timestamp).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+  return new Date(timestamp).toLocaleString('ru-RU', {
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
 }
 
 /** Для списка диалогов: сегодня — время, иначе дата. */

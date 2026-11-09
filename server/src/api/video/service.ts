@@ -2,8 +2,8 @@ import { createGraphQLError } from 'graphql-yoga'
 
 import { storagePath } from '@/config'
 import prisma from '@/db/db'
-import Video from '@/db/models/video-model'
 import User from '@/db/models/user-model'
+import Video from '@/db/models/video-model'
 
 import VideoStorageService from './video-service'
 

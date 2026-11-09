@@ -45,7 +45,16 @@ export const MenuHeader = () => {
                   <Link to={item.link}>
                     {item.text}
                     {item.link === '/messages' && unread > 0 ? (
-                      <span style={{ marginLeft: 6, padding: '1px 6px', borderRadius: 10, background: 'brown', color: '#fff', fontSize: 12 }}>
+                      <span
+                        style={{
+                          marginLeft: 6,
+                          padding: '1px 6px',
+                          borderRadius: 10,
+                          background: 'brown',
+                          color: '#fff',
+                          fontSize: 12,
+                        }}
+                      >
                         {unread > 99 ? '99+' : unread}
                       </span>
                     ) : null}

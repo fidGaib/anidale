@@ -1,6 +1,5 @@
-import os from 'node:os'
-
 import { createGraphQLError } from 'graphql-yoga'
+import os from 'node:os'
 
 import { createLimiter } from '@/utils/limiter'
 

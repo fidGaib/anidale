@@ -37,8 +37,7 @@ export const MessagesBridge = () => {
     // Сообщение изменено, удалено или закреплено: обновляем открытый чат и список диалогов
     const onUpdated = ({ message }: { message: Parameters<typeof toMessage>[0] }) => applyUpdated(toMessage(message))
     const onMessagesDeleted = (event: { userA: number; userB: number; ids: number[] }) => applyDeleted(event, myId)
-    const onPinned = (event: { userA: number; userB: number; pinnedIds: number[] }) =>
-      applyPinned(event, myId)
+    const onPinned = (event: { userA: number; userB: number; pinnedIds: number[] }) => applyPinned(event, myId)
     socket.on('newMessage', onNew)
     socket.on('conversationDeleted', onDeleted)
     socket.on('messageUpdated', onUpdated)
@@ -67,7 +66,21 @@ export const MessagesBridge = () => {
       socket.off('messagesDeleted', onMessagesDeleted)
       socket.off('messagePinned', onPinned)
     }
-  }, [socket, isConnected, myId, receive, drop, applyUpdated, applyDeleted, applyPinned, applyRead, applyTyping, applyReactions, applyPresence, loadConversations])
+  }, [
+    socket,
+    isConnected,
+    myId,
+    receive,
+    drop,
+    applyUpdated,
+    applyDeleted,
+    applyPinned,
+    applyRead,
+    applyTyping,
+    applyReactions,
+    applyPresence,
+    loadConversations,
+  ])
 
   return null
 }

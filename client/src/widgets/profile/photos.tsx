@@ -5,7 +5,7 @@ import { useRefreshStore } from '@/app/providers/routes/model'
 import { storageUrl } from '@/shared/config'
 import { CREATE_PHOTO, GET_PHOTOS, GET_SAVED_PHOTOS, REMOVE_PHOTO, SAVE_PHOTO } from '@/shared/graphql/schema'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
-import { openPhotos, ViewerPhoto } from '@/shared/lib/photo-viewer'
+import { ViewerPhoto, openPhotos } from '@/shared/lib/photo-viewer'
 import ButtonUI from '@/shared/ui/button'
 
 import cl from './photos.module.css'
@@ -174,8 +174,8 @@ export const ProfilePhotos = ({ id, isOwn, onCountChange }: Props) => {
             {album === 'saved'
               ? 'Вы ещё не сохранили ни одного фото'
               : isOwn
-                ? 'Добавьте фото или опубликуйте пост с картинкой'
-                : 'Фотографий пока нет'}
+              ? 'Добавьте фото или опубликуйте пост с картинкой'
+              : 'Фотографий пока нет'}
           </p>
         </div>
       ) : (

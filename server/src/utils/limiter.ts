@@ -16,7 +16,8 @@ export const createLimiter = (max: number) => {
       return await task()
     } finally {
       const next = queue.shift()
-      if (next) next() // слот переходит следующей задаче, счётчик не меняется
+      if (next)
+        next() // слот переходит следующей задаче, счётчик не меняется
       else active--
     }
   }

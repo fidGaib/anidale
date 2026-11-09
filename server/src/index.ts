@@ -4,10 +4,10 @@ import { Server as IoServer } from 'socket.io'
 
 import { getOptionalUserId } from './api/user/optional-user'
 import prisma from './db/db'
-import { markConnected, markDisconnected, presenceRoom } from './handlers/presence'
-import { applyCors, getAllowedOrigins } from './handlers/cors'
 import { parseCookies } from './handlers/cookie-parser'
+import { applyCors, getAllowedOrigins } from './handlers/cors'
 import { serveStatic } from './handlers/file-upload'
+import { markConnected, markDisconnected, presenceRoom } from './handlers/presence'
 import { yoga } from './schema'
 
 const server = http.createServer()

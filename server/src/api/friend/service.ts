@@ -46,7 +46,8 @@ class FriendService {
       }),
     ])
 
-    const status: FriendStatus = forward && backward ? 'FRIEND' : forward ? 'SUBSCRIBED' : backward ? 'SUBSCRIBER' : 'NONE'
+    const status: FriendStatus =
+      forward && backward ? 'FRIEND' : forward ? 'SUBSCRIBED' : backward ? 'SUBSCRIBER' : 'NONE'
     return { status, ...counts }
   }
 

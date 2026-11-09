@@ -6,8 +6,8 @@ import { assetUrl } from '@/shared/config'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import Posts from '@/widgets/post'
 
-import { FeedVideos } from './videos'
 import cl from './ui.module.css'
+import { FeedVideos } from './videos'
 
 const meshBlock = [
   { icon: assetUrl('icons/note.svg'), text: 'посты', layout: 1 },

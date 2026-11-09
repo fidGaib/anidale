@@ -63,10 +63,10 @@ export const Friends = () => {
 
   const users: FriendUser[] =
     tab === 'friends'
-      ? (friendsQuery.data?.getFriends ?? [])
+      ? friendsQuery.data?.getFriends ?? []
       : tab === 'subscribers'
-        ? (subscribersQuery.data?.getSubscribers ?? [])
-        : (allQuery.data?.getUsers ?? [])
+      ? subscribersQuery.data?.getSubscribers ?? []
+      : allQuery.data?.getUsers ?? []
   const loading =
     tab === 'friends' ? friendsQuery.loading : tab === 'subscribers' ? subscribersQuery.loading : allQuery.loading
   const error = tab === 'friends' ? friendsQuery.error : tab === 'subscribers' ? subscribersQuery.error : allQuery.error
@@ -81,7 +81,9 @@ export const Friends = () => {
         const res = await subscribersQuery.fetchMore({ variables: { id, limit: PAGE, offset: users.length } })
         if ((res.data?.getSubscribers?.length ?? 0) < PAGE) setDone(true)
       } else {
-        const res = await allQuery.fetchMore({ variables: { limit: PAGE, offset: users.length, search: search || null } })
+        const res = await allQuery.fetchMore({
+          variables: { limit: PAGE, offset: users.length, search: search || null },
+        })
         if ((res.data?.getUsers?.length ?? 0) < PAGE) setDone(true)
       }
     } catch {
@@ -119,10 +121,10 @@ export const Friends = () => {
     tab === 'friends'
       ? 'У вас пока нет друзей'
       : tab === 'subscribers'
-        ? 'Подписчиков пока нет'
-        : search
-          ? 'Никого не нашли'
-          : 'Пользователей пока нет'
+      ? 'Подписчиков пока нет'
+      : search
+      ? 'Никого не нашли'
+      : 'Пользователей пока нет'
 
   return (
     <Content className={cl.content}>
