@@ -45,6 +45,8 @@ export const privateRoutes = [
 // public routes
 export const publicRoutes = [
   { path: '/feed', element: Feed },
+  { path: '/anime', element: Anime },
+  { path: '/watch', element: Watch },
   { path: '/signin', element: Signin },
   { path: '/signup', element: Registration },
   { path: '/verify-email', element: VerifyEmail },

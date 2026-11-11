@@ -1,106 +1,635 @@
 #content {
-  width: 45%;
+  width: min(1480px, 94vw);
 }
 
-.releases {
-  width: 100%;
-  margin-top: 10px;
-  height: 400px;
+.page {
+  --accent: #8b5cf6;
+  --accent-soft: rgba(139, 92, 246, 0.16);
+  --radius: 16px;
   display: flex;
-  overflow: hidden;
-  justify-content: center;
+  flex-direction: column;
+  gap: 46px;
+  padding: 18px 0 56px;
+  color: var(--text);
 }
 
-.releases img {
-  width: 100%;
-  height: 400px;
-  border-radius: 10px;
-  opacity: 0.3;
+.dark {
+  --text: #f4f4f5;
+  --muted: #a1a1aa;
+  --card: #17171d;
+  --card-hover: #1e1e27;
+  --line: rgba(255, 255, 255, 0.08);
+  --chip: rgba(255, 255, 255, 0.06);
+  --shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
+  --image-overlay: linear-gradient(180deg, rgba(10, 10, 14, 0) 32%, rgba(10, 10, 14, 0.94) 100%);
+  color-scheme: dark;
 }
 
-#oneReales {
-  background: #000;
+.light {
+  --text: #18181b;
+  --muted: #6b7280;
+  --card: #ffffff;
+  --card-hover: #f6f6f8;
+  --line: rgba(0, 0, 0, 0.08);
+  --chip: rgba(0, 0, 0, 0.05);
+  --shadow: 0 14px 30px rgba(30, 30, 40, 0.12);
+  --image-overlay: linear-gradient(180deg, rgba(0, 0, 0, 0) 28%, rgba(0, 0, 0, 0.88) 100%);
+}
+
+/* Верхнее меню разделов */
+.nav {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.navLink {
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: var(--chip);
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease;
+}
+
+.navLink:hover {
+  color: var(--text);
+  background: var(--card-hover);
+}
+
+.navLinkActive,
+.navLinkActive:hover {
+  color: #fff;
+  background: var(--accent);
+}
+
+/* Заголовки секций */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  scroll-margin-top: 18px;
+}
+
+.sectionHead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.sectionTitle {
   position: relative;
-  border-radius: 10px;
-  display: flex;
-  justify-content: center;
+  margin: 0;
+  padding-left: 16px;
+  font-size: clamp(22px, 2.4vw, 30px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.sectionTitle::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.12em;
+  bottom: 0.12em;
+  width: 4px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #a78bfa, #6d28d9);
+}
+
+.sectionSubtitle {
+  margin: 7px 0 0 16px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* Новые эпизоды */
+.episodes {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.episodeCard {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
-}
-
-.ReleasInfo {
-  padding: 60px;
-}
-
-.ReleasTitle {
-  font-weight: bold;
-  font-size: 30px;
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
   color: #fff;
-  font-family: calibri, sans-serif;
-  margin-bottom: 10px;
+  text-decoration: none;
+  isolation: isolate;
 }
 
-.ReleasDate {
-  font-family: calibri, sans-serif;
-  color: #fff;
-  font-size: 18px;
-  margin-bottom: 10px;
-}
-
-.ReleasCat {
-  font-family: calibri, sans-serif;
-  color: #ffffff86;
-  font-size: 16px;
-  margin-bottom: 10px;
-}
-
-.ReleasDesc {
-  color: #ffffff86;
-  font-size: 16px;
-  font-family: calibri, sans-serif;
-}
-
-#ReleasButton {
-  background: brown;
-  margin-top: 20px;
-  color: #fff;
-  border-radius: 10px;
-}
-
-.NewReleases .EpisodesP {
-  margin-top: 10px;
-  font-size: 24px;
-  font-weight: bold;
-}
-
-.NewReleases .EpisodesP2 {
-  margin-top: 5px;
-  font-size: 16px;
-}
-
-.wrapReleases {
+.episodeCard img {
   width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.45s ease;
+}
+
+.episodeCard::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--image-overlay);
+}
+
+.episodeCard:hover img {
+  transform: scale(1.06);
+}
+
+.episodeBadge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 3;
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.episodePlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
   display: flex;
-  margin-top: 20px;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.25s ease;
 }
 
-.oneReleas {
-  flex: 1 0 20%;
-  padding: 5px;
+.episodeCard:hover .episodePlay {
+  opacity: 1;
 }
 
-.oneReleas p {
-  text-align: center;
-  z-index: 9;
-  margin-top: -40px;
+.playIcon {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: rgba(139, 92, 246, 0.92);
+  box-shadow: 0 8px 24px rgba(109, 40, 217, 0.5);
+  position: relative;
+}
+
+.playIcon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 54%;
+  transform: translate(-50%, -50%);
+  border-style: solid;
+  border-width: 9px 0 9px 15px;
+  border-color: transparent transparent transparent #fff;
+}
+
+.episodeBody {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px;
+}
+
+.episodeTitle {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.32;
+}
+
+.episodeMeta {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* Промо-баннер */
+.promo {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 26px;
+  overflow: hidden;
+  padding: 30px 36px;
+  border-radius: var(--radius);
+  background: linear-gradient(115deg, #5b21b6 0%, #7c3aed 45%, #a78bfa 100%);
+  box-shadow: 0 18px 40px rgba(76, 29, 149, 0.35);
   color: #fff;
-  font-weight: bold;
-  text-shadow: 0px 0px 10px rgba(0, 0, 0, 1), 0px 0px 50px rgba(0, 0, 0, 1), 0px 0px 10px rgba(0, 0, 0, 1),
-    0px 0px 50px rgba(0, 0, 0, 1), 0px 0px 10px rgba(0, 0, 0, 1), 0px 0px 50px rgba(0, 0, 0, 1),
-    0px 0px 50px rgba(0, 0, 0, 1), 0px 0px 10px rgba(0, 0, 0, 1), 0px 0px 10px rgba(0, 0, 0, 1);
 }
 
-.oneReleas img {
-  width: 100%;
-  height: 250px;
+.promo::before,
+.promo::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.promo::before {
+  width: 260px;
+  height: 260px;
+  top: -120px;
+  right: 18%;
+}
+
+.promo::after {
+  width: 180px;
+  height: 180px;
+  bottom: -110px;
+  right: 4%;
+}
+
+.promoText {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.promoTitle {
+  margin: 0;
+  font-size: clamp(20px, 2vw, 26px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.promoSubtitle {
+  margin: 8px 0 0;
+  max-width: 640px;
+  font-size: 14px;
+  line-height: 1.5;
+  opacity: 0.85;
+}
+
+.promoButton {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  padding: 12px 22px;
+  border-radius: 12px;
+  background: #fff;
+  color: #5b21b6;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.promoButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(15, 10, 40, 0.3);
+}
+
+/* Расписание */
+.tabs {
+  display: inline-flex;
+  gap: 6px;
+  width: fit-content;
+  padding: 5px;
+  border-radius: 999px;
+  background: var(--chip);
+}
+
+.tab {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tabActive,
+.tabActive:hover {
+  color: #fff;
+  background: var(--accent);
+  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
+}
+
+.schedule {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.scheduleCard {
+  display: flex;
+  gap: 14px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--card);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.scheduleCard:hover {
+  transform: translateY(-2px);
+  border-color: rgba(139, 92, 246, 0.55);
+  background: var(--card-hover);
+}
+
+.schedulePoster {
+  flex: none;
+  width: 66px;
+  height: 92px;
   border-radius: 10px;
+  object-fit: cover;
+  background: var(--chip);
+}
+
+.scheduleBody {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.scheduleName {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.scheduleEpisode {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.scheduleMeta {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.scheduleGenres {
+  overflow: hidden;
+  font-size: 12px;
+  color: var(--muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Видео */
+.videos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.videoCard {
+  display: flex;
+  flex-direction: column;
+  color: inherit;
+  text-decoration: none;
+}
+
+.videoThumb {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--card);
+}
+
+.videoThumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.videoCard:hover .videoThumb img {
+  transform: scale(1.05);
+}
+
+.videoDuration {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.78);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.videoPlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.videoCard:hover .videoPlay {
+  opacity: 1;
+}
+
+.videoTitle {
+  display: -webkit-box;
+  overflow: hidden;
+  margin-top: 11px;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.videoMeta {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* Франшизы */
+.franchises {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.franchiseCard {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: 220px;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--card);
+  color: #fff;
+  text-decoration: none;
+  isolation: isolate;
+}
+
+.franchiseCard img {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.franchiseCard::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, rgba(10, 10, 14, 0.1) 20%, rgba(10, 10, 14, 0.94) 100%);
+}
+
+.franchiseCard:hover img {
+  transform: scale(1.06);
+}
+
+.franchiseBody {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 20px;
+}
+
+.franchiseTitle {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.franchiseOriginal {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.franchiseMeta,
+.franchiseDuration {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Жанры */
+.genres {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.genre {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 15px 18px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card);
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.genre:hover {
+  border-color: rgba(139, 92, 246, 0.45);
+  background: var(--card-hover);
+}
+
+.genreName {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.genreCount {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+@media (max-width: 1180px) {
+  .episodes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .schedule,
+  .videos,
+  .franchises {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .page {
+    gap: 34px;
+    padding-top: 10px;
+  }
+
+  .promo {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 24px;
+  }
+
+  .episodes,
+  .schedule,
+  .videos,
+  .franchises {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .franchiseCard {
+    min-height: 190px;
+  }
+
+  .genres {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .genre {
+    padding: 13px 14px;
+  }
 }

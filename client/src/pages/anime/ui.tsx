@@ -1,152 +1,181 @@
-import { CSSProperties } from 'react'
-import { FreeMode, Navigation } from 'swiper/modules'
-import 'swiper/css/free-mode'
-import 'swiper/css/navigation'
-import { Swiper, SwiperSlide } from 'swiper/react'
-// Import Swiper styles
-import 'swiper/css'
+import { PropsWithChildren, useState } from 'react'
+import { Link } from 'react-router-dom'
 
 import { useDarkModeStore } from '@/app/module'
 import Content from '@/shared/content'
-import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
-import ButtonUI from '@/shared/ui/button'
 
+import {
+  franchises,
+  genres,
+  newEpisodes,
+  releaseMeta,
+  schedule,
+  SCHEDULE_DAYS,
+  ScheduleDay,
+  videos,
+} from './model'
 import cl from './ui.module.css'
 
-export const Anime = () => {
-  const anime = [
-    {
-      title: 'Магическая битва 2 сезон',
-      src: '/5.jpg',
-      date: 'Лето • 2023 • +18',
-      cat: 'Демоны • Сверхъестественное • Сёнен • Фэнтези • Экшен',
-      desc: '2006 год. Юджи Итадори только-только исполнилось четыре, а шестнадцатилетний Сатору Годжо на пару с Сугуру Гэто уже стали самыми сильными. Преподаватель Токийского колледжа магии поручает им двоим крайне важную миссию: в целости и сохранности доставить к мастеру Тэнгэну старшеклассницу по имени Рико Аманай. Девочка была избрана идеальным сосудом силы, и пришло время мастеру слиться с её физической оболочкой. Однако недоброжелатели не дремлют, и, чтобы помешать этому, обращаются к человеку по прозвищу Убийца магов. Кто же на самом деле этот Убийца? Получится ли у юных магов выполнить свою миссию? Обо всём этом мы узнаем во втором сезоне "Магической битвы"!',
-    },
-    {
-      title: 'Клинок, Рассекающий Демонов: Тренировка Хашира',
-      src: '/6.jpeg',
-      date: 'Весна • 2024 • +18',
-      cat: 'Исторический • Приключения • Сверхъестественное • Сёнен • Фэнтези • Экшен',
-      desc: 'С тех пор как Нэзуко стала невосприимчива к солнечному свету, нападения демонов прекратились. Но, разумеется, охотники знают, что Кибутсуджи Мудзан обязательно вновь попытается схватить её, а значит, вскоре им предстоит новое разрушительное противостояние. Чтобы повысить шансы на победу в грядущей войне, корпус решает провести так называемую тренировку столпов. Эта изнурительная программа должна не только укрепить физические способности и здоровье рядовых охотников на демонов, но и значительно поднять индивидуальную силу каждого из столпов. Разумеется, для Танджиро с ребятами этот процесс будет явно не из лёгких, но ради победы над демонами они должны стиснуть зубы и вытерпеть все предстоящие испытания.',
-    },
-  ]
+const PAGE_NAV = [
+  { href: '#new-episodes', label: 'Новые эпизоды' },
+  { href: '#schedule', label: 'Расписание' },
+  { href: '#videos', label: 'Видео' },
+  { href: '#franchises', label: 'Франшизы' },
+  { href: '#genres', label: 'Жанры' },
+]
 
+/** Страница каталога аниме: новые эпизоды, расписание, видео, франшизы и жанры. */
+export const Anime = () => {
   const theme = useDarkModeStore((store) => store.theme)
+  const [day, setDay] = useState<ScheduleDay>('today')
+
   return (
     <Content id={cl.content}>
-      <NewReleases anime={anime} />
-      <div className={cl.NewReleases}>
-        <p className={cl.EpisodesP} style={{ color: `${theme === 'dark' ? '#fff' : '#000'}` }}>
-          Новые эпизоды ›
-        </p>
-        <p className={cl.EpisodesP2}>Самые новые и свежие эпизоды в любимой озвучке</p>
+      <div className={`${cl.page} ${theme === 'dark' ? cl.dark : cl.light}`}>
+        <nav className={cl.nav} aria-label='Разделы каталога'>
+          {PAGE_NAV.map((item, index) => (
+            <a key={item.href} href={item.href} className={`${cl.navLink} ${index === 0 ? cl.navLinkActive : ''}`}>
+              {item.label}
+            </a>
+          ))}
+        </nav>
 
-        <div className={cl.wrapReleases}>
-          <div className={cl.oneReleas}>
-            <img src='https://i.pinimg.com/736x/e9/0a/f9/e90af95413f296d47f20882300fa0b3c.jpg' alt='' />
+        <Section id='new-episodes' title='Новые эпизоды' subtitle='Самые новые и свежие эпизоды в любимой озвучке'>
+          <div className={cl.episodes}>
+            {newEpisodes.map((episode) => (
+              <Link to='/watch' className={cl.episodeCard} key={episode.id}>
+                <img src={episode.preview} alt={episode.title} loading='lazy' />
+                <span className={cl.episodeBadge}>Эпизод {episode.episode}</span>
+                <span className={cl.episodePlay} aria-hidden>
+                  <span className={cl.playIcon} />
+                </span>
+                <span className={cl.episodeBody}>
+                  <span className={cl.episodeTitle}>{episode.title}</span>
+                  <span className={cl.episodeMeta}>{releaseMeta(episode)}</span>
+                </span>
+              </Link>
+            ))}
           </div>
-          <div className={cl.oneReleas}>
-            <img src='https://i.pinimg.com/736x/a1/0d/37/a10d372d63df3336cf2bdc69aaae5f66.jpg' alt='' />
+        </Section>
+
+        <div className={cl.promo}>
+          <div className={cl.promoText}>
+            <h2 className={cl.promoTitle}>Так звучит аниме!</h2>
+            <p className={cl.promoSubtitle}>
+              Перевод и озвучивание на русский язык аниме-сериалов и не только. Смотрите новые эпизоды без рекламы и
+              ждите продолжения вместе с нами.
+            </p>
           </div>
-          <div className={cl.oneReleas}>
-            <img src='https://i.pinimg.com/736x/ee/24/d8/ee24d89378444b1a1e70f54211809f8a.jpg' alt='' />
-          </div>
-          <div className={cl.oneReleas}>
-            <img src='https://i.pinimg.com/736x/17/b3/0e/17b30eb03357f13214eab5477acbaade.jpg' alt='' />
-          </div>
-          <div className={cl.oneReleas}>
-            <img
-              src='https://diskomir.ru/upload/resize_cache/webp/iblock/61a/61a9b39dd8df35d0e9a74785b15402bb.webp'
-              alt=''
-            />
-          </div>
+          <a className={cl.promoButton} href='#schedule'>
+            Смотреть расписание
+          </a>
         </div>
-        <div className={cl.NewReleases}>
-          <p className={cl.EpisodesP} style={{ color: `${theme === 'dark' ? '#fff' : '#000'}` }}>
-            Жанры ›
-          </p>
-          <p className={cl.EpisodesP2}>Список жанров на любой вкус и цвет</p>
-          <div className={cl.wrapReleases} id={cl.wrapCat}>
-            <div className={cl.oneReleas}>
-              <img src='https://i.pinimg.com/736x/17/b3/0e/17b30eb03357f13214eab5477acbaade.jpg' alt='' />
-              <p>Фэнтези</p>
-            </div>
-            <div className={cl.oneReleas}>
-              <img
-                src='https://diskomir.ru/upload/resize_cache/webp/iblock/61a/61a9b39dd8df35d0e9a74785b15402bb.webp'
-                alt=''
-              />
-              <p>Исекай</p>
-            </div>
-            <div className={cl.oneReleas}>
-              <img src='https://i.pinimg.com/736x/e9/0a/f9/e90af95413f296d47f20882300fa0b3c.jpg' alt='' />
-              <p>Экшен</p>
-            </div>
-            <div className={cl.oneReleas}>
-              <img src='https://i.pinimg.com/736x/ee/24/d8/ee24d89378444b1a1e70f54211809f8a.jpg' alt='' />
-              <p>Вампиры</p>
-            </div>
-            <div className={cl.oneReleas}>
-              <img src='https://i.pinimg.com/736x/a1/0d/37/a10d372d63df3336cf2bdc69aaae5f66.jpg' alt='' />
-              <p>Сверхъестественное</p>
-            </div>
+
+        <Section
+          id='schedule'
+          title='Расписание релизов'
+          subtitle='Список релизов, над которыми команда трудится прямо сейчас'
+        >
+          <div className={cl.tabs} role='tablist' aria-label='День показа'>
+            {SCHEDULE_DAYS.map((tab) => (
+              <button
+                key={tab.id}
+                type='button'
+                role='tab'
+                aria-selected={day === tab.id}
+                className={`${cl.tab} ${day === tab.id ? cl.tabActive : ''}`}
+                onClick={() => setDay(tab.id)}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
-        </div>
+          <div className={cl.schedule}>
+            {schedule[day].map((release) => (
+              <Link to='/watch' className={cl.scheduleCard} key={release.id}>
+                <img className={cl.schedulePoster} src={release.poster} alt='' loading='lazy' />
+                <span className={cl.scheduleBody}>
+                  <span className={cl.scheduleName}>{release.title}</span>
+                  <span className={cl.scheduleEpisode}>Эпизод {release.episode}</span>
+                  <span className={cl.scheduleMeta}>{releaseMeta(release)}</span>
+                  <span className={cl.scheduleGenres}>{release.genres.slice(0, 3).join(' • ')}</span>
+                </span>
+              </Link>
+            ))}
+          </div>
+        </Section>
+
+        <Section id='videos' title='Последние видео' subtitle='Самые интересные видео ролики от любимой команды'>
+          <div className={cl.videos}>
+            {videos.map((video) => (
+              <Link to='/watch' className={cl.videoCard} key={video.id}>
+                <span className={cl.videoThumb}>
+                  <img src={video.thumb} alt='' loading='lazy' />
+                  <span className={cl.videoPlay} aria-hidden>
+                    <span className={cl.playIcon} />
+                  </span>
+                  <span className={cl.videoDuration}>{video.duration}</span>
+                </span>
+                <span className={cl.videoTitle}>{video.title}</span>
+                <span className={cl.videoMeta}>
+                  {video.author} • {video.views} просмотров
+                </span>
+              </Link>
+            ))}
+          </div>
+        </Section>
+
+        <Section
+          id='franchises'
+          title='Франшизы'
+          subtitle='Самые интересные и захватывающие франшизы в любимой озвучке'
+        >
+          <div className={cl.franchises}>
+            {franchises.map((franchise) => (
+              <Link to='/watch' className={cl.franchiseCard} key={franchise.id}>
+                <img src={franchise.poster} alt='' loading='lazy' />
+                <span className={cl.franchiseBody}>
+                  <span className={cl.franchiseTitle}>{franchise.title}</span>
+                  <span className={cl.franchiseOriginal}>{franchise.original}</span>
+                  <span className={cl.franchiseMeta}>
+                    {franchise.years} • {franchise.releases} сезона • {franchise.episodes} эпизодов
+                  </span>
+                  <span className={cl.franchiseDuration}>{franchise.duration}</span>
+                </span>
+              </Link>
+            ))}
+          </div>
+        </Section>
+
+        <Section id='genres' title='Жанры' subtitle='Список жанров на любой вкус и цвет'>
+          <div className={cl.genres}>
+            {genres.map((genre) => (
+              <div className={cl.genre} key={genre.name}>
+                <span className={cl.genreName}>{genre.name}</span>
+                <span className={cl.genreCount}>{genre.count} релизов</span>
+              </div>
+            ))}
+          </div>
+        </Section>
       </div>
     </Content>
   )
 }
 
-interface AnimeItem {
+type SectionProps = PropsWithChildren<{
+  id: string
   title: string
-  src: string
-  date: string
-  cat: string
-  desc: string
-}
+  subtitle?: string
+}>
 
-const NewReleases = ({ anime }: { anime: AnimeItem[] }) => {
-  return (
-    <Swiper
-      style={
-        {
-          '--swiper-navigation-color': '#fff',
-          '--swiper-pagination-color': '#fff',
-          width: '100%',
-        } as CSSProperties
-      }
-      spaceBetween={0}
-      navigation={true}
-      className={cl.releases}
-      modules={[FreeMode, Navigation]}
-    >
-      {anime.map((child) => {
-        return (
-          <SwiperSlide id={cl.oneReales} key={child.title}>
-            <ImageLoading className={cl.img} src={child.src} />
-            <div
-              className='hz'
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                width: '100%',
-                height: '100%',
-                position: 'absolute',
-                zIndex: 9,
-                top: 0,
-              }}
-            >
-              <div className={cl.ReleasInfo}>
-                <p className={cl.ReleasTitle}>{child.title}</p>
-                <p className={cl.ReleasDate}>{child.date}</p>
-                <p className={cl.ReleasCat}>{child.cat}</p>
-                <p className={cl.ReleasDesc}>{child.desc}</p>
-                <ButtonUI id={cl.ReleasButton}>Смотреть</ButtonUI>
-              </div>
-            </div>
-          </SwiperSlide>
-        )
-      })}
-    </Swiper>
-  )
-}
+const Section = ({ id, title, subtitle, children }: SectionProps) => (
+  <section className={cl.section} id={id}>
+    <header className={cl.sectionHead}>
+      <div>
+        <h2 className={cl.sectionTitle}>{title}</h2>
+        {subtitle && <p className={cl.sectionSubtitle}>{subtitle}</p>}
+      </div>
+    </header>
+    {children}
+  </section>
+)
