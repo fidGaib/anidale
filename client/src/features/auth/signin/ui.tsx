@@ -34,7 +34,10 @@ export const FormSignin = () => {
         {error && <p>{error.message}</p>}
         <Input {...register('email')} type='email' placeholder='E-mail...' required />
         <Input {...register('pass')} type='password' placeholder='Пароль...' required />
-        <ButtonUI>Войти</ButtonUI>
+        <p className={cl.forgot}>
+          <Link to='/forgot-password'>Забыли пароль?</Link>
+        </p>
+        <ButtonUI type='submit'>Войти</ButtonUI>
         <p className={cl.redirect}>
           Нет аккаунта? - <Link to={'/signup'}>Регистрация</Link>
         </p>

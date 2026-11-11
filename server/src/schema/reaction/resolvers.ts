@@ -1,6 +1,7 @@
 import ReactionController from '@/api/reaction/controller'
 import UserController from '@/api/user/controller'
 import { getOptionalUserId } from '@/api/user/optional-user'
+import { requireVerifiedUser } from '@/api/user/require-verified'
 import { Resolvers } from '@/schema/resolvers-types'
 import { throttle } from '@/utils/rate-limit'
 
@@ -17,7 +18,7 @@ const ReactionResolvers: Resolvers = {
       return await ReactionController.setLike(id, user.id, liked)
     },
     async addComment(_, { postId, text }, { req, res }) {
-      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      const user = await requireVerifiedUser(req, res)
       await throttle('comment', user.id)
       return await ReactionController.addComment(postId, user.id, text)
     },

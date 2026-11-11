@@ -43,6 +43,32 @@ const UserResolvers: Resolvers = {
       const tokienData = await UserController.refresh(res, req.cookies.refreshToken)
       return await UserController.remove(tokienData.id)
     },
+    async verifyEmail(_, { token }) {
+      return await UserController.verifyEmail(token)
+    },
+    async resendVerificationEmail(_, __, { req, res }) {
+      await throttle('emailSend', clientIp(req))
+      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      await throttle('emailResend', user.id)
+      return await UserController.resendVerificationEmail(req, res)
+    },
+    async requestPasswordReset(_, { email }, { req }) {
+      const normalized = String(email ?? '')
+        .trim()
+        .toLowerCase()
+      await throttle('emailSend', clientIp(req))
+      await throttle('passwordReset', normalized)
+      return await UserController.requestPasswordReset(email)
+    },
+    async resetPassword(_, { token, pass, pass2 }, { req }) {
+      await throttle('passwordReset', clientIp(req))
+      return await UserController.resetPassword(token, pass, pass2)
+    },
+    async changePassword(_, { oldPass, pass, pass2 }, { req, res }) {
+      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      await throttle('passwordChange', user.id)
+      return await UserController.changePassword(req, res, oldPass, pass, pass2)
+    },
   },
 }
 

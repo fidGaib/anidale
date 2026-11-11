@@ -1,5 +1,6 @@
 import MessageController from '@/api/message/controller'
 import UserController from '@/api/user/controller'
+import { requireVerifiedUser } from '@/api/user/require-verified'
 import { Resolvers } from '@/schema/resolvers-types'
 import { throttle } from '@/utils/rate-limit'
 
@@ -40,7 +41,7 @@ const MessageResolvers: Resolvers = {
       return await MessageController.deleteMessage(user.id, id, forEveryone ?? false)
     },
     async forwardMessage(_, { id, to }, { req, res }) {
-      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      const user = await requireVerifiedUser(req, res)
       return await MessageController.forward(user.id, id, to)
     },
     async deleteMessages(_, { ids, forEveryone }, { req, res }) {
@@ -48,7 +49,7 @@ const MessageResolvers: Resolvers = {
       return await MessageController.deleteMessages(user.id, ids, forEveryone ?? false)
     },
     async forwardMessages(_, { ids, to }, { req, res }) {
-      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      const user = await requireVerifiedUser(req, res)
       await throttle('message', user.id)
       return await MessageController.forwardMany(user.id, ids, to)
     },
@@ -65,7 +66,7 @@ const MessageResolvers: Resolvers = {
       return await MessageController.pin(user.id, id, pinned)
     },
     async sendMessage(_, { to, text, files, replyTo }, { req, res }) {
-      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      const user = await requireVerifiedUser(req, res)
       await throttle('message', user.id)
       return await MessageController.send(user.id, to, text ?? undefined, files ?? undefined, replyTo ?? undefined)
     },

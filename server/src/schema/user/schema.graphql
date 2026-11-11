@@ -7,13 +7,25 @@ type Query {
 type Mutation {
   registration(user: Registration!): User
   login(user: Login!): User
-  updateUser(user: UpdateUser, pass: String, old_pass: String): typeUpdateUser
+  updateUser(user: UpdateUser): typeUpdateUser
   remove: Boolean
+  "Переход по одноразовой ссылке из письма (24 часа)"
+  verifyEmail(token: String!): Boolean!
+  "Отправить письмо с подтверждением ещё раз (с лимитом)"
+  resendVerificationEmail: Boolean!
+  "Запросить ссылку для восстановления пароля. Ответ не раскрывает, есть ли такая почта"
+  requestPasswordReset(email: String!): Boolean!
+  "Задать новый пароль по одноразовой ссылке (1 час); завершает все сессии"
+  resetPassword(token: String!, pass: String!, pass2: String!): Boolean!
+  "Смена пароля из настроек; завершает все сессии, кроме текущей"
+  changePassword(oldPass: String!, pass: String!, pass2: String!): Boolean!
 }
 type RefreshUser {
   id: Int!
   login: String!
   avatar: String!
+  email: String!
+  isActivated: Boolean!
 }
 type User {
   id: Int!
@@ -27,8 +39,7 @@ type User {
   about: String
   website: String
   birthDate: Date
-  activationLink: String
-  isActivated: Boolean
+  isActivated: Boolean!
   createdAt: Date
   accessToken: String
   refreshToken: String
@@ -53,12 +64,9 @@ type typeUpdateUser {
   website: String
   birthDate: Date
   backgroundImage: String
-  activationLink: String
-  isActivated: Boolean
 }
 input UpdateUser {
   email: String
-  pass: String
   login: String
   avatar: FILE
   status: String
@@ -69,8 +77,6 @@ input UpdateUser {
   website: String
   birthDate: Date
   backgroundImage: FILE
-  activationLink: String
-  isActivated: Boolean
 }
 input Registration {
   email: String!

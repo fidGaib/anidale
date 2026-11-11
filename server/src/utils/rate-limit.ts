@@ -21,6 +21,10 @@ export const POLICIES = {
   reaction: { max: 120, windowMs: MINUTE, message: 'Слишком много оценок подряд' },
   discussion: { max: 30, windowMs: 5 * MINUTE, message: 'Вы пишете в обсуждениях слишком часто' },
   join: { max: 30, windowMs: 10 * MINUTE, message: 'Слишком много подписок подряд' },
+  emailSend: { max: 5, windowMs: 60 * MINUTE, message: 'Слишком много писем с вашего адреса' },
+  emailResend: { max: 3, windowMs: 60 * MINUTE, message: 'Письмо можно запросить не больше трёх раз в час' },
+  passwordReset: { max: 3, windowMs: 60 * MINUTE, message: 'Слишком много запросов на восстановление пароля' },
+  passwordChange: { max: 5, windowMs: 15 * MINUTE, message: 'Слишком много попыток смены пароля' },
 } as const
 
 export type Policy = keyof typeof POLICIES

@@ -10,6 +10,7 @@ import { PhotoViewerHost } from '@/features/photo-viewer'
 import { PostModalHost, ShareDialogHost } from '@/features/post-viewer'
 import { StoryViewerHost } from '@/features/stories'
 import Loader from '@/shared/loader'
+import { EmailConfirmationBanner } from '@/widgets/email-confirmation'
 import Header from '@/widgets/header'
 
 import GlobalStyles from '../globalStyles'
@@ -28,6 +29,7 @@ export const withRouter = (Component: () => React.ReactElement) =>
             <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
               <GlobalStyles />
               <Header />
+              <EmailConfirmationBanner />
               <Suspense fallback={<Loader />}>
                 <Component />
               </Suspense>

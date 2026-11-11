@@ -1,6 +1,7 @@
 import postController from '@/api/post/controller'
 import UserController from '@/api/user/controller'
 import { getOptionalUserId } from '@/api/user/optional-user'
+import { requireVerifiedUser } from '@/api/user/require-verified'
 import { Resolvers } from '@/schema/resolvers-types'
 import { throttle } from '@/utils/rate-limit'
 
@@ -25,7 +26,7 @@ const PostResolvers: Resolvers = {
   Mutation: {
     async createPost(_, { post }, ctx) {
       const { req, res } = ctx
-      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      const user = await requireVerifiedUser(req, res)
       await throttle('post', user.id)
       const { description, images, videos, communityId, music, musicIds, videoIds } = post
       const postData = await postController.create(
@@ -49,7 +50,7 @@ const PostResolvers: Resolvers = {
       }
     },
     async editPost(_, { id, description }, ctx) {
-      const user = await UserController.refresh(ctx.res, ctx.req.cookies.refreshToken)
+      const user = await requireVerifiedUser(ctx.req, ctx.res)
       return await postController.edit(user.id, id, description)
     },
     async pinPost(_, { id, pinned }, ctx) {
@@ -69,7 +70,7 @@ const PostResolvers: Resolvers = {
       return await postController.report(user.id, id, reason)
     },
     async repostPost(_, { id, comment }, ctx) {
-      const user = await UserController.refresh(ctx.res, ctx.req.cookies.refreshToken)
+      const user = await requireVerifiedUser(ctx.req, ctx.res)
       await throttle('post', user.id)
       return await postController.repost(user.id, id, comment)
     },

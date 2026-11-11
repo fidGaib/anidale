@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import http from 'http'
 import jwt from 'jsonwebtoken'
 
@@ -24,15 +25,16 @@ class TokenService {
   }
 
   async generateTokens({ avatar, id, login }: { avatar: string; id: number; login: string }) {
-    const accessToken = jwt.sign({ avatar, id, login }, this.accessSecret, { expiresIn: '15m' })
-    const refreshToken = jwt.sign({ avatar, id, login }, this.refreshSecret, { expiresIn: '14d' })
+    // jti делает каждый токен уникальным: два входа в одну секунду не должны совпасть
+    const accessToken = jwt.sign({ avatar, id, login }, this.accessSecret, { expiresIn: '15m', jwtid: randomUUID() })
+    const refreshToken = jwt.sign({ avatar, id, login }, this.refreshSecret, { expiresIn: '14d', jwtid: randomUUID() })
     return {
       accessToken,
       refreshToken,
     }
   }
   async findToken(refreshToken: string) {
-    const tokenData = await Token.findMany({
+    return await Token.findFirst({
       where: { refreshToken },
       include: {
         user: {
@@ -41,21 +43,22 @@ class TokenService {
             avatar: true,
             email: true,
             login: true,
+            isActivated: true,
           },
         },
       },
     })
-    return tokenData[0]
   }
+  /**
+   * Каждый вход — отдельная сессия. Раньше запись обновлялась, и человек мог быть
+   * авторизован только в одном браузере. Теперь устройства не выбивают друг друга.
+   */
   async saveToken(userId: number, refreshToken: string) {
-    const tokenData = await Token.findMany({ where: { userId } })
-    if (tokenData.length > 0) {
-      return Token.update({
-        where: { id: tokenData[0].id },
-        data: {
-          refreshToken,
-        },
-      })
+    // Изредка чистим сессии старше срока жизни refresh-токена (14 дней)
+    if (Math.random() < 0.02) {
+      void Token.deleteMany({ where: { createdAt: { lt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000) } } }).catch(
+        () => undefined,
+      )
     }
     return await Token.create({ data: { userId, refreshToken } })
   }
@@ -66,6 +69,10 @@ class TokenService {
       },
     })
     return true
+  }
+  /** Завершает все сессии пользователя (смена или сброс пароля). */
+  async removeAllForUser(userId: number) {
+    await Token.deleteMany({ where: { userId } })
   }
   validateAccessToken(token: string) {
     try {

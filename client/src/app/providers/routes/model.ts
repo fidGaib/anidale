@@ -6,6 +6,8 @@ interface typeRefreshData {
   id?: number
   avatar?: string
   login?: string
+  email?: string
+  isActivated?: boolean
 }
 interface typeUserStore {
   refreshData: typeRefreshData

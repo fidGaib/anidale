@@ -11,56 +11,56 @@ generator client {
 }
 
 model User {
-  id          Int      @id @default(autoincrement())
-  email       String   @unique
-  pass        String
-  login       String
-  avatar      String
+  id                    Int                 @id @default(autoincrement())
+  email                 String              @unique
+  pass                  String
+  login                 String
+  avatar                String
   // Публичные поля профиля
-  status          String    @default("")
-  city            String    @default("")
+  status                String              @default("")
+  city                  String              @default("")
   // Блок «Подробнее» в профиле
-  work            String    @default("")
-  education       String    @default("")
-  about           String    @default("")
-  website         String    @default("")
-  birthDate       DateTime?
-  backgroundImage String    @default("")
-  activationLink String?
-  isActivated Boolean
-  createdAt   DateTime @default(now())
-  posts       Post[]
-  tokens      Token[]
-  musics      Music[]
-  photos      Photo[]
-  videos      Video[]
-  likes       Like[]
-  comments    Comment[]
-  convsA      Conversation[] @relation("ConversationA")
-  convsB      Conversation[] @relation("ConversationB")
-  messages    Message[]      @relation("MessageSender")
+  work                  String              @default("")
+  education             String              @default("")
+  about                 String              @default("")
+  website               String              @default("")
+  birthDate             DateTime?
+  backgroundImage       String              @default("")
+  isActivated           Boolean
+  createdAt             DateTime            @default(now())
+  posts                 Post[]
+  tokens                Token[]
+  emailTokens           EmailToken[]
+  musics                Music[]
+  photos                Photo[]
+  videos                Video[]
+  likes                 Like[]
+  comments              Comment[]
+  convsA                Conversation[]      @relation("ConversationA")
+  convsB                Conversation[]      @relation("ConversationB")
+  messages              Message[]           @relation("MessageSender")
   // Когда пользователь последний раз был в сети (пишется при отключении последнего сокета)
-  lastSeenAt  DateTime?
-  messageReactions MessageReaction[]
-  bookmarks   Bookmark[]
-  savedVideos SavedVideo[]
-  savedPhotos SavedPhoto[]
-  postReports PostReport[]
-  stories     Story[]
-  storyViews  StoryView[]
-  postViews   PostView[]
-  communitiesOwned Community[] @relation("CommunityOwner")
-  communityMemberships CommunityMember[]
-  communityRequests CommunityRequest[]
-  communityBans CommunityBan[]
-  discussionTopics DiscussionTopic[]
-  discussionMessages DiscussionMessage[]
-  communityContacts CommunityContact[]
-  notifications    Notification[] @relation("NotificationOwner")
-  notificationsMade Notification[] @relation("NotificationActor")
+  lastSeenAt            DateTime?
+  messageReactions      MessageReaction[]
+  bookmarks             Bookmark[]
+  savedVideos           SavedVideo[]
+  savedPhotos           SavedPhoto[]
+  postReports           PostReport[]
+  stories               Story[]
+  storyViews            StoryView[]
+  postViews             PostView[]
+  communitiesOwned      Community[]         @relation("CommunityOwner")
+  communityMemberships  CommunityMember[]
+  communityRequests     CommunityRequest[]
+  communityBans         CommunityBan[]
+  discussionTopics      DiscussionTopic[]
+  discussionMessages    DiscussionMessage[]
+  communityContacts     CommunityContact[]
+  notifications         Notification[]      @relation("NotificationOwner")
+  notificationsMade     Notification[]      @relation("NotificationActor")
   // Подписки: кого подписан я и кто подписан на меня
-  subscriptionsMade     Subscription[] @relation("SubscriptionFollower")
-  subscriptionsReceived Subscription[] @relation("SubscriptionFollowing")
+  subscriptionsMade     Subscription[]      @relation("SubscriptionFollower")
+  subscriptionsReceived Subscription[]      @relation("SubscriptionFollowing")
 }
 
 // Подписка пользователя на другого. Дружба — это две встречные подписки.
@@ -78,31 +78,31 @@ model Subscription {
 
 // Личный диалог двух пользователей. userAId всегда меньше userBId, поэтому на пару ровно одна запись.
 model Conversation {
-  id            Int      @id @default(autoincrement())
-  userAId       Int
-  userBId       Int
-  lastMessageId Int      @default(0)
-  lastMessageAt DateTime @default(now())
+  id              Int       @id @default(autoincrement())
+  userAId         Int
+  userBId         Int
+  lastMessageId   Int       @default(0)
+  lastMessageAt   DateTime  @default(now())
   // До какого сообщения (включительно) участник очистил историю: «удалить диалог у себя»
-  clearedA      Int      @default(0)
-  clearedB      Int      @default(0)
+  clearedA        Int       @default(0)
+  clearedB        Int       @default(0)
   // Последнее сообщение, до которого участник дочитал
-  readA         Int      @default(0)
-  readB         Int      @default(0)
+  readA           Int       @default(0)
+  readB           Int       @default(0)
   // Устарело: раньше закреплялось одно сообщение. Данные перенесены в pinnedIds, поле больше не используется
   pinnedMessageId Int?
   // Закреплённые сообщения (до 10), видно обоим
-  pinnedIds     Int[]    @default([])
+  pinnedIds       Int[]     @default([])
   // Настройки диалога у каждого участника: без звука, в архиве, закреплён в списке
-  mutedA        Boolean  @default(false)
-  mutedB        Boolean  @default(false)
-  archivedA     Boolean  @default(false)
-  archivedB     Boolean  @default(false)
-  topA          Boolean  @default(false)
-  topB          Boolean  @default(false)
-  userA         User     @relation("ConversationA", fields: [userAId], references: [id])
-  userB         User     @relation("ConversationB", fields: [userBId], references: [id])
-  messages      Message[]
+  mutedA          Boolean   @default(false)
+  mutedB          Boolean   @default(false)
+  archivedA       Boolean   @default(false)
+  archivedB       Boolean   @default(false)
+  topA            Boolean   @default(false)
+  topB            Boolean   @default(false)
+  userA           User      @relation("ConversationA", fields: [userAId], references: [id])
+  userB           User      @relation("ConversationB", fields: [userBId], references: [id])
+  messages        Message[]
 
   @@unique([userAId, userBId])
   @@index([userAId, lastMessageAt])
@@ -110,21 +110,21 @@ model Conversation {
 }
 
 model Message {
-  id             Int          @id @default(autoincrement())
-  text           String       @default("")
-  date           DateTime     @default(now())
+  id             Int               @id @default(autoincrement())
+  text           String            @default("")
+  date           DateTime          @default(now())
   conversationId Int
   senderId       Int
   editedAt       DateTime?
   // Ответ на сообщение: id оригинала. Без внешнего ключа, чтобы удаление оригинала не затрагивало ответы
   replyToId      Int?
   // Кто скрыл сообщение у себя («удалить у меня»). Когда скрыли оба, сообщение стирается
-  hiddenBy       Int[]        @default([])
+  hiddenBy       Int[]             @default([])
   // Пересланное сообщение: снимок автора оригинала (id и логин на момент пересылки)
   fwdUserId      Int?
-  fwdLogin       String       @default("")
-  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  sender         User         @relation("MessageSender", fields: [senderId], references: [id])
+  fwdLogin       String            @default("")
+  conversation   Conversation      @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User              @relation("MessageSender", fields: [senderId], references: [id])
   attachments    Attachment[]
   reactions      MessageReaction[]
 
@@ -185,15 +185,15 @@ model Comment {
 }
 
 model Music {
-  id          Int      @id @default(autoincrement())
+  id          Int        @id @default(autoincrement())
   title       String
-  artist      String   @default("Неизвестный исполнитель")
-  date        DateTime @default(now())
-  file        String   @default("")
-  size        Int      @default(0)
-  image       String   @default("")
+  artist      String     @default("Неизвестный исполнитель")
+  date        DateTime   @default(now())
+  file        String     @default("")
+  size        Int        @default(0)
+  image       String     @default("")
   owner       Int
-  user        User     @relation(fields: [owner], references: [id])
+  user        User       @relation(fields: [owner], references: [id])
   // Трек из музыки сообщества (загрузил редактор или администратор)
   communityId Int?
   community   Community? @relation(fields: [communityId], references: [id], onDelete: Cascade)
@@ -205,78 +205,78 @@ model Music {
   @@index([communityId])
   @@index([postId])
 }
+
 model Post {
-  id          Int      @id @default(autoincrement())
-  description String
-  date        DateTime @default(now())
-  images      PostImage[]
-  videos      Video[]
-  likes       Like[]
-  comments    Comment[]
+  id            Int            @id @default(autoincrement())
+  description   String
+  date          DateTime       @default(now())
+  images        PostImage[]
+  videos        Video[]
+  likes         Like[]
+  comments      Comment[]
   notifications Notification[]
-  owner      Int
-  user        User     @relation(fields: [owner], references: [id])
+  owner         Int
+  user          User           @relation(fields: [owner], references: [id])
   // Когда пост правили; null — не правили
-  editedAt    DateTime?
+  editedAt      DateTime?
   // Закреплён на странице автора (один на автора)
-  pinned      Boolean  @default(false)
+  pinned        Boolean        @default(false)
   // В архиве: виден только автору
-  archived    Boolean  @default(false)
-  views       Int      @default(0)
+  archived      Boolean        @default(false)
+  views         Int            @default(0)
   // Репост: id исходного поста (всегда корневого). После удаления оригинала становится null, repostDeleted = true
-  repostOfId  Int?
-  repostDeleted Boolean @default(false)
+  repostOfId    Int?
+  repostDeleted Boolean        @default(false)
   // Статья: пост-обёртка с заголовком и блоками (лайки, комментарии, архив и закладки работают как у поста)
-  article     Article?
-  music       Music[]
+  article       Article?
+  music         Music[]
   // Пост на стене сообщества: owner — администратор, который его написал
-  communityId Int?
-  community   Community? @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  communityId   Int?
+  community     Community?     @relation(fields: [communityId], references: [id], onDelete: Cascade)
   // Запись участника ждёт одобрения администратора и пока скрыта от всех, кроме автора и администраторов
-  suggested   Boolean  @default(false)
-  repostOf    Post?    @relation("Reposts", fields: [repostOfId], references: [id], onDelete: SetNull)
-  reposts     Post[]   @relation("Reposts")
-  bookmarks   Bookmark[]
-  reports     PostReport[]
-  viewedBy    PostView[]
+  suggested     Boolean        @default(false)
+  repostOf      Post?          @relation("Reposts", fields: [repostOfId], references: [id], onDelete: SetNull)
+  reposts       Post[]         @relation("Reposts")
+  bookmarks     Bookmark[]
+  reports       PostReport[]
+  viewedBy      PostView[]
 
   @@index([owner])
 }
 
 model PostImage {
-  id          Int      @id @default(autoincrement())
-  high      String
-  medium    String
-  small     String
-  type      String
-  vertical  Boolean
-  date      DateTime @default(now())
-  post      Post   @relation(fields: [postId], references: [id])
-  postId    Int
-  savedBy   SavedPhoto[]
+  id       Int          @id @default(autoincrement())
+  high     String
+  medium   String
+  small    String
+  type     String
+  vertical Boolean
+  date     DateTime     @default(now())
+  post     Post         @relation(fields: [postId], references: [id])
+  postId   Int
+  savedBy  SavedPhoto[]
 
   @@index([postId])
   @@index([medium])
 }
 
-
 // Видео пользователя: либо прикреплено к посту (postId), либо загружено отдельно в альбом (postId = null).
 // file — путь внутри storage вместе с расширением (mp4/webm), его выбирает сервер по содержимому файла.
 model Video {
-  id      Int      @id @default(autoincrement())
-  title   String   @default("")
-  file    String
-  size    Int      @default(0)
-  type    String   @default("")
-  date    DateTime @default(now())
-  ownerId Int
-  user    User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  postId  Int?
-  post    Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  id          Int          @id @default(autoincrement())
+  title       String       @default("")
+  file        String
+  size        Int          @default(0)
+  type        String       @default("")
+  date        DateTime     @default(now())
+  ownerId     Int
+  user        User         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  postId      Int?
+  post        Post?        @relation(fields: [postId], references: [id], onDelete: Cascade)
   // Видео из альбома сообщества (загрузил администратор)
   communityId Int?
-  community   Community? @relation(fields: [communityId], references: [id], onDelete: Cascade)
-  savedBy SavedVideo[]
+  community   Community?   @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  savedBy     SavedVideo[]
 
   @@index([ownerId, id])
   @@index([postId])
@@ -297,19 +297,19 @@ model SavedVideo {
 
 // Фотография в личном альбоме пользователя. Пути к файлам хранятся без расширения (.webp добавляет клиент)
 model Photo {
-  id        Int      @id @default(autoincrement())
-  high      String   @default("")
-  medium    String
-  small     String   @default("")
-  vertical  Boolean  @default(false)
-  type      String   @default("")
-  date      DateTime @default(now())
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id          Int          @id @default(autoincrement())
+  high        String       @default("")
+  medium      String
+  small       String       @default("")
+  vertical    Boolean      @default(false)
+  type        String       @default("")
+  date        DateTime     @default(now())
+  userId      Int
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   // Фото из альбома сообщества (загрузил администратор)
   communityId Int?
-  community   Community? @relation(fields: [communityId], references: [id], onDelete: Cascade)
-  savedBy   SavedPhoto[]
+  community   Community?   @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  savedBy     SavedPhoto[]
 
   @@index([userId, id])
 }
@@ -331,31 +331,52 @@ model SavedPhoto {
   @@index([userId, id])
 }
 
+// Одна запись — одна активная сессия (вход). При смене пароля сессии удаляются.
 model Token {
-  id          Int      @id @default(autoincrement())
-  user        User     @relation(fields: [userId], references: [id])
-  userId      Int
+  id           Int      @id @default(autoincrement())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       Int
   refreshToken String
+  createdAt    DateTime @default(now())
 
   @@index([userId])
   @@index([refreshToken])
+  @@index([createdAt])
 }
+
+// Одноразовый токен для подтверждения почты или сброса пароля.
+// В базе лежит только SHA-256-хеш: сама ссылка существует лишь в письме.
+model EmailToken {
+  id        Int       @id @default(autoincrement())
+  tokenHash String    @unique
+  // verify — подтверждение почты, reset — восстановление пароля
+  type      String
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, type])
+  @@index([expiresAt])
+}
+
 // Уведомление пользователю о действии другого: лайк или комментарий к посту, добавленный трек.
 // type: like | comment | track. text: фрагмент комментария или название трека.
 model Notification {
-  id        Int       @id @default(autoincrement())
-  type      String
-  text      String    @default("")
-  date      DateTime  @default(now())
-  readAt    DateTime?
-  userId    Int
-  actorId   Int
-  postId    Int?
+  id          Int        @id @default(autoincrement())
+  type        String
+  text        String     @default("")
+  date        DateTime   @default(now())
+  readAt      DateTime?
+  userId      Int
+  actorId     Int
+  postId      Int?
   communityId Int?
-  community Community? @relation(fields: [communityId], references: [id], onDelete: Cascade)
-  user      User      @relation("NotificationOwner", fields: [userId], references: [id], onDelete: Cascade)
-  actor     User      @relation("NotificationActor", fields: [actorId], references: [id], onDelete: Cascade)
-  post      Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  community   Community? @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  user        User       @relation("NotificationOwner", fields: [userId], references: [id], onDelete: Cascade)
+  actor       User       @relation("NotificationActor", fields: [actorId], references: [id], onDelete: Cascade)
+  post        Post?      @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@index([userId, id])
 }
@@ -388,21 +409,21 @@ model PostReport {
 
 // История: картинка на 24 часа. После expiresAt в ленте не показывается и удаляется вместе с файлами
 model Story {
-  id        Int      @id @default(autoincrement())
-  high      String
-  medium    String
-  small     String
-  vertical  Boolean
-  type      String
-  text      String   @default("")
-  date      DateTime @default(now())
-  expiresAt DateTime
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id          Int         @id @default(autoincrement())
+  high        String
+  medium      String
+  small       String
+  vertical    Boolean
+  type        String
+  text        String      @default("")
+  date        DateTime    @default(now())
+  expiresAt   DateTime
+  userId      Int
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   // История сообщества (опубликовал редактор или администратор)
   communityId Int?
-  community   Community? @relation(fields: [communityId], references: [id], onDelete: Cascade)
-  views     StoryView[]
+  community   Community?  @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  views       StoryView[]
 
   @@index([userId, id])
   @@index([expiresAt])
@@ -434,48 +455,48 @@ model PostView {
 
 // Статья: хранится вместе с постом, который её публикует
 model Article {
-  id         Int      @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   title      String
   // Обложка: пути medium и small; пусто — без обложки
-  cover      String   @default("")
-  coverSmall String   @default("")
+  cover      String    @default("")
+  coverSmall String    @default("")
   // Начало текста для карточки на стене
-  excerpt    String   @default("")
+  excerpt    String    @default("")
   // JSON-массив блоков (см. api/article/content.ts)
   content    String
-  date       DateTime @default(now())
+  date       DateTime  @default(now())
   editedAt   DateTime?
-  postId     Int      @unique
-  post       Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId     Int       @unique
+  post       Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
 
 // Сообщество: страница с описанием, участниками и стеной
 model Community {
-  id          Int      @id @default(autoincrement())
-  name        String
-  description String   @default("")
-  status      String   @default("")
-  website     String   @default("")
+  id            Int                @id @default(autoincrement())
+  name          String
+  description   String             @default("")
+  status        String             @default("")
+  website       String             @default("")
   // Пути картинок (medium) без расширения; пусто — без картинки
-  avatar      String   @default("")
-  cover       String   @default("")
-  createdAt   DateTime @default(now())
-  ownerId     Int
-  owner       User     @relation("CommunityOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  avatar        String             @default("")
+  cover         String             @default("")
+  createdAt     DateTime           @default(now())
+  ownerId       Int
+  owner         User               @relation("CommunityOwner", fields: [ownerId], references: [id], onDelete: Cascade)
   // Закрытое сообщество: стену и участников видят только участники, вступить можно по заявке
-  isClosed    Boolean  @default(false)
-  members     CommunityMember[]
-  posts       Post[]
-  links       CommunityLink[]
-  requests    CommunityRequest[]
-  bans        CommunityBan[]
-  videos      Video[]
-  photos      Photo[]
+  isClosed      Boolean            @default(false)
+  members       CommunityMember[]
+  posts         Post[]
+  links         CommunityLink[]
+  requests      CommunityRequest[]
+  bans          CommunityBan[]
+  videos        Video[]
+  photos        Photo[]
   notifications Notification[]
-  topics      DiscussionTopic[]
-  contacts    CommunityContact[]
-  music       Music[]
-  stories     Story[]
+  topics        DiscussionTopic[]
+  contacts      CommunityContact[]
+  music         Music[]
+  stories       Story[]
 
   @@index([name])
 }
@@ -483,10 +504,10 @@ model Community {
 // Участник сообщества. role: member | moderator | editor | admin (создатель тоже admin, он же Community.ownerId).
 // rank хранит старшинство роли (0..3): по нему сортируется список участников
 model CommunityMember {
-  id          Int      @id @default(autoincrement())
-  role        String   @default("member")
-  rank        Int      @default(0)
-  date        DateTime @default(now())
+  id          Int       @id @default(autoincrement())
+  role        String    @default("member")
+  rank        Int       @default(0)
+  date        DateTime  @default(now())
   communityId Int
   userId      Int
   community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
@@ -535,26 +556,26 @@ model CommunityBan {
 
 // Тема обсуждения в сообществе
 model DiscussionTopic {
-  id            Int       @id @default(autoincrement())
+  id            Int                 @id @default(autoincrement())
   title         String
-  pinned        Boolean   @default(false)
-  closed        Boolean   @default(false)
-  date          DateTime  @default(now())
+  pinned        Boolean             @default(false)
+  closed        Boolean             @default(false)
+  date          DateTime            @default(now())
   // Когда писали последнее сообщение: по нему темы сортируются
-  lastMessageAt DateTime  @default(now())
+  lastMessageAt DateTime            @default(now())
   communityId   Int
   authorId      Int
-  community     Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
-  author        User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  community     Community           @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  author        User                @relation(fields: [authorId], references: [id], onDelete: Cascade)
   messages      DiscussionMessage[]
 
   @@index([communityId, lastMessageAt])
 }
 
 model DiscussionMessage {
-  id       Int      @id @default(autoincrement())
+  id       Int             @id @default(autoincrement())
   text     String
-  date     DateTime @default(now())
+  date     DateTime        @default(now())
   topicId  Int
   authorId Int
   topic    DiscussionTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)

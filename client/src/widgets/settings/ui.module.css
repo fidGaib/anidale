@@ -213,6 +213,10 @@
   font-family: var(--font-text-main);
 }
 
+.passwordMeter {
+  width: 100%;
+}
+
 /* ---------- Обложка ---------- */
 
 .coverPreview {

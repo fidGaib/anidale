@@ -5,12 +5,14 @@ import Dropzone from 'react-dropzone'
 
 import { useRefreshStore } from '@/app/providers/routes/model'
 import { useSettingsStore } from '@/features/settings/module'
-import { PROFILE, UPDATE_COVER, UPDATE_PROFILE, updateUserQuery } from '@/shared/graphql/schema'
+import { CHANGE_PASSWORD, PROFILE, UPDATE_COVER, UPDATE_PROFILE, updateUserQuery } from '@/shared/graphql/schema'
 import ImageLoading from '@/shared/hooks/onLoadImage/onLoadImage'
 import { useSrcAvatar } from '@/shared/hooks/useSrcAvatar'
+import { isPasswordReady } from '@/shared/lib/password'
 import { toTimestamp } from '@/shared/lib/time'
 import { ButtonUI } from '@/shared/ui/button/ui'
 import Input from '@/shared/ui/input'
+import { PasswordMeter } from '@/shared/ui/password-meter'
 
 import cl from './ui.module.css'
 
@@ -43,6 +45,7 @@ export const LayoutLoginAvatar = () => {
       <EditProfile user={user} />
       <CoverEditor user={user} />
       <AvatarEditorComponent />
+      <PasswordSection />
     </div>
   )
 }
@@ -238,6 +241,74 @@ const CoverEditor = ({ user }: { user?: ProfileData }) => {
           </div>
         </>
       )}
+    </section>
+  )
+}
+
+// Смена пароля: остальные сессии завершаются, текущая остаётся
+const PasswordSection = () => {
+  const me = useRefreshStore((state) => state.refreshData)
+  const [oldPass, setOldPass] = useState('')
+  const [pass, setPass] = useState('')
+  const [pass2, setPass2] = useState('')
+  const [saved, setSaved] = useState(false)
+  const [changePassword, { loading, error }] = useMutation(CHANGE_PASSWORD)
+  const canSubmit = Boolean(oldPass) && isPasswordReady(pass, [me.login, me.email]) && pass2 === pass
+
+  const save = async () => {
+    setSaved(false)
+    try {
+      await changePassword({ variables: { oldPass, pass, pass2 }, fetchPolicy: 'network-only' })
+      setOldPass('')
+      setPass('')
+      setPass2('')
+      setSaved(true)
+    } catch {
+      // Текст ошибки берём из состояния мутации
+    }
+  }
+
+  return (
+    <section className={cl.section}>
+      <h2>Пароль</h2>
+      <p className={cl.error}>{loading ? 'Сохранение...' : error?.message}</p>
+      {saved && !loading && !error && <p className={cl.success}>Пароль изменён. Остальные сессии завершены.</p>}
+      <div className={cl.form}>
+        <label>
+          Текущий пароль
+          <Input
+            type='password'
+            value={oldPass}
+            onChange={(event) => setOldPass(event.target.value)}
+            autoComplete='current-password'
+          />
+        </label>
+        <label>
+          Новый пароль
+          <Input
+            type='password'
+            value={pass}
+            onChange={(event) => setPass(event.target.value)}
+            autoComplete='new-password'
+          />
+        </label>
+        <div className={cl.passwordMeter}>
+          <PasswordMeter password={pass} userInputs={[me.login, me.email]} />
+        </div>
+        <label>
+          Повторите новый пароль
+          <Input
+            type='password'
+            value={pass2}
+            onChange={(event) => setPass2(event.target.value)}
+            autoComplete='new-password'
+          />
+        </label>
+        {pass2 && pass2 !== pass && <p className={cl.error}>Пароли не совпадают</p>}
+        <ButtonUI onClick={save} disabled={!canSubmit || loading}>
+          Сменить пароль
+        </ButtonUI>
+      </div>
     </section>
   )
 }

@@ -21,6 +21,9 @@
   margin-top: 10px;
   width: 70%;
 }
+.passwordMeter {
+  width: 70%;
+}
 
 .form p {
   color: var(--accent);

@@ -1,22 +1,22 @@
-import { compare, hash } from 'bcrypt'
 import { createGraphQLError } from 'graphql-yoga'
-import { v4 } from 'uuid'
 
 import { storagePath } from '@/config'
+import prisma from '@/db/db'
 import Token from '@/db/models/token-model'
 import User from '@/db/models/user-model'
 
 import avatar from '../dtos/avatar-random'
 import FileStorageService from '../post/file-service'
+import emailTokenService from './email-token-service'
+import mailService from './mail-service'
+import passwordService from './password-service'
 import tokenService from './token-service'
 
 type UpdateUser = {
   avatar?: File
   backgroundImage?: File
   email?: string
-  isActivated?: boolean
   login?: string
-  pass?: string
   status?: string
   city?: string
   work?: string
@@ -24,7 +24,6 @@ type UpdateUser = {
   about?: string
   website?: string
   birthDate?: Date | null
-  activationLink?: string
 }
 // Поля, которые можно отдавать в публичных запросах (без email, пароля и токенов)
 export type PublicUser = {
@@ -78,17 +77,16 @@ class UserService {
   async registration(email: string, pass: string) {
     const candidate = await User.findUnique({ where: { email: email.trim() } })
     if (candidate) throw createGraphQLError('E-mail занят')
+    passwordService.assertStrong(pass, { email })
     const defaultLogin = Math.round(Math.random() * 99999999)
     // Math.floor: индекс от 0 до length - 1; Math.round мог дать length и вернуть undefined
     const avatar_random = Math.floor(Math.random() * avatar.length)
-    const hashPass = await hash(pass + process.env.PASS_PEPPER, 10)
-    const activationLink = v4()
+    const hashPass = await passwordService.hash(pass)
 
     const user = await User.create({
       data: {
         email,
         pass: hashPass,
-        activationLink,
         isActivated: false,
         login: `bot#` + defaultLogin,
         avatar: avatar[avatar_random],
@@ -98,7 +96,13 @@ class UserService {
         avatar: true,
         email: true,
         login: true,
+        isActivated: true,
       },
+    })
+
+    // Письмо не должно ломать регистрацию: если SMTP недоступен, человек сможет отправить его ещё раз
+    await this.sendVerificationEmail(user).catch((error) => {
+      console.error('Не удалось отправить письмо с подтверждением', error)
     })
 
     const tokens = await tokenService.generateTokens(user)
@@ -107,6 +111,43 @@ class UserService {
       ...tokens,
       user,
     }
+  }
+
+  private async sendVerificationEmail(user: { id: number; email: string; login: string }) {
+    const token = await emailTokenService.issue(user.id, 'verify')
+    await mailService.sendVerification(user.email, user.login, token)
+    void emailTokenService.cleanup()
+  }
+
+  /** Повторная отправка письма с подтверждением уже вошедшему пользователю. */
+  async resendVerificationEmail(userId: number) {
+    const user = await User.findUnique({
+      where: { id: userId },
+      select: { id: true, email: true, login: true, isActivated: true },
+    })
+    if (!user) throw createGraphQLError('Пользователь не найден')
+    if (user.isActivated) throw createGraphQLError('Почта уже подтверждена')
+    await this.sendVerificationEmail(user)
+    return true
+  }
+
+  /** Переход по ссылке из письма. Ссылка одноразовая, живёт 24 часа. */
+  async verifyEmail(token: string) {
+    const record = await emailTokenService.findValid(token, 'verify')
+    await prisma.$transaction(async (tx) => {
+      const consumed = await tx.emailToken.updateMany({
+        where: { id: record.id, usedAt: null, expiresAt: { gt: new Date() } },
+        data: { usedAt: new Date() },
+      })
+      if (consumed.count === 0) throw createGraphQLError('Ссылка недействительна или устарела')
+      await tx.user.update({ where: { id: record.user.id }, data: { isActivated: true } })
+      // Остальные письма «подтвердите почту» больше не нужны
+      await tx.emailToken.updateMany({
+        where: { userId: record.user.id, type: 'verify', usedAt: null },
+        data: { usedAt: new Date() },
+      })
+    })
+    return true
   }
   // | ----------------> LOGIN <---------------- |
 
@@ -119,11 +160,17 @@ class UserService {
         avatar: true,
         email: true,
         login: true,
+        isActivated: true,
       },
     })
     if (!candidate) throw createGraphQLError('Пользователь не найден')
-    const isPassEquals = await compare(pass + process.env.PASS_PEPPER, candidate.pass)
+    const isPassEquals = await passwordService.verify(pass, candidate.pass)
     if (!isPassEquals) throw createGraphQLError('Не верный пароль.')
+    // Старые bcrypt-хеши незаметно заменяем на Argon2id при следующем входе
+    if (passwordService.needsRehash(candidate.pass)) {
+      const passHash = await passwordService.hash(pass)
+      await User.update({ where: { id: candidate.id }, data: { pass: passHash } })
+    }
     const tokens = await tokenService.generateTokens(candidate)
     await tokenService.saveToken(candidate.id, tokens.refreshToken)
     return {
@@ -264,6 +311,74 @@ class UserService {
     }
   }
 
+  // | ----------------> ПАРОЛЬ <---------------- |
+
+  /**
+   * Письмо для восстановления пароля. Ответ всегда успешный, чтобы нельзя было
+   * перебором узнать, зарегистрирована ли почта.
+   */
+  async requestPasswordReset(email: string) {
+    const user = await User.findUnique({
+      where: { email: email.trim() },
+      select: { id: true, email: true, login: true },
+    })
+    if (!user) return true
+    const token = await emailTokenService.issue(user.id, 'reset')
+    await mailService.sendPasswordReset(user.email, user.login, token)
+    void emailTokenService.cleanup()
+    return true
+  }
+
+  /** Новый пароль по одноразовой ссылке. Все старые сессии завершаются. */
+  async resetPassword(token: string, pass: string, pass2: string) {
+    if (!pass || !pass2) throw createGraphQLError('У вас пустые поля')
+    if (pass !== pass2) throw createGraphQLError('Пароли не совпадают')
+    const record = await emailTokenService.findValid(token, 'reset')
+    passwordService.assertStrong(pass, { email: record.user.email, login: record.user.login })
+    const passHash = await passwordService.hash(pass)
+    await prisma.$transaction(async (tx) => {
+      // Ссылку гасим атомарно: два одновременных перехода не должны оба сменить пароль
+      const consumed = await tx.emailToken.updateMany({
+        where: { id: record.id, usedAt: null, expiresAt: { gt: new Date() } },
+        data: { usedAt: new Date() },
+      })
+      if (consumed.count === 0) throw createGraphQLError('Ссылка недействительна или устарела')
+      await tx.user.update({
+        where: { id: record.user.id },
+        // Письмо пришло на почту — значит, адрес принадлежит человеку
+        data: { pass: passHash, isActivated: true },
+      })
+      await tx.token.deleteMany({ where: { userId: record.user.id } })
+      await tx.emailToken.updateMany({
+        where: { userId: record.user.id, type: 'reset', usedAt: null },
+        data: { usedAt: new Date() },
+      })
+    })
+    return true
+  }
+
+  /** Смена пароля из настроек: проверяем старый, завершаем остальные сессии и оставляем текущую. */
+  async changePassword(userId: number, oldPass: string, pass: string, pass2: string) {
+    if (!oldPass || !pass || !pass2) throw createGraphQLError('У вас пустые поля')
+    if (pass !== pass2) throw createGraphQLError('Пароли не совпадают')
+    const user = await User.findUnique({
+      where: { id: userId },
+      select: { id: true, email: true, login: true, avatar: true, pass: true },
+    })
+    if (!user) throw createGraphQLError('Пользователь не найден')
+    if (!(await passwordService.verify(oldPass, user.pass))) throw createGraphQLError('Текущий пароль указан неверно')
+    if (await passwordService.verify(pass, user.pass)) throw createGraphQLError('Новый пароль должен отличаться от текущего')
+    passwordService.assertStrong(pass, { email: user.email, login: user.login })
+
+    const passHash = await passwordService.hash(pass)
+    await User.update({ where: { id: userId }, data: { pass: passHash } })
+    // Остальные устройства выходят; текущее получает новую сессию
+    await tokenService.removeAllForUser(userId)
+    const tokens = await tokenService.generateTokens(user)
+    await tokenService.saveToken(userId, tokens.refreshToken)
+    return tokens
+  }
+
   // | ----------------> REMOVE USER <---------------- |
   async remove(id: number) {
     const user = await User.findUnique({
@@ -302,6 +417,8 @@ class UserService {
       id: tokenData.user.id,
       avatar: tokenData.user.avatar,
       login: tokenData.user.login,
+      email: tokenData.user.email,
+      isActivated: tokenData.user.isActivated,
     }
   }
 }

@@ -1,6 +1,7 @@
 import MusicController from '@/api/music/controller'
 import UserController from '@/api/user/controller'
 import { getOptionalUserId } from '@/api/user/optional-user'
+import { requireVerifiedUser } from '@/api/user/require-verified'
 import { Resolvers } from '@/schema/resolvers-types'
 import { throttle } from '@/utils/rate-limit'
 
@@ -26,7 +27,7 @@ const PostResolvers: Resolvers = {
       return await MusicController.addToProfile(id, user.id)
     },
     async createMusic(_, { music }, { req, res }) {
-      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      const user = await requireVerifiedUser(req, res)
       await throttle('upload', user.id)
       const { title, artist, file, communityId } = music
       return await MusicController.create(user.id, title, artist ?? undefined, file, communityId)

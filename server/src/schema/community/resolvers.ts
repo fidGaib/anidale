@@ -3,6 +3,7 @@ import CommunityService from '@/api/community/service'
 import PhotoService from '@/api/photo/service'
 import UserController from '@/api/user/controller'
 import { getOptionalUserId } from '@/api/user/optional-user'
+import { requireVerifiedUser } from '@/api/user/require-verified'
 import VideoService from '@/api/video/service'
 import { Resolvers } from '@/schema/resolvers-types'
 import { throttle } from '@/utils/rate-limit'
@@ -54,12 +55,12 @@ const CommunityResolvers: Resolvers = {
   },
   Mutation: {
     async createDiscussionTopic(_, { id, title, text }, { req, res }) {
-      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      const user = await requireVerifiedUser(req, res)
       await throttle('discussion', user.id)
       return await DiscussionService.createTopic(user.id, id, title, text)
     },
     async addDiscussionMessage(_, { topicId, text }, { req, res }) {
-      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      const user = await requireVerifiedUser(req, res)
       await throttle('discussion', user.id)
       return await DiscussionService.addMessage(user.id, topicId, text)
     },
@@ -80,7 +81,7 @@ const CommunityResolvers: Resolvers = {
       return await CommunityService.setContacts(user.id, id, contacts)
     },
     async createCommunity(_, { name, description, avatar, isClosed }, { req, res }) {
-      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      const user = await requireVerifiedUser(req, res)
       await throttle('createCommunity', user.id)
       return await CommunityService.create(user.id, { name, description, avatar, isClosed })
     },
@@ -89,7 +90,7 @@ const CommunityResolvers: Resolvers = {
       return await CommunityService.update(user.id, id, input)
     },
     async joinCommunity(_, { id }, { req, res }) {
-      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      const user = await requireVerifiedUser(req, res)
       await throttle('join', user.id)
       return await CommunityService.join(user.id, id)
     },

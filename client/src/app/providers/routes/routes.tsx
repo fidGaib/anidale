@@ -6,6 +6,9 @@ const Profile = lazy(() => import('@/pages/profile'))
 const Signin = lazy(() => import('@/pages/auth/signin/'))
 const Signout = lazy(() => import('@/pages/auth/signout'))
 const Registration = lazy(() => import('@/pages/auth/signup/'))
+const VerifyEmail = lazy(() => import('@/pages/auth/verify-email'))
+const ForgotPassword = lazy(() => import('@/pages/auth/forgot-password'))
+const ResetPassword = lazy(() => import('@/pages/auth/reset-password'))
 const Settings = lazy(() => import('@/pages/settings'))
 const Music = lazy(() => import('@/pages/music'))
 const Messages = lazy(() => import('@/pages/messages'))
@@ -35,10 +38,16 @@ export const privateRoutes = [
   { path: '/article/new', element: ArticleEditor },
   { path: '/article/:id/edit', element: ArticleEditor },
   { path: '/article/:id', element: Article },
+  { path: '/verify-email', element: VerifyEmail },
+  { path: '/forgot-password', element: ForgotPassword },
+  { path: '/reset-password', element: ResetPassword },
 ]
 // public routes
 export const publicRoutes = [
   { path: '/feed', element: Feed },
   { path: '/signin', element: Signin },
   { path: '/signup', element: Registration },
+  { path: '/verify-email', element: VerifyEmail },
+  { path: '/forgot-password', element: ForgotPassword },
+  { path: '/reset-password', element: ResetPassword },
 ]

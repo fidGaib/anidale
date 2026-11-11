@@ -12,6 +12,8 @@ export const REFRESH = graphql(`
       id
       login
       avatar
+      email
+      isActivated
     }
   }
 `)
@@ -23,6 +25,7 @@ export const REGISTRATION = graphql(`
       login
       avatar
       email
+      isActivated
     }
   }
 `)
@@ -34,7 +37,38 @@ export const SIGNIN = graphql(`
       login
       avatar
       email
+      isActivated
     }
+  }
+`)
+
+export const VERIFY_EMAIL = graphql(`
+  mutation VERIFY_EMAIL($token: String!) {
+    verifyEmail(token: $token)
+  }
+`)
+
+export const RESEND_VERIFICATION = graphql(`
+  mutation RESEND_VERIFICATION {
+    resendVerificationEmail
+  }
+`)
+
+export const REQUEST_PASSWORD_RESET = graphql(`
+  mutation REQUEST_PASSWORD_RESET($email: String!) {
+    requestPasswordReset(email: $email)
+  }
+`)
+
+export const RESET_PASSWORD = graphql(`
+  mutation RESET_PASSWORD($token: String!, $pass: String!, $pass2: String!) {
+    resetPassword(token: $token, pass: $pass, pass2: $pass2)
+  }
+`)
+
+export const CHANGE_PASSWORD = graphql(`
+  mutation CHANGE_PASSWORD($oldPass: String!, $pass: String!, $pass2: String!) {
+    changePassword(oldPass: $oldPass, pass: $pass, pass2: $pass2)
   }
 `)
 

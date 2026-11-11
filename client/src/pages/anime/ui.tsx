@@ -1,10 +1,10 @@
 import { CSSProperties } from 'react'
-import { FreeMode, Navigation } from 'swiper'
+import { FreeMode, Navigation } from 'swiper/modules'
 import 'swiper/css/free-mode'
 import 'swiper/css/navigation'
 import { Swiper, SwiperSlide } from 'swiper/react'
 // Import Swiper styles
-import 'swiper/swiper.min.css'
+import 'swiper/css'
 
 import { useDarkModeStore } from '@/app/module'
 import Content from '@/shared/content'

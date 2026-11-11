@@ -1,6 +1,6 @@
 import ArticleController from '@/api/article/controller'
-import UserController from '@/api/user/controller'
 import { getOptionalUserId } from '@/api/user/optional-user'
+import { requireVerifiedUser } from '@/api/user/require-verified'
 import { Resolvers } from '@/schema/resolvers-types'
 import { throttle } from '@/utils/rate-limit'
 
@@ -12,12 +12,12 @@ const ArticleResolvers: Resolvers = {
   },
   Mutation: {
     async createArticle(_, { article }, { req, res }) {
-      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      const user = await requireVerifiedUser(req, res)
       await throttle('post', user.id)
       return (await ArticleController.create(user.id, article)) as never
     },
     async editArticle(_, { article }, { req, res }) {
-      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      const user = await requireVerifiedUser(req, res)
       const { id, ...input } = article
       return (await ArticleController.edit(user.id, id, input)) as never
     },

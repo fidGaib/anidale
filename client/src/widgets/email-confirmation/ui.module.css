@@ -1,0 +1,45 @@
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 8px 0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgba(214, 178, 62, 0.16);
+  border: 1px solid rgba(214, 178, 62, 0.45);
+  font-family: var(--font-text-main);
+}
+
+.text {
+  flex: 1;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.action {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.error {
+  max-width: 280px;
+  color: #d64545;
+  font-size: 12px;
+  text-align: right;
+}
+
+@media (max-width: 700px) {
+  .banner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .action {
+    align-items: flex-start;
+  }
+  .error {
+    text-align: left;
+  }
+}
