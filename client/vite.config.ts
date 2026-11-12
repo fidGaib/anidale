@@ -16,6 +16,15 @@ export default defineConfig({
       plugins: [autoprefixer()],
     },
   },
+  server: {
+    /**
+     * В разработке файлы хранилища отдаёт API. Проксируем их, чтобы картинки
+     * и видео открывались с того же origin: тогда VITE_STATIC_URL можно не задавать.
+     */
+    proxy: {
+      '/storage': 'http://localhost:5000',
+    },
+  },
   build: {
     rollupOptions: {
       output: {
