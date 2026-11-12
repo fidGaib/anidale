@@ -1,0 +1,152 @@
+# Каталог аниме: релизы, серии, расписание и жанры.
+# Постеры, кадры и видео лежат в открытом каталоге /storage/anime и доступны без входа.
+
+"Релиз каталога: карточка аниме-сериала или фильма"
+type AnimeRelease {
+  id: Int!
+  title: String!
+  "Оригинальное название"
+  originalTitle: String!
+  description: String!
+  year: Int!
+  "Зима, Весна, Лето или Осень"
+  season: String!
+  "ТВ, ONA, OVA или Фильм"
+  type: String!
+  ageRating: String!
+  "ongoing, completed или announced"
+  status: String!
+  "Путь постера в хранилище без расширения"
+  poster: String!
+  "Путь кадра-превью в хранилище без расширения"
+  preview: String!
+  "Название франшизы; пустая строка — без франшизы"
+  franchise: String!
+  isPublished: Boolean!
+  createdAt: Date!
+  updatedAt: Date!
+  genres: [AnimeGenre!]!
+  episodes: [AnimeEpisode!]!
+  episodesCount: Int!
+  "Последняя вышедшая серия"
+  latestEpisode: AnimeEpisode
+  "Ближайшая запланированная серия"
+  nextEpisode: AnimeScheduleEntry
+}
+
+type AnimeGenre {
+  id: Int!
+  name: String!
+  "Сколько релизов используют жанр"
+  releasesCount: Int!
+}
+
+type AnimeEpisode {
+  id: Int!
+  releaseId: Int!
+  release: AnimeRelease!
+  number: Int!
+  title: String!
+  description: String!
+  "Путь видео в хранилище; пустая строка — видео ещё не загружено"
+  video: String!
+  "Путь кадра в хранилище без расширения"
+  preview: String!
+  "Длительность вида 24:00; пустая строка — не указана"
+  duration: String!
+  publishedAt: Date!
+}
+
+type AnimeScheduleEntry {
+  id: Int!
+  releaseId: Int!
+  release: AnimeRelease!
+  episodeNumber: Int!
+  airAt: Date!
+}
+
+type AnimeFranchise {
+  name: String!
+  poster: String!
+  firstYear: Int!
+  lastYear: Int!
+  releasesCount: Int!
+  episodesCount: Int!
+}
+
+"Всё для главной страницы каталога"
+type AnimeHome {
+  "Четыре последние вышедшие серии"
+  newEpisodes: [AnimeEpisode!]!
+  "Три последние серии с видео"
+  videos: [AnimeEpisode!]!
+  schedule: [AnimeScheduleEntry!]!
+  genres: [AnimeGenre!]!
+  franchises: [AnimeFranchise!]!
+}
+
+extend type Query {
+  "Главная каталога: новые серии, расписание за промежуток, жанры и франшизы"
+  animeHome(from: Date!, to: Date!): AnimeHome!
+  "Расписание выхода серий за промежуток"
+  animeSchedule(from: Date!, to: Date!): [AnimeScheduleEntry!]!
+  "Опубликованный релиз со всеми сериями"
+  animeRelease(id: Int!): AnimeRelease
+  "Все релизы для админки, включая черновики"
+  adminAnimeReleases(search: String, limit: Int, offset: Int): [AnimeRelease!]!
+  "Всё расписание для админки, включая прошедшие серии"
+  adminAnimeSchedule(limit: Int): [AnimeScheduleEntry!]!
+  adminAnimeGenres: [AnimeGenre!]!
+  "Серии релиза для админки"
+  adminAnimeEpisodes(releaseId: Int!): [AnimeEpisode!]!
+}
+
+input AnimeReleaseInput {
+  id: Int
+  title: String!
+  originalTitle: String
+  description: String
+  year: Int!
+  season: String!
+  type: String!
+  ageRating: String!
+  status: String!
+  franchise: String
+  isPublished: Boolean
+  poster: FILE
+  preview: FILE
+  genres: [String!]
+}
+
+input AnimeEpisodeInput {
+  id: Int
+  releaseId: Int!
+  number: Int!
+  title: String
+  description: String
+  duration: String
+  publishedAt: Date
+  video: FILE
+  preview: FILE
+}
+
+input AnimeScheduleInput {
+  releaseId: Int!
+  episodeNumber: Int!
+  airAt: Date!
+}
+
+extend type Mutation {
+  "Создать или изменить релиз (нужна роль администратора)"
+  saveAnimeRelease(input: AnimeReleaseInput!): AnimeRelease!
+  "Удалить релиз вместе с сериями и расписанием"
+  deleteAnimeRelease(id: Int!): Boolean!
+  "Добавить или изменить серию; серия убирается из расписания"
+  saveAnimeEpisode(input: AnimeEpisodeInput!): AnimeEpisode!
+  deleteAnimeEpisode(id: Int!): Boolean!
+  "Запланировать выход серии; повтор заменяет дату"
+  saveAnimeSchedule(input: AnimeScheduleInput!): AnimeScheduleEntry!
+  deleteAnimeSchedule(id: Int!): Boolean!
+  "Удалить жанр, который не используется релизами"
+  deleteAnimeGenre(id: Int!): Boolean!
+}

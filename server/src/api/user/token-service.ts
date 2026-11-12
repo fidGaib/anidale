@@ -44,6 +44,7 @@ class TokenService {
             email: true,
             login: true,
             isActivated: true,
+            role: true,
           },
         },
       },

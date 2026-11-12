@@ -419,6 +419,8 @@ class UserService {
       login: tokenData.user.login,
       email: tokenData.user.email,
       isActivated: tokenData.user.isActivated,
+      role: tokenData.user.role,
+      isAdmin: tokenData.user.role === 'admin',
     }
   }
 }

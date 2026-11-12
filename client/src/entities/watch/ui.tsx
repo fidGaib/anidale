@@ -4,11 +4,18 @@ import screenfull from 'screenfull'
 
 import { useDarkModeStore } from '@/app/module'
 import { ControlsVideo } from '@/features/watch'
-import { dataAnime, usePayerStore } from '@/pages/watch/module'
+import { usePayerStore } from '@/pages/watch/module'
 
 import cl from './ui.module.css'
 
-export const ViedeoWrapper = () => {
+interface Props {
+  title: string
+  /** Адрес видеофайла; пустая строка — видео ещё не загружено. */
+  src: string
+  description?: string
+}
+
+export const ViedeoWrapper = ({ title, src, description }: Props) => {
   const ref__player = useRef<ReactPlayer>(null)
   const refScreenfull = useRef<HTMLDivElement>(null)
   // store player
@@ -22,25 +29,34 @@ export const ViedeoWrapper = () => {
   return (
     <>
       <p className={cl.title} style={{ color: `${theme === 'dark' ? 'lightgrey' : '#000'}` }}>
-        {dataAnime[0].title}
+        {title}
       </p>
       <div className={cl.video__wrapper} ref={refScreenfull}>
-        <ReactPlayer
-          url={dataAnime[0].src}
-          playing={playing}
-          controls={false}
-          width={'100%'}
-          height={'100%'}
-          volume={volume}
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          ref={ref__player}
-          onProgress={handle__progress}
-          className={cl.video}
-        />
-        <ControlsVideo ref__player={ref__player} handle_screenfull={handle_screenfull} />
+        {src ? (
+          <>
+            <ReactPlayer
+              url={src}
+              playing={playing}
+              controls={false}
+              width={'100%'}
+              height={'100%'}
+              volume={volume}
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              ref={ref__player}
+              onProgress={handle__progress}
+              className={cl.video}
+            />
+            <ControlsVideo ref__player={ref__player} handle_screenfull={handle_screenfull} />
+          </>
+        ) : (
+          <div className={cl.empty}>
+            <img src='/icons/video.svg' alt='' />
+            <span>Видео этой серии ещё не загружено</span>
+          </div>
+        )}
       </div>
-      <p className={cl.description}>{dataAnime[0].desc}</p>
+      {description && <p className={cl.description}>{description}</p>}
     </>
   )
 }

@@ -14,6 +14,7 @@ export const REFRESH = graphql(`
       avatar
       email
       isActivated
+      isAdmin
     }
   }
 `)

@@ -23,6 +23,7 @@ export const MenuHeader = () => {
     { link: `/bookmarks`, text: 'Закладки', icon: 'note.svg' },
     { link: `/music`, text: 'Музыка', icon: 'music.svg' },
     { link: `/anime`, text: 'Аниме', icon: 'manga.svg' },
+    ...(refreshData.isAdmin ? [{ link: `/admin/anime`, text: 'Админка', icon: 'edit.svg' }] : []),
     { link: `/settings`, text: 'Настройки', icon: 'settings.svg' },
   ]
   const linksNotAuth = [{ link: `/feed`, text: 'Лента', icon: assetUrl('icons/feed.svg') }]

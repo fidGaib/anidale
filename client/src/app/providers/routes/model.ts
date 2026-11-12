@@ -8,6 +8,8 @@ interface typeRefreshData {
   login?: string
   email?: string
   isActivated?: boolean
+  /** Администратор сайта: видит пункт «Админка» в меню. */
+  isAdmin?: boolean
 }
 interface typeUserStore {
   refreshData: typeRefreshData

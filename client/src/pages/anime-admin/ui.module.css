@@ -1,0 +1,417 @@
+#content {
+  width: min(1180px, 94vw);
+}
+
+.page {
+  --text: #18181b;
+  --muted: #6b7280;
+  --card: #ffffff;
+  --card-hover: #f6f6f8;
+  --line: rgba(0, 0, 0, 0.08);
+  --chip: rgba(0, 0, 0, 0.05);
+  --accent: #8b5cf6;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 18px 0 56px;
+  color: var(--text);
+}
+
+.dark {
+  --text: #f4f4f5;
+  --muted: #a1a1aa;
+  --card: #17171d;
+  --card-hover: #1e1e27;
+  --line: rgba(255, 255, 255, 0.08);
+  --chip: rgba(255, 255, 255, 0.06);
+  color-scheme: dark;
+}
+
+.back {
+  width: fit-content;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.back:hover {
+  color: var(--text);
+}
+
+.head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(24px, 2.6vw, 32px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.tabs {
+  display: inline-flex;
+  gap: 6px;
+  width: fit-content;
+  padding: 5px;
+  border-radius: 999px;
+  background: var(--chip);
+}
+
+.tab {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tabActive,
+.tabActive:hover {
+  color: #fff;
+  background: var(--accent);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.search {
+  width: min(420px, 100%);
+  padding: 11px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+}
+
+.search:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+/* Карточка релиза в списке */
+.releases {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.release {
+  display: flex;
+  gap: 16px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--card);
+}
+
+.poster {
+  display: block;
+  flex: none;
+  width: 78px;
+  height: 112px;
+  border-radius: 10px;
+  background: var(--chip);
+  object-fit: cover;
+}
+
+.releaseBody {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+
+.releaseHead {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.releaseTitle {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.badge {
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.published {
+  background: rgba(34, 197, 94, 0.16);
+  color: #22c55e;
+}
+
+.draft {
+  background: rgba(245, 158, 11, 0.16);
+  color: #f59e0b;
+}
+
+.releaseMeta,
+.releaseGenres {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.releaseActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 6px;
+}
+
+/* Простые строки: расписание и жанры */
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card);
+}
+
+.rowDate {
+  flex: none;
+  min-width: 130px;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.rowMain {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.rowMain b {
+  overflow: hidden;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowMain small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* Формы в окнах */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.formFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  width: 100%;
+}
+
+.formActions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.select {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.select select,
+.select input {
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--card);
+  color: #18181b;
+  font: inherit;
+  font-size: 14px;
+}
+
+.file {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.file input {
+  min-width: 0;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+}
+
+.file small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.check span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.check small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+/* Серии внутри окна */
+.episodeList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.episodeRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--card);
+}
+
+.episodeNumber {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: var(--chip);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.episodeMain {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.episodeMain b {
+  overflow: hidden;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.episodeMain small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.fileLink {
+  flex: none;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+@media (max-width: 760px) {
+  .head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .release {
+    flex-direction: column;
+  }
+
+  .poster {
+    width: 100%;
+    height: 180px;
+  }
+
+  .row {
+    flex-wrap: wrap;
+  }
+
+  .rowDate {
+    min-width: 0;
+  }
+}

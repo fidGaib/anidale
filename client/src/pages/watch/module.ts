@@ -1,20 +1,6 @@
 import { ChangeEvent, RefObject } from 'react'
 import { create } from 'zustand'
 
-export interface DataTypes {
-  title: string
-  src: string
-  desc: string
-}
-export const dataAnime: DataTypes[] = [
-  {
-    title: 'Башня бога',
-    src: '/grand blue/1.mkv',
-    desc: `Lorem ipsum dolor sit amet consectetur, adipisicing elit. Voluptatem ullam similique, facilis officia maxime
-      nemo quo ratione necessitatibus numquam illo deserunt, esse totam ipsa nostrum quasi dolore. Facilis, incidunt
-      voluptatibus.`,
-  },
-]
 interface ControlVideoTypes {
   playing: boolean
   volume: number

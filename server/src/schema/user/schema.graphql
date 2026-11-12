@@ -26,6 +26,8 @@ type RefreshUser {
   avatar: String!
   email: String!
   isActivated: Boolean!
+  "Администратор сайта: может управлять каталогом аниме"
+  isAdmin: Boolean!
 }
 type User {
   id: Int!

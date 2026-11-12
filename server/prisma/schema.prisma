@@ -16,6 +16,8 @@ model User {
   pass                  String
   login                 String
   avatar                String
+  // Роль на сайте: "user" — обычный, "admin" — доступ к управлению каталогом аниме
+  role                  String              @default("user")
   // Публичные поля профиля
   status                String              @default("")
   city                  String              @default("")
@@ -604,4 +606,70 @@ model RateLimit {
   resetAt DateTime
 
   @@index([resetAt])
+}
+
+// Аниме-релиз: карточка каталога. Постер и превью — пути в хранилище без расширения (webp).
+model AnimeRelease {
+  id            Int      @id @default(autoincrement())
+  title         String
+  originalTitle String   @default("")
+  description   String   @default("")
+  year          Int
+  // Сезон: Зима, Весна, Лето или Осень
+  season        String
+  // ТВ, ONA, OVA, Фильм
+  type          String
+  ageRating     String
+  // ongoing, completed, announced
+  status        String   @default("ongoing")
+  poster        String
+  preview       String   @default("")
+  // Название франшизы для группировки; пустая строка — без франшизы
+  franchise     String   @default("")
+  isPublished   Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  genres        AnimeGenre[]  @relation("AnimeReleaseGenres")
+  episodes      AnimeEpisode[]
+  schedule      AnimeScheduleEntry[]
+
+  @@index([isPublished, year])
+}
+
+// Жанр аниме. Создаётся из формы релиза и удаляется только без релизов.
+model AnimeGenre {
+  id       Int            @id @default(autoincrement())
+  name     String         @unique
+  releases AnimeRelease[] @relation("AnimeReleaseGenres")
+}
+
+// Выпущенная серия. video — путь в хранилище (anime/videos/<uuid>.mp4), preview — картинка-кадр.
+model AnimeEpisode {
+  id          Int          @id @default(autoincrement())
+  releaseId   Int
+  release     AnimeRelease @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+  number      Int
+  title       String       @default("")
+  description String       @default("")
+  video       String       @default("")
+  preview     String       @default("")
+  duration    String       @default("")
+  publishedAt DateTime     @default(now())
+  createdAt   DateTime     @default(now())
+
+  @@unique([releaseId, number])
+  @@index([publishedAt])
+}
+
+// Запланированный выход серии. После загрузки серии запись расписания удаляется.
+model AnimeScheduleEntry {
+  id            Int          @id @default(autoincrement())
+  releaseId     Int
+  release       AnimeRelease @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+  episodeNumber Int
+  airAt         DateTime
+  createdAt     DateTime     @default(now())
+
+  @@unique([releaseId, episodeNumber])
+  @@index([airAt])
 }

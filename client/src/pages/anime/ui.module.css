@@ -69,6 +69,19 @@
   background: var(--accent);
 }
 
+/* Ссылка администратора: справа от разделов */
+.navAdmin {
+  margin-left: auto;
+  border: 1px solid rgba(139, 92, 246, 0.55);
+  background: transparent;
+  color: var(--accent);
+}
+
+.navAdmin:hover {
+  color: #fff;
+  background: var(--accent);
+}
+
 /* Заголовки секций */
 .section {
   display: flex;
