@@ -1,1 +1,1376 @@
-/* Ширина страницы задаётся общим Content (как в профиле) */
+#content {
+  width: min(1220px, 94vw);
+}
+
+.page {
+  --accent: #7c5cfc;
+  --accent-soft: rgba(124, 92, 252, 0.14);
+  --accent-text: #6d4aff;
+  --text: #18181b;
+  --muted: #6b7280;
+  --card: #ffffff;
+  --card-hover: #f4f4f6;
+  --line: rgba(0, 0, 0, 0.08);
+  --chip: rgba(0, 0, 0, 0.05);
+  --danger: #ef4444;
+  --shadow: 0 18px 40px rgba(24, 24, 27, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 18px 0 56px;
+  color: var(--text);
+}
+
+.dark {
+  --accent-soft: rgba(124, 92, 252, 0.2);
+  --accent-text: #a48bff;
+  --text: #f4f4f5;
+  --muted: #a1a1aa;
+  --card: #17171d;
+  --card-hover: #1f1f28;
+  --line: rgba(255, 255, 255, 0.08);
+  --chip: rgba(255, 255, 255, 0.07);
+  --danger: #ff6b6b;
+  --shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  color-scheme: dark;
+}
+
+/* Шапка страницы */
+.hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  overflow: hidden;
+  padding: 26px 28px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background:
+    radial-gradient(120% 160% at 0% 0%, rgba(124, 92, 252, 0.24), transparent 58%),
+    radial-gradient(100% 140% at 100% 100%, rgba(59, 130, 246, 0.18), transparent 60%),
+    var(--card);
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  right: -60px;
+  top: -80px;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  border: 32px solid rgba(124, 92, 252, 0.12);
+  pointer-events: none;
+}
+
+.kicker {
+  margin: 0 0 6px;
+  color: var(--accent-text);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.heroTitle {
+  margin: 0;
+  font-size: clamp(26px, 3vw, 36px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.heroText {
+  max-width: 560px;
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.heroActions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.notice {
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  border-radius: 12px;
+  background: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.dark .notice {
+  color: #4ade80;
+}
+
+/* Две колонки: разделы и список */
+.layout {
+  display: grid;
+  grid-template-columns: 262px minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.side {
+  position: sticky;
+  top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sideCard {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--card);
+}
+
+.sideLink {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.sideLink:hover {
+  background: var(--card-hover);
+  color: var(--text);
+}
+
+.sideLinkActive,
+.sideLinkActive:hover {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+
+.sideLinkIcon {
+  display: flex;
+  flex: none;
+  color: currentColor;
+}
+
+.sideLinkIcon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.sideLinkLabel {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sideLinkCount {
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--chip);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.sideLinkActive .sideLinkCount {
+  background: rgba(124, 92, 252, 0.18);
+  color: var(--accent-text);
+}
+
+.sideHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.sideAdd {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--chip);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.sideAdd:hover {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+
+.sideHint {
+  margin: 0;
+  padding: 6px 10px 10px;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.sidePlaylists {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidePlaylist {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 8px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sidePlaylist:hover {
+  background: var(--card-hover);
+}
+
+.sidePlaylistActive,
+.sidePlaylistActive:hover {
+  background: var(--accent-soft);
+}
+
+.sidePlaylistCover {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 7px;
+  color: #fff;
+}
+
+.sidePlaylistText {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.sidePlaylistTitle {
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidePlaylistCount {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+/* Центральная колонка */
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.mainHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mainTitle {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.mainSubtitle {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.mainActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card);
+}
+
+.search:focus-within {
+  border-color: rgba(124, 92, 252, 0.55);
+}
+
+.searchIcon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  color: var(--muted);
+}
+
+.search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+}
+
+.searchClear {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.searchClear:hover {
+  color: var(--text);
+}
+
+/* Карточка плейлиста в списке разделов */
+.playlistHero {
+  display: flex;
+  gap: 18px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--card);
+}
+
+.playlistCover {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 126px;
+  height: 126px;
+  border-radius: 14px;
+  color: #fff;
+  box-shadow: var(--shadow);
+}
+
+.playlistInfo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.playlistKicker {
+  margin: 4px 0 2px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.playlistTitle {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.25;
+  word-break: break-word;
+}
+
+.playlistMeta {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.playlistActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 14px;
+}
+
+/* Волна */
+.waveCard {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  overflow: hidden;
+  padding: 22px 24px;
+  border: 1px solid rgba(124, 92, 252, 0.35);
+  border-radius: 18px;
+  background:
+    radial-gradient(120% 160% at 0% 0%, rgba(124, 92, 252, 0.32), transparent 62%),
+    radial-gradient(100% 140% at 100% 100%, rgba(236, 72, 153, 0.22), transparent 60%),
+    var(--card);
+}
+
+.waveText {
+  max-width: 620px;
+}
+
+.waveKicker {
+  margin: 0 0 6px;
+  color: var(--accent-text);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.waveTitle {
+  margin: 0;
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.waveDesc {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.waveArt {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  height: 74px;
+  padding-right: 6px;
+}
+
+.waveArt span {
+  width: 7px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #a48bff, #7c5cfc);
+  animation: wavePulse 1.6s ease-in-out infinite alternate;
+}
+
+.waveArt span:nth-child(1) {
+  height: 34%;
+  animation-delay: 0s;
+}
+
+.waveArt span:nth-child(2) {
+  height: 68%;
+  animation-delay: 0.18s;
+}
+
+.waveArt span:nth-child(3) {
+  height: 100%;
+  animation-delay: 0.36s;
+}
+
+.waveArt span:nth-child(4) {
+  height: 58%;
+  animation-delay: 0.54s;
+}
+
+.waveArt span:nth-child(5) {
+  height: 78%;
+  animation-delay: 0.72s;
+}
+
+@keyframes wavePulse {
+  from {
+    transform: scaleY(0.45);
+    opacity: 0.7;
+  }
+  to {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+/* Список треков */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 46px auto;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 8px;
+  border-radius: 12px;
+  transition: background 0.15s;
+}
+
+.row:hover {
+  background: var(--card-hover);
+}
+
+.rowActive,
+.rowActive:hover {
+  background: var(--accent-soft);
+}
+
+.rowCover {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 0;
+  border-radius: 9px;
+  color: #fff;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.rowCoverNote {
+  width: 20px;
+  height: 20px;
+  opacity: 0.9;
+}
+
+.rowCoverPlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: rgba(12, 12, 18, 0.42);
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.row:hover .rowCoverPlay,
+.rowCoverPlayActive {
+  opacity: 1;
+}
+
+.rowCoverPlay svg {
+  width: 18px;
+  height: 18px;
+}
+
+.rowInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rowTitle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 14.5px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowActive .rowTitle {
+  color: var(--accent-text);
+}
+
+.equalizer {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  flex: none;
+  width: 12px;
+  height: 12px;
+}
+
+.equalizer i {
+  width: 2px;
+  height: 100%;
+  border-radius: 1px;
+  background: var(--accent);
+  transform-origin: bottom;
+  animation: equalize 0.9s ease-in-out infinite alternate;
+}
+
+.equalizer i:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.equalizer i:nth-child(2) {
+  animation-delay: 0.25s;
+}
+
+.equalizer i:nth-child(3) {
+  animation-delay: 0.5s;
+}
+
+@keyframes equalize {
+  from {
+    transform: scaleY(0.3);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.rowArtist {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 12.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowBadge {
+  flex: none;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.rowDuration {
+  color: var(--muted);
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.rowActions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  opacity: 0.8;
+  transition: opacity 0.15s;
+}
+
+.row:hover .rowActions,
+.rowActive .rowActions {
+  opacity: 1;
+}
+
+.rowIcon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.rowIcon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.rowIcon:hover {
+  background: var(--chip);
+  color: var(--text);
+}
+
+.rowIconLiked,
+.rowIconLiked:hover {
+  color: #f43f5e;
+}
+
+.rowIconOpen {
+  background: var(--chip);
+  color: var(--text);
+}
+
+.rowMenuWrap {
+  position: relative;
+}
+
+.rowMenu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 196px;
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.rowMenuItem {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.rowMenuItem svg {
+  width: 16px;
+  height: 16px;
+  color: var(--muted);
+}
+
+.rowMenuItem:hover {
+  background: var(--card-hover);
+}
+
+.rowMenuItemDanger,
+.rowMenuItemDanger svg {
+  color: var(--danger);
+}
+
+/* Сетка плейлистов */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: 18px 16px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.cardCoverWrap {
+  position: relative;
+}
+
+.cardCover {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: 14px;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.18s ease;
+}
+
+.cardCover:hover {
+  transform: translateY(-2px);
+}
+
+.cardPlay {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  color: #18181b;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.18s,
+    transform 0.18s;
+  cursor: pointer;
+}
+
+.cardPlay svg {
+  width: 16px;
+  height: 16px;
+  margin-left: 2px;
+}
+
+.cardCoverWrap:hover .cardPlay {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.cardTitle {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.cardTitle:hover {
+  color: var(--accent-text);
+}
+
+.cardMeta {
+  color: var(--muted);
+  font-size: 11.5px;
+}
+
+.cardNew {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 200px;
+  padding: 12px;
+  border: 1px dashed var(--line);
+  border-radius: 14px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
+}
+
+.cardNew:hover {
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+.cardNewIcon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--chip);
+}
+
+.cardNewIcon svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* Пустые разделы */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 46px 24px;
+  border: 1px dashed var(--line);
+  border-radius: 18px;
+  text-align: center;
+}
+
+.emptyIcon {
+  width: 44px;
+  height: 44px;
+  color: var(--muted);
+  opacity: 0.7;
+}
+
+.empty h3 {
+  margin: 2px 0 0;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.empty p {
+  max-width: 430px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+.emptyActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+/* Нижний плеер */
+.bar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 70;
+  border-top: 1px solid var(--line);
+  background: var(--card);
+  box-shadow: 0 -12px 32px rgba(0, 0, 0, 0.16);
+  animation: barSlide 0.22s ease;
+}
+
+.dark .bar {
+  background: rgba(23, 23, 29, 0.96);
+  backdrop-filter: blur(14px);
+}
+
+@keyframes barSlide {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.barInner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 520px) minmax(0, 1fr);
+  align-items: center;
+  gap: 18px;
+  width: min(1220px, 94vw);
+  margin: 0 auto;
+  padding: 10px 0;
+}
+
+.barTrack {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.barCover {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 9px;
+  color: #fff;
+}
+
+.barCoverIcon {
+  width: 20px;
+  height: 20px;
+}
+
+.barText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.barTitle {
+  overflow: hidden;
+  font-size: 13.5px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.barArtist {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.barCenter {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.barButtons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.barBtn {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.barBtn svg {
+  width: 17px;
+  height: 17px;
+}
+
+.barBtn:hover {
+  background: var(--chip);
+  color: var(--text);
+}
+
+.barPlay,
+.barPlay:hover {
+  width: 38px;
+  height: 38px;
+  background: var(--accent);
+  color: #fff;
+}
+
+.barPlay:hover {
+  opacity: 0.9;
+}
+
+.barTimeline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.barTime {
+  min-width: 34px;
+  color: var(--muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.barRange {
+  flex: 1;
+  min-width: 0;
+  height: 4px;
+  appearance: none;
+  border-radius: 2px;
+  background: linear-gradient(to right, var(--accent) var(--range-pct, 0%), var(--chip) var(--range-pct, 0%));
+  cursor: pointer;
+}
+
+.barRange:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.barRange::-webkit-slider-thumb {
+  appearance: none;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px rgba(124, 92, 252, 0.18);
+}
+
+.barRange::-moz-range-thumb {
+  width: 11px;
+  height: 11px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.barRight {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.barVolume {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 124px;
+}
+
+.playerSpacer {
+  height: 74px;
+}
+
+/* Окна */
+.dialogForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dialogText {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.pickTrack {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.pickCover {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  color: #fff;
+}
+
+.pickCover svg {
+  width: 20px;
+  height: 20px;
+}
+
+.pickText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.pickText b {
+  overflow: hidden;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pickText small {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pickList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.pickRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.pickRow:hover:not(:disabled) {
+  background: var(--card-hover);
+}
+
+.pickRow:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.pickAdded {
+  margin-left: auto;
+  color: #22c55e;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.pickPlus {
+  flex: none;
+  margin-left: auto;
+  width: 18px;
+  height: 18px;
+  color: var(--muted);
+}
+
+.pickCreate {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.pickCreate input {
+  flex: 1;
+  min-width: 0;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--card);
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+}
+
+.pickCreate input:focus {
+  border-color: rgba(124, 92, 252, 0.55);
+  outline: none;
+}
+
+@media (max-width: 980px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .side {
+    position: static;
+  }
+
+  .sideCard:first-child {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .sideLink {
+    flex: 1 1 150px;
+    width: auto;
+  }
+
+  .sideHead,
+  .sidePlaylists,
+  .sideHint {
+    display: none;
+  }
+
+  .sideCard:last-child {
+    display: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .hero {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 22px;
+  }
+
+  .playlistHero {
+    flex-direction: column;
+  }
+
+  .playlistCover {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 2 / 1;
+  }
+
+  .waveArt {
+    display: none;
+  }
+
+  .row {
+    grid-template-columns: 44px minmax(0, 1fr) auto;
+    gap: 10px;
+    padding: 6px 4px;
+  }
+
+  .rowCover {
+    width: 44px;
+    height: 44px;
+  }
+
+  .rowDuration {
+    display: none;
+  }
+
+  .barInner {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    padding: 8px 0;
+  }
+
+  .barCenter .barTimeline,
+  .barVolume {
+    display: none;
+  }
+
+  .playerSpacer {
+    height: 64px;
+  }
+}

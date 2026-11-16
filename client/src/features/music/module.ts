@@ -93,6 +93,9 @@ interface MusicStore {
   /** Позиция и длительность текущего трека, секунды. */
   currentTime: number
   duration: number
+  /** Громкость от 0 до 1. Общая для всех страниц, запоминается на время сессии. */
+  volume: number
+  setVolume: (value: number) => void
   load: (scope: MusicScope) => Promise<void>
   loadMore: () => Promise<void>
   addFiles: (files: FileList | File[]) => Promise<void>
@@ -138,6 +141,7 @@ export const useMusicStore = create<MusicStore>()((set, get) => {
     if (audio) return audio
     const player = new Audio()
     player.preload = 'metadata'
+    player.volume = get().volume
     playerHost.__anidaleAudio = player
     // Состояние берём из событий самого плеера, а не угадываем по промисам play():
     // при быстром переключении треков play() предыдущего трека отклоняется с AbortError.
@@ -238,6 +242,7 @@ export const useMusicStore = create<MusicStore>()((set, get) => {
     error: '',
     currentTime: 0,
     duration: 0,
+    volume: 1,
 
     load: async (scope) => {
       const token = ++loadToken
@@ -425,6 +430,12 @@ export const useMusicStore = create<MusicStore>()((set, get) => {
       if (!audio || !get().current) return
       if (audio.paused) void audio.play().catch(() => undefined)
       else audio.pause()
+    },
+
+    setVolume: (value) => {
+      const volume = Math.min(Math.max(Number.isFinite(value) ? value : 0, 0), 1)
+      if (audio) audio.volume = volume
+      set({ volume })
     },
 
     next: () => {

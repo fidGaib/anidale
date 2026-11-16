@@ -40,6 +40,8 @@ export const GlobalPlayer = () => {
   }, [isAuthPage, reset])
 
   if (isAuthPage) return null
+  // На странице музыки свой нижний плеер в стиле VK
+  if (pathname === '/music') return null
   return <Player />
 }
 
