@@ -8,6 +8,7 @@ import { io } from '@/index'
 import { canManageContent, canPublish, canViewCommunity } from '../community/access'
 import { canSeePost } from '../post/visibility'
 import AudioStorageService from './audio-service'
+import { invalidateMusicCache, musicCached } from './cache'
 
 const MAX_PAGE_LIMIT = 50
 const MAX_TEXT_LENGTH = 100
@@ -40,6 +41,7 @@ class MusicController {
         include: { user: userSelect },
       })
       // Музыка сообщества в общую ленту не попадает
+      await invalidateMusicCache()
       if (!communityId) io.emit('newMusic', { music })
       return music
     } catch (error) {
@@ -52,14 +54,16 @@ class MusicController {
     // Защита от запросов вида limit = 1000000 и отрицательных значений
     const take = Math.min(Math.max(Math.trunc(limit) || 1, 1), MAX_PAGE_LIMIT)
     const skip = Math.max(Math.trunc(page) || 0, 0) * take
-    return await Music.findMany({
-      take,
-      skip,
-      // Личная страница: без треков сообществ, которые загрузил этот человек
-      where: user_id ? { owner: user_id, communityId: null, postId: null } : { communityId: null, postId: null },
-      orderBy: { id: 'desc' },
-      include: { user: userSelect },
-    })
+    // Личная страница: без треков сообществ, которые загрузил этот человек
+    return await musicCached(`user:${user_id ?? 'all'}:${take}:${skip}`, () =>
+      Music.findMany({
+        take,
+        skip,
+        where: user_id ? { owner: user_id, communityId: null, postId: null } : { communityId: null, postId: null },
+        orderBy: { id: 'desc' },
+        include: { user: userSelect },
+      }),
+    )
   }
 
   /** Музыка сообщества: новые сверху. Закрытое сообщество показывает её только участникам. */
@@ -67,13 +71,16 @@ class MusicController {
     if (!(await canViewCommunity(communityId, viewerId))) return []
     const take = Math.min(Math.max(Math.trunc(limit) || 1, 1), MAX_PAGE_LIMIT)
     const skip = Math.max(Math.trunc(page) || 0, 0) * take
-    return await Music.findMany({
-      take,
-      skip,
-      where: { communityId, postId: null },
-      orderBy: { id: 'desc' },
-      include: { user: userSelect },
-    })
+    // Доступ уже проверен, поэтому список одинаков для всех, кому сообщество видно
+    return await musicCached(`community:${communityId}:${take}:${skip}`, () =>
+      Music.findMany({
+        take,
+        skip,
+        where: { communityId, postId: null },
+        orderBy: { id: 'desc' },
+        include: { user: userSelect },
+      }),
+    )
   }
 
   /** Условие выборки треков: только с файлом, при поиске — по названию или исполнителю. */
@@ -95,46 +102,53 @@ class MusicController {
 
   /** Сколько разных треков (по файлу) подходит под поиск. */
   async countAll(search?: string) {
-    const groups = await Music.groupBy({ by: ['file'], where: this.searchWhere(search) })
-    return groups.length
+    const key = search?.trim() ?? ''
+    return await musicCached(`count:${key}`, async () => {
+      const groups = await Music.groupBy({ by: ['file'], where: this.searchWhere(search) })
+      return groups.length
+    })
   }
 
   /** Вся музыка сайта для ленты. Один и тот же файл, добавленный в несколько профилей, показывается один раз. */
   async getAllMusic(limit: number, page: number, search?: string) {
     const take = Math.min(Math.max(Math.trunc(limit) || 1, 1), MAX_PAGE_LIMIT)
     const skip = Math.max(Math.trunc(page) || 0, 0) * take
-    const page_ = await Music.findMany({
-      take,
-      skip,
-      // Записи без файла (созданные до появления загрузки аудио) играть нечем
-      where: this.searchWhere(search),
-      distinct: ['file'],
-      orderBy: { id: 'desc' },
-      select: { file: true },
-    })
-    if (page_.length === 0) return []
-    // Автор оригинала — самая ранняя запись с этим файлом (остальные — копии, добавленные из ленты)
-    const originals = await Music.findMany({
-      where: { file: { in: page_.map((row) => row.file) } },
-      distinct: ['file'],
-      orderBy: { id: 'asc' },
-      include: { user: userSelect },
-    })
-    const byFile = new Map(originals.map((row) => [row.file, row]))
-    return page_.flatMap((row) => {
-      const original = byFile.get(row.file)
-      return original ? [original] : []
+    return await musicCached(`all:${take}:${skip}:${search?.trim() ?? ''}`, async () => {
+      const page_ = await Music.findMany({
+        take,
+        skip,
+        // Записи без файла (созданные до появления загрузки аудио) играть нечем
+        where: this.searchWhere(search),
+        distinct: ['file'],
+        orderBy: { id: 'desc' },
+        select: { file: true },
+      })
+      if (page_.length === 0) return []
+      // Автор оригинала — самая ранняя запись с этим файлом (остальные — копии, добавленные из ленты)
+      const originals = await Music.findMany({
+        where: { file: { in: page_.map((row) => row.file) } },
+        distinct: ['file'],
+        orderBy: { id: 'asc' },
+        include: { user: userSelect },
+      })
+      const byFile = new Map(originals.map((row) => [row.file, row]))
+      return page_.flatMap((row) => {
+        const original = byFile.get(row.file)
+        return original ? [original] : []
+      })
     })
   }
 
   /** Файлы треков пользователя (без пустых). Потолок защищает от огромного ответа. */
   async getMyFiles(userId: number) {
-    const rows = await Music.findMany({
-      where: { owner: userId, communityId: null, postId: null, file: { not: '' } },
-      select: { file: true },
-      take: 5000,
+    return await musicCached(`mine:${userId}`, async () => {
+      const rows = await Music.findMany({
+        where: { owner: userId, communityId: null, postId: null, file: { not: '' } },
+        select: { file: true },
+        take: 5000,
+      })
+      return rows.map((row) => row.file)
     })
-    return rows.map((row) => row.file)
   }
 
   /** Копирует чужой трек в профиль пользователя. Файл общий, в хранилище он не дублируется. */
@@ -165,6 +179,7 @@ class MusicController {
       },
       include: { user: userSelect },
     })
+    await invalidateMusicCache()
     if (!source.communityId && !source.postId)
       await NotificationController.notify(source.owner, userId, 'track', { text: source.title })
     return added
@@ -181,6 +196,7 @@ class MusicController {
     if (!allowed) throw createGraphQLError('Нет доступа')
 
     await Music.delete({ where: { id } })
+    await invalidateMusicCache()
     await this.removeFileIfUnused(music.file)
     return true
   }
@@ -190,6 +206,7 @@ class MusicController {
     if (!file) throw createGraphQLError('Трек не найден')
     const { count } = await Music.deleteMany({ where: { owner: userId, communityId: null, postId: null, file } })
     if (count === 0) throw createGraphQLError('Трека нет в вашем профиле')
+    await invalidateMusicCache()
     await this.removeFileIfUnused(file)
     return true
   }
@@ -198,6 +215,7 @@ class MusicController {
   async removeCommunityTracks(communityId: number) {
     const tracks = await Music.findMany({ where: { communityId }, select: { id: true, file: true } })
     await Music.deleteMany({ where: { communityId } })
+    await invalidateMusicCache()
     for (const track of tracks) await this.removeFileIfUnused(track.file)
   }
 

@@ -1,9 +1,12 @@
 import { createGraphQLError } from 'graphql-yoga'
 
 import prisma from '@/db/db'
+import { getRedis } from '@/redis'
 
 const SECOND = 1000
 const MINUTE = 60 * SECOND
+
+const REDIS_PREFIX = 'anidale:limit:'
 
 /**
  * Лимиты по действиям: не больше `max` обращений за окно `windowMs` на одного субъекта (человека или адрес).
@@ -36,11 +39,42 @@ export interface LimitResult {
 }
 
 /**
+ * Счётчик в Redis: INCR и установка окна одним скриптом, поэтому одновременные
+ * обращения не обгоняют друг друга, а счётчик общий для всех процессов.
+ */
+const redisHit = async (key: string, max: number, windowMs: number): Promise<LimitResult | null> => {
+  const client = await getRedis()
+  if (!client) return null
+  try {
+    const [count, ttl] = (await client.eval(
+      `local count = redis.call('INCR', KEYS[1])
+       local ttl = redis.call('PTTL', KEYS[1])
+       if ttl < 0 then
+         redis.call('PEXPIRE', KEYS[1], ARGV[1])
+         ttl = tonumber(ARGV[1])
+       end
+       return {count, ttl}`,
+      1,
+      `${REDIS_PREFIX}${key}`,
+      String(Math.max(1, Math.round(windowMs))),
+    )) as [number, number]
+    return {
+      allowed: count <= max,
+      retryAfter: Math.max(Math.ceil(ttl / SECOND), 1),
+    }
+  } catch (error) {
+    console.error('Redis: не удалось проверить лимит, считаем в базе', key, error)
+    return null
+  }
+}
+
+/**
  * Считает обращение в базе: общий счётчик у всех процессов сервера и переживает перезапуск.
  * Окно фиксированное: первое обращение открывает его, по истечении счётчик начинается заново.
  * Одним запросом (INSERT … ON CONFLICT), поэтому одновременные обращения не обгоняют друг друга.
+ * Запасной путь на случай, когда Redis не настроен или лежит.
  */
-export const hit = async (key: string, max: number, windowMs: number, now = new Date()): Promise<LimitResult> => {
+const databaseHit = async (key: string, max: number, windowMs: number, now: Date): Promise<LimitResult> => {
   const resetAt = new Date(now.getTime() + windowMs)
   // Время передаём ISO-строкой и приводим к «наивному» UTC, как его хранит Prisma: часовой пояс сервера не влияет
   const nowUtc = now.toISOString()
@@ -64,9 +98,23 @@ export const hit = async (key: string, max: number, windowMs: number, now = new 
   }
 }
 
+/**
+ * Считает обращение: сначала в Redis (общий счётчик процессов, окно истекает само),
+ * при недоступном Redis — в базе. `now` нужен только запасному пути: в Redis окно
+ * отсчитывается от реального времени.
+ */
+export const hit = async (key: string, max: number, windowMs: number, now = new Date()): Promise<LimitResult> => {
+  const cached = await redisHit(key, max, windowMs)
+  if (cached) return cached
+  return await databaseHit(key, max, windowMs, now)
+}
+
 /** Сбрасывает счётчик (например, после успешного входа). */
 export const resetLimit = async (policy: Policy, subject: string | number) => {
-  await prisma.rateLimit.deleteMany({ where: { key: `${policy}:${subject}` } }).catch(() => undefined)
+  const key = `${policy}:${subject}`
+  const client = await getRedis()
+  if (client) await client.del(`${REDIS_PREFIX}${key}`).catch(() => undefined)
+  await prisma.rateLimit.deleteMany({ where: { key } }).catch(() => undefined)
 }
 
 /**

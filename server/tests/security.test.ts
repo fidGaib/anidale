@@ -118,7 +118,7 @@ describe('ограничитель частоты', () => {
     expect((await hit('k', 3, 1000, at(2))).allowed).toBe(true)
   })
 
-  it('счётчик общий и хранится в базе: переживает перезапуск процесса', async () => {
+  it('счётчик в запасной таблице (Redis выключен): переживает перезапуск процесса', async () => {
     await hit('persist', 1, 60_000, T0)
     expect(await prisma.rateLimit.findUnique({ where: { key: 'persist' } })).toMatchObject({ count: 1 })
     expect((await hit('persist', 1, 60_000, at(1))).allowed).toBe(false)

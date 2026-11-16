@@ -1,4 +1,5 @@
 import { requireAdmin } from '@/api/anime/access'
+import { animeCached, invalidateAnimeCache } from '@/api/anime/cache'
 import AnimeController from '@/api/anime/controller'
 import {
   AnimeEpisode,
@@ -24,13 +25,15 @@ const asEpisode = (value: unknown) => value as AnimeEpisode
 const AnimeResolvers: Resolvers = {
   Query: {
     async animeHome(_, { from, to }) {
-      return asHome(await AnimeController.home(from, to))
+      const key = `home:${from.getTime()}:${to.getTime()}`
+      return asHome(await animeCached(key, () => AnimeController.home(from, to)))
     },
     async animeSchedule(_, { from, to }) {
-      return asSchedule(await AnimeController.schedule(from, to))
+      const key = `schedule:${from.getTime()}:${to.getTime()}`
+      return asSchedule(await animeCached(key, () => AnimeController.schedule(from, to)))
     },
     async animeRelease(_, { id }) {
-      return asRelease(await AnimeController.release(id))
+      return asRelease(await animeCached(`release:${id}`, () => AnimeController.release(id)))
     },
     async adminAnimeReleases(_, { search, limit, offset }, { req, res }) {
       await requireAdmin(req, res)
@@ -52,31 +55,45 @@ const AnimeResolvers: Resolvers = {
   Mutation: {
     async saveAnimeRelease(_, { input }, { req, res }) {
       await requireAdmin(req, res)
-      return asRelease(await AnimeController.saveRelease(input))
+      const release = asRelease(await AnimeController.saveRelease(input))
+      await invalidateAnimeCache()
+      return release
     },
     async deleteAnimeRelease(_, { id }, { req, res }) {
       await requireAdmin(req, res)
-      return await AnimeController.deleteRelease(id)
+      const deleted = await AnimeController.deleteRelease(id)
+      await invalidateAnimeCache()
+      return deleted
     },
     async saveAnimeEpisode(_, { input }, { req, res }) {
       await requireAdmin(req, res)
-      return asEpisode(await AnimeController.saveEpisode(input))
+      const episode = asEpisode(await AnimeController.saveEpisode(input))
+      await invalidateAnimeCache()
+      return episode
     },
     async deleteAnimeEpisode(_, { id }, { req, res }) {
       await requireAdmin(req, res)
-      return await AnimeController.deleteEpisode(id)
+      const deleted = await AnimeController.deleteEpisode(id)
+      await invalidateAnimeCache()
+      return deleted
     },
     async saveAnimeSchedule(_, { input }, { req, res }) {
       await requireAdmin(req, res)
-      return asScheduleEntry(await AnimeController.saveSchedule(input))
+      const entry = asScheduleEntry(await AnimeController.saveSchedule(input))
+      await invalidateAnimeCache()
+      return entry
     },
     async deleteAnimeSchedule(_, { id }, { req, res }) {
       await requireAdmin(req, res)
-      return await AnimeController.deleteSchedule(id)
+      const deleted = await AnimeController.deleteSchedule(id)
+      await invalidateAnimeCache()
+      return deleted
     },
     async deleteAnimeGenre(_, { id }, { req, res }) {
       await requireAdmin(req, res)
-      return await AnimeController.deleteGenre(id)
+      const deleted = await AnimeController.deleteGenre(id)
+      await invalidateAnimeCache()
+      return deleted
     },
   },
   AnimeRelease: {

@@ -1,4 +1,5 @@
 import 'dotenv/config'
+import { createAdapter } from '@socket.io/redis-adapter'
 import http from 'http'
 import { Server as IoServer } from 'socket.io'
 
@@ -7,8 +8,10 @@ import prisma from './db/db'
 import { parseCookies } from './handlers/cookie-parser'
 import { applyCors, getAllowedOrigins } from './handlers/cors'
 import { serveStatic } from './handlers/file-upload'
-import { markConnected, markDisconnected, presenceRoom } from './handlers/presence'
+import { healthCheck } from './handlers/health'
+import { markConnected, markDisconnected, presenceRoom, touchPresence } from './handlers/presence'
 import { storageAuth } from './handlers/storage-auth'
+import { closeRedis, createRedisConnection, pingRedis, redis, redisEnabled } from './redis'
 import { yoga } from './schema'
 
 const server = http.createServer()
@@ -37,6 +40,11 @@ server.on('request', async (req, res) => {
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin')
     if (process.env.NODE_ENV === 'production') {
       res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')
+    }
+    // Проверка живости для мониторинга: база и Redis, без секретов
+    if (req.url === '/healthz' || req.url?.startsWith('/healthz?')) {
+      await healthCheck(res)
+      return
     }
     // Проверка доступа к файлам для nginx
     if (req.url?.startsWith('/_storage-auth')) {
@@ -74,9 +82,11 @@ io.on('connection', async (socket) => {
   const userId = await getOptionalUserId({ cookies: parseCookies(socket.request) })
   if (userId) {
     socket.join(`user:${userId}`)
-    if (markConnected(userId)) {
+    if (await markConnected(userId, socket.id)) {
       io.to(presenceRoom(userId)).emit('presence', { userId, online: true, lastSeenAt: null })
     }
+    // Heartbeat продлевает запись в Redis: упавший процесс не оставит человека «в сети» навсегда
+    socket.conn.on('heartbeat', () => void touchPresence(userId, socket.id))
   }
   // Подписка на статус собеседника открытого чата: одна за раз
   let watched: number | null = null
@@ -94,7 +104,7 @@ io.on('connection', async (socket) => {
   })
   socket.on('disconnect', async () => {
     console.log('Клиент отключился: ', socket.id)
-    if (userId && markDisconnected(userId)) {
+    if (userId && (await markDisconnected(userId, socket.id))) {
       const lastSeenAt = new Date()
       io.to(presenceRoom(userId)).emit('presence', { userId, online: false, lastSeenAt })
       try {
@@ -108,6 +118,7 @@ io.on('connection', async (socket) => {
 
 const stopApplication = (server: http.Server) => {
   server.close()
+  void closeRedis()
   return new Promise((resolve) => {
     server.on('close', () => resolve(0))
   })
@@ -124,9 +135,55 @@ const onHotReload = async (server: http.Server) => {
   }
 }
 
+/** Включает обмен событиями между процессами через Redis. Без Redis сервер работает как обычно. */
+let adapterEnabled = false
+let adapterSetup: Promise<void> | null = null
+
+const setupRedisAdapter = async () => {
+  const pubClient = createRedisConnection()
+  const subClient = createRedisConnection()
+  if (!pubClient || !subClient) return
+  try {
+    await Promise.all([pubClient.connect(), subClient.connect()])
+    io.adapter(createAdapter(pubClient, subClient))
+    console.log('Socket.IO: Redis-адаптер включён')
+  } catch (error) {
+    pubClient.disconnect()
+    subClient.disconnect()
+    throw error
+  }
+}
+
+/** Одновременные вызовы (старт и восстановление связи) делят одну попытку; после ошибки можно повторить. */
+const enableRedisAdapter = () => {
+  if (adapterEnabled) return Promise.resolve()
+  adapterSetup ??= setupRedisAdapter()
+    .then(() => {
+      adapterEnabled = true
+    })
+    .catch((error) => {
+      console.error('Socket.IO: не удалось включить Redis-адаптер, работаем без него', error)
+      adapterSetup = null
+    })
+  return adapterSetup
+}
+
 const start = async () => {
   try {
     if (import.meta.hot) await import.meta.hot.data.stopping
+    if (redisEnabled) {
+      // Если Redis поднимется позже, адаптер включится при первом успешном подключении
+      redis?.on('ready', () => void enableRedisAdapter())
+      const redisReady = await pingRedis()
+      console.log(
+        redisReady
+          ? 'Redis готов — кэш, онлайн-статусы и лимиты общие'
+          : 'Redis недоступен — без кэша: лимиты в PostgreSQL, статусы в памяти процесса',
+      )
+      // Адаптер позволяет нескольким процессам сервера обмениваться событиями сокетов
+      // (сообщения, «печатает…», статусы онлайна) через общий Redis.
+      if (redisReady) await enableRedisAdapter()
+    }
     server.listen(process.env.PORT, () => console.log(`Server started on port ${process.env.PORT}`))
     onHotReload(server)
   } catch (e) {

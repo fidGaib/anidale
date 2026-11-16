@@ -16,6 +16,8 @@ async function generateEnv() {
 PORT=5000
 # db link
 DB_LINK='postgresql://postgres:123@localhost:5432/anidale?schema=public'
+# redis (кэш, онлайн-статусы и ограничители; пустое значение — работать без Redis)
+REDIS_URL='redis://127.0.0.1:6379'
 # tokens
 JWT_ACCESS_SECRET='${randomBytes(64).toString('base64')}'
 JWT_REFRESH_SECRET='${randomBytes(64).toString('base64')}'

@@ -1,0 +1,12 @@
+[Unit]
+Description=Daily AniDale backup
+
+[Timer]
+# Ночью, со случайной задержкой до 5 минут, чтобы не совпадать с другими задачами
+OnCalendar=*-*-* 03:17:00
+RandomizedDelaySec=300
+# Если сервер был выключен, задача выполнится при следующем запуске
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -3,4 +3,6 @@ node_modules
 server/**/uploads/**/*
 server/src/schema/resolvers-types.ts
 server/storage
+server/dist
+server/backups
 target

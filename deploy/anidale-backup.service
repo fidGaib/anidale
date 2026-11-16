@@ -1,0 +1,18 @@
+[Unit]
+# Ежедневная резервная копия базы и файлов AniDale.
+# Установка:
+#   sudo install -d -o anidale -g anidale /var/backups/anidale
+#   sudo cp deploy/anidale-backup.service deploy/anidale-backup.timer /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now anidale-backup.timer
+Description=AniDale backup (database and storage)
+
+[Service]
+Type=oneshot
+User=anidale
+Group=anidale
+WorkingDirectory=/srv/anidale/server
+EnvironmentFile=/srv/anidale/server/.env
+Environment=BACKUP_DIR=/var/backups/anidale
+Environment=BACKUP_KEEP_DAYS=14
+ExecStart=/usr/bin/node scripts/backup.mjs

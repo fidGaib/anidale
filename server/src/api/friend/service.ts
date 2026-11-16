@@ -3,7 +3,7 @@ import { createGraphQLError } from 'graphql-yoga'
 import { publicUserSelect } from '@/api/user/service'
 import prisma from '@/db/db'
 import User from '@/db/models/user-model'
-import { isOnline } from '@/handlers/presence'
+import { onlineUsers } from '@/handlers/presence'
 
 export type FriendStatus = 'NONE' | 'FRIEND' | 'SUBSCRIBED' | 'SUBSCRIBER'
 
@@ -90,9 +90,10 @@ class FriendService {
       take: 200,
       select: { following: { select: publicUserSelect } },
     })
+    const online = await onlineUsers(rows.map((row) => row.following.id))
     return rows
       .map((row) => row.following)
-      .filter((friend) => isOnline(friend.id))
+      .filter((friend) => online.has(friend.id))
       .slice(0, clampLimit(limit))
   }
 

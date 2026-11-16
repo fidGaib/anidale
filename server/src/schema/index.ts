@@ -6,7 +6,7 @@ import { Resolvers } from './resolvers-types'
 
 const resolvers = import.meta.glob('./**/*resolvers.ts', { import: 'default', eager: true })
 
-const schemasRaw = import.meta.glob('./**/*schema.graphql', { eager: true, as: 'raw' })
+const schemasRaw = import.meta.glob('./**/*schema.graphql', { eager: true, query: '?raw', import: 'default' })
 
 const executableSchema = makeExecutableSchema({
   typeDefs: Object.values(schemasRaw),

@@ -6,6 +6,11 @@ import { assertTestDatabase, buildTestUrl } from './test-db'
 process.env.DB_LINK = buildTestUrl()
 assertTestDatabase()
 
+// Redis: тесты не должны зависеть от локального Redis и его данных.
+// Кэш и лимиты тогда работают запасным путём (память процесса и таблица RateLimit),
+// а сам Redis проверяется отдельно в redis.test.ts.
+process.env.REDIS_URL = ''
+
 // Сокет: настоящий `@/index` поднимает HTTP-сервер, в тестах он не нужен.
 // Заглушка запоминает все события, чтобы тесты могли проверять, кому и что отправлено.
 vi.mock('@/index', () => {

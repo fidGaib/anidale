@@ -28,8 +28,8 @@ describe('друзья онлайн', () => {
   let subscriber: User
   const online: number[] = []
 
-  const setOnline = (user: User) => {
-    markConnected(user.id)
+  const setOnline = async (user: User) => {
+    await markConnected(user.id)
     online.push(user.id)
   }
 
@@ -41,17 +41,17 @@ describe('друзья онлайн', () => {
     // Подписчик: подписан на меня, но я на него нет — другом не считается
     await follow(subscriber.id, me.id)
     // Сброс присутствия прошлых тестов
-    for (const id of online.splice(0)) markDisconnected(id)
+    for (const id of online.splice(0)) await markDisconnected(id)
   })
 
   it('показывает только друзей, которые сейчас в сети', async () => {
-    setOnline(friend1)
+    await setOnline(friend1)
     const result = await FriendService.friendsOnline(me.id)
     expect(result.map((u) => u.id)).toEqual([friend1.id])
   })
 
   it('подписчики и посторонние не попадают в список, даже если они в сети', async () => {
-    setOnline(subscriber)
+    await setOnline(subscriber)
     expect(await FriendService.friendsOnline(me.id)).toEqual([])
   })
 
@@ -60,15 +60,15 @@ describe('друзья онлайн', () => {
   })
 
   it('после выхода друг пропадает из списка', async () => {
-    setOnline(friend1)
-    markDisconnected(friend1.id)
+    await setOnline(friend1)
+    await markDisconnected(friend1.id)
     online.pop()
     expect(await FriendService.friendsOnline(me.id)).toEqual([])
   })
 
   it('свежие друзья идут первыми, число ограничено limit', async () => {
-    setOnline(friend1)
-    setOnline(friend2)
+    await setOnline(friend1)
+    await setOnline(friend2)
     const result = await FriendService.friendsOnline(me.id, 1)
     expect(result).toHaveLength(1)
     // friend2 добавлен позже: у него более свежая подписка

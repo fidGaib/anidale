@@ -552,7 +552,7 @@ class MessageController {
   async presence(userId: number) {
     const user = await User.findUnique({ where: { id: userId }, select: { lastSeenAt: true } })
     if (!user) throw createGraphQLError('Пользователь не найден')
-    return { online: isOnline(userId), lastSeenAt: user.lastSeenAt }
+    return { online: await isOnline(userId), lastSeenAt: user.lastSeenAt }
   }
 
   // ---------- диалог целиком ----------
