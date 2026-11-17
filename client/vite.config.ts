@@ -30,14 +30,18 @@ export default defineConfig({
       output: {
         // Вендоры меняются реже кода приложения — выносим их в отдельные
         // долгоживущие чанки, чтобы после деплоя кэш браузера оставался валидным.
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'apollo-vendor': ['@apollo/client', 'graphql', 'apollo-upload-client'],
-          'socket-vendor': ['socket.io-client'],
-          'styled-vendor': ['styled-components'],
+        // Vite 8 (rolldown) принимает только функцию, не объект.
+        manualChunks: (id: string) => {
+          if (!id.includes('node_modules')) return
+          if (/(^|[\\/])node_modules[\\/](react|react-dom|react-router|react-router-dom)[\\/]/.test(id))
+            return 'react-vendor'
+          if (id.includes('@apollo') || id.includes('apollo-upload-client')) return 'apollo-vendor'
+          if (/node_modules[\\/]graphql[\\/]/.test(id)) return 'apollo-vendor'
+          if (id.includes('socket.io-client') || id.includes('engine.io-client')) return 'socket-vendor'
+          if (id.includes('styled-components')) return 'styled-vendor'
           // Тяжёлый zxcvbn нужен только на страницах с паролем: отдельный чанк
           // подгружается вместе с ними, а не на первом экране.
-          'password-vendor': ['zxcvbn'],
+          if (id.includes('zxcvbn')) return 'password-vendor'
         },
       },
     },

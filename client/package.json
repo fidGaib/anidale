@@ -25,7 +25,7 @@
     "react-hook-form": "^7.43.7",
     "react-intersection-observer": "^9.13.1",
     "react-player": "^2.16.0",
-    "react-router-dom": "^6.9.0",
+    "react-router-dom": "^7.18.5",
     "screenfull": "^6.0.2",
     "socket.io-client": "^4.8.3",
     "styled-components": "^6.1.13",
@@ -39,7 +39,7 @@
     "@trivago/prettier-plugin-sort-imports": "^4.1.1",
     "@types/apollo-upload-client": "^17.0.2",
     "@types/compose-function": "^0.0.30",
-    "@types/node": "^18.19.130",
+    "@types/node": "^22.20.5",
     "@types/react": "^18.0.28",
     "@types/react-avatar-editor": "^13.0.3",
     "@types/react-dom": "^18.0.11",
@@ -47,7 +47,7 @@
     "@types/zxcvbn": "^4.4.5",
     "@typescript-eslint/eslint-plugin": "^5.56.0",
     "@typescript-eslint/parser": "^5.56.0",
-    "@vitejs/plugin-react-swc": "^3.7.1",
+    "@vitejs/plugin-react-swc": "^4.3.3",
     "autoprefixer": "^10.4.14",
     "caniuse-lite": "^1.0.30001549",
     "eslint": "^8.36.0",
@@ -58,7 +58,7 @@
     "less-loader": "^12.2.0",
     "prettier": "^2.8.4",
     "typescript": "^4.9.3",
-    "vite": "^5.4.11",
-    "vitest": "^3.2.7"
+    "vite": "^8.3.8",
+    "vitest": "^4.1.12"
   }
 }
