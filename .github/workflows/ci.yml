@@ -1,0 +1,122 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: anidale
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DB_LINK: postgresql://postgres:postgres@127.0.0.1:5432/anidale
+      TEST_REDIS_URL: redis://127.0.0.1:6379
+      # Значения только для CI: продакшен-секреты сюда не попадают
+      JWT_ACCESS_SECRET: ci-access-secret-0123456789abcdef0123456789abcdef0123456789abcdef
+      JWT_REFRESH_SECRET: ci-refresh-secret-0123456789abcdef0123456789abcdef0123456789abcdef
+      PASS_PEPPER: ci-pepper-0123456789abcdef0123456789abcdef
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            server/package-lock.json
+            client/package-lock.json
+
+      - name: Install server dependencies
+        working-directory: server
+        run: npm ci
+
+      - name: Generate server types
+        working-directory: server
+        run: |
+          npm run codegen:once
+          npx prisma generate
+
+      - name: Typecheck and lint server
+        working-directory: server
+        run: |
+          npx tsc --noEmit
+          npm run lint
+
+      - name: Server tests
+        working-directory: server
+        run: npm test
+
+      - name: Build server
+        working-directory: server
+        run: npm run build
+
+      - name: Prepare database for client codegen
+        working-directory: server
+        run: npx prisma db push --skip-generate
+
+      - name: Start server for client codegen
+        working-directory: server
+        run: |
+          npm start > "$RUNNER_TEMP/server.log" 2>&1 &
+          for i in $(seq 1 40); do
+            if curl -fsS http://127.0.0.1:5000/healthz > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/server.log"
+          exit 1
+
+      - name: Install client dependencies
+        working-directory: client
+        run: npm ci
+
+      - name: Generate client types
+        working-directory: client
+        env:
+          API_URL: http://127.0.0.1:5000/graphql
+        run: npm run codegen:once
+
+      - name: Typecheck, test and build client
+        working-directory: client
+        run: |
+          npx tsc --noEmit
+          npm test
+          npm run build
+
+      - name: Stop server
+        if: always()
+        run: pkill -f "start.mjs" || true
+
+      - name: Show server log on failure
+        if: failure()
+        run: cat "$RUNNER_TEMP/server.log" || true

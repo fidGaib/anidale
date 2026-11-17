@@ -35,6 +35,9 @@ export default defineConfig({
           'apollo-vendor': ['@apollo/client', 'graphql', 'apollo-upload-client'],
           'socket-vendor': ['socket.io-client'],
           'styled-vendor': ['styled-components'],
+          // Тяжёлый zxcvbn нужен только на страницах с паролем: отдельный чанк
+          // подгружается вместе с ними, а не на первом экране.
+          'password-vendor': ['zxcvbn'],
         },
       },
     },

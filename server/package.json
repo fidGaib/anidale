@@ -16,6 +16,7 @@
     "db:migrate": "prisma migrate deploy",
     "preview": "vite-node preview",
     "codegen": "graphql-codegen -w",
+    "codegen:once": "graphql-codegen",
     "admin": "node scripts/grant-admin.mjs",
     "seed:anime": "node scripts/seed-anime.mjs",
     "lint": "eslint src/ generate-env.ts codegen.ts",
