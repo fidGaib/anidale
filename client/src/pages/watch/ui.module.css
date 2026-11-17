@@ -86,6 +86,42 @@
   font-weight: 700;
 }
 
+.episodeNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.episodeNavButton {
+  padding: 10px 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--card);
+  color: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.episodeNavButton:not(:disabled):hover {
+  border-color: rgba(139, 92, 246, 0.6);
+  background: var(--card-hover);
+}
+
+.episodeNavButton:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.episodeNavInfo {
+  color: var(--muted);
+  font-size: 14px;
+}
+
 .section {
   display: flex;
   flex-direction: column;

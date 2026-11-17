@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client'
-import { useEffect } from 'react'
-import { Link, useParams, useSearchParams } from 'react-router-dom'
+import { useEffect, useMemo } from 'react'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 
 import { useDarkModeStore } from '@/app/module'
 import { ViedeoWrapper } from '@/entities/watch'
@@ -19,6 +19,7 @@ const imageUrl = (path?: string | null) => (path ? storageUrl(`${path}.webp`) : 
 export const Watch = () => {
   const { id } = useParams()
   const [params] = useSearchParams()
+  const navigate = useNavigate()
   const releaseId = Number(id)
   const theme = useDarkModeStore((store) => store.theme)
 
@@ -31,6 +32,18 @@ export const Watch = () => {
   // Серия выбирается ссылкой (?episode=), по умолчанию — последняя вышедшая
   const requested = Number(params.get('episode'))
   const episode = release?.episodes.find((item) => item.id === requested) ?? release?.episodes[0]
+
+  // Список серий приходит от новых к старым; для переходов «назад/вперёд» нужен порядок показа
+  const episodes = useMemo(
+    () => [...(release?.episodes ?? [])].sort((a, b) => a.number - b.number),
+    [release?.episodes],
+  )
+  const index = episodes.findIndex((item) => item.id === episode?.id)
+  const previous = index > 0 ? episodes[index - 1] : undefined
+  const following = index >= 0 && index < episodes.length - 1 ? episodes[index + 1] : undefined
+  const openEpisode = (target?: typeof episode) => {
+    if (target) navigate(`/watch/${releaseId}?episode=${target.id}`)
+  }
 
   useEffect(() => {
     if (!release) return
@@ -72,11 +85,37 @@ export const Watch = () => {
         </Link>
 
         {episode ? (
-          <ViedeoWrapper
-            title={title}
-            src={episode.video ? storageUrl(episode.video) : ''}
-            description={episode.description || release.description}
-          />
+          <>
+            <ViedeoWrapper
+              key={episode.id}
+              title={title}
+              src={episode.video ? storageUrl(episode.video) : ''}
+              description={episode.description || release.description}
+              onEnded={following ? () => openEpisode(following) : undefined}
+            />
+            <div className={cl.episodeNav}>
+              <button
+                type='button'
+                className={cl.episodeNavButton}
+                disabled={!previous}
+                onClick={() => openEpisode(previous)}
+              >
+                ← Предыдущая
+              </button>
+              <span className={cl.episodeNavInfo}>
+                Эпизод {episode.number}
+                {episodes.length > 1 ? ` из ${episodes.length}` : ''}
+              </span>
+              <button
+                type='button'
+                className={cl.episodeNavButton}
+                disabled={!following}
+                onClick={() => openEpisode(following)}
+              >
+                Следующая →
+              </button>
+            </div>
+          </>
         ) : (
           <div className={cl.hero}>
             <img src={imageUrl(release.poster)} alt='' />

@@ -54,6 +54,7 @@
   background: rgba(35, 35, 35, 0.582);
   display: flex;
   align-items: center;
+  gap: 10px;
   padding: 10px;
 }
 .video__controls_play {
@@ -69,11 +70,47 @@
   cursor: pointer;
 }
 .video__controls_volume {
-  width: 10%;
+  flex: none;
+  width: 90px;
 }
 .video__controls_track {
-  width: 90%;
-  margin-left: 20px;
+  flex: 1;
+  width: auto;
+  margin-left: 0;
+}
+.video__controls_time {
+  flex: none;
+  color: #fff;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.video__controls_skip {
+  flex: none;
+  padding: 4px 6px;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font-size: 12px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.video__controls_skip:hover {
+  opacity: 0.75;
+}
+
+@media (max-width: 640px) {
+  .video__controls_skip {
+    display: none;
+  }
+
+  .video__controls_time {
+    font-size: 11px;
+  }
+
+  .video__controls_volume {
+    width: 60px;
+  }
 }
 /*********** Baseline, reset styles ***********/
 input[type='range'] {

@@ -6,10 +6,13 @@ interface ControlVideoTypes {
   volume: number
   loadedSeconds: number
   playedSeconds: number
+  duration: number
   screenfull: boolean
   handle__play: () => void
   handle__volume: (e: ChangeEvent<HTMLInputElement>) => void
   handle__progress: (state: ProgressState) => void
+  handle__duration: (seconds: number) => void
+  resetProgress: () => void
   handle_prodress_track: (seconds: string | number, ref__player: RefObject<Seekable>) => void
 }
 
@@ -23,11 +26,14 @@ export interface ProgressState {
 export interface Seekable {
   seekTo: (seconds: number) => void
 }
+
 export const usePayerStore = create<ControlVideoTypes>()((set, get) => ({
   playing: false,
-  volume: 0,
+  // Не начинаем с нулевой громкости: иначе серия «не работает» без звука
+  volume: 1,
   loadedSeconds: 1,
   playedSeconds: 0,
+  duration: 0,
   screenfull: false,
   handle__play() {
     set(() => ({
@@ -41,6 +47,12 @@ export const usePayerStore = create<ControlVideoTypes>()((set, get) => ({
   },
   handle__progress({ playedSeconds, loadedSeconds }) {
     set(() => ({ playedSeconds, loadedSeconds }))
+  },
+  handle__duration(duration) {
+    set(() => ({ duration }))
+  },
+  resetProgress() {
+    set(() => ({ playedSeconds: 0, loadedSeconds: 1, duration: 0 }))
   },
   handle_prodress_track(seconds, ref__player) {
     ref__player.current?.seekTo(Number(seconds))

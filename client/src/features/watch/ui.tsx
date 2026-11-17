@@ -2,6 +2,7 @@ import { ChangeEvent, RefObject } from 'react'
 
 import { useDarkModeStore } from '@/app/module'
 import { Seekable, usePayerStore } from '@/pages/watch/module'
+import { formatMediaTime } from '@/shared/lib/time'
 import Input from '@/shared/ui/input'
 
 import cl from './ui.module.css'
@@ -11,14 +12,24 @@ interface ControlsProps {
   handle_screenfull: () => void
 }
 
+const SKIP_SECONDS = 10
+
 export const ControlsVideo = ({ ref__player, handle_screenfull }: ControlsProps) => {
   const handle__volume = usePayerStore((store) => store.handle__volume)
   const handle__play = usePayerStore((store) => store.handle__play)
   const handle_prodress_track = usePayerStore((store) => store.handle_prodress_track)
   const loadedSeconds = usePayerStore((store) => store.loadedSeconds)
   const playedSeconds = usePayerStore((store) => store.playedSeconds)
+  const duration = usePayerStore((store) => store.duration)
   const playing = usePayerStore((store) => store.playing)
   const volume = usePayerStore((store) => store.volume)
+
+  // Длительность приходит от плеера; до неё перемотка ограничена загруженным фрагментом
+  const total = duration || loadedSeconds
+  const skip = (delta: number) => {
+    const target = Math.min(Math.max(playedSeconds + delta, 0), total)
+    handle_prodress_track(target, ref__player)
+  }
 
   return (
     <>
@@ -26,6 +37,25 @@ export const ControlsVideo = ({ ref__player, handle_screenfull }: ControlsProps)
         {playing ? <img src='/icons/pause.svg' alt='' /> : <img src='/icons/play.svg' alt='' />}
       </div>
       <div className={cl.video__controls}>
+        <button type='button' className={cl.video__controls_skip} onClick={() => skip(-SKIP_SECONDS)}>
+          −{SKIP_SECONDS} с
+        </button>
+        <input
+          type='range'
+          onChange={(e: ChangeEvent<HTMLInputElement>) => handle_prodress_track(e.target.value, ref__player)}
+          min={0}
+          max={total}
+          value={Math.min(playedSeconds, total)}
+          step={1}
+          aria-label='Позиция в серии'
+          className={cl.video__controls_track}
+        />
+        <span className={cl.video__controls_time}>
+          {formatMediaTime(playedSeconds)} / {formatMediaTime(duration)}
+        </span>
+        <button type='button' className={cl.video__controls_skip} onClick={() => skip(SKIP_SECONDS)}>
+          +{SKIP_SECONDS} с
+        </button>
         <input
           type='range'
           onChange={handle__volume}
@@ -33,25 +63,15 @@ export const ControlsVideo = ({ ref__player, handle_screenfull }: ControlsProps)
           max={1}
           value={volume}
           step={0.1}
+          aria-label='Громкость'
           className={cl.video__controls_volume}
-        />
-        <input
-          type='range'
-          onChange={(e: ChangeEvent<HTMLInputElement>) => {
-            handle_prodress_track(e.target.value, ref__player)
-          }}
-          min={0}
-          max={loadedSeconds}
-          value={playedSeconds}
-          step={1}
-          className={cl.video__controls_track}
         />
         <img
           width={'30px'}
-          style={{ marginLeft: '20px', cursor: 'pointer' }}
+          style={{ marginLeft: '10px', cursor: 'pointer' }}
           onClick={handle_screenfull}
           src='/icons/fullscreen.svg'
-          alt=''
+          alt='На весь экран'
         />
       </div>
     </>

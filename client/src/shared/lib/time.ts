@@ -38,6 +38,17 @@ export const formatFileSize = (bytes: number) => {
   return `${(bytes / 1024 / 1024).toFixed(1)} МБ`
 }
 
+/** Время плеера: «0:07», «12:34», «1:02:03». */
+export const formatMediaTime = (seconds: number) => {
+  if (!Number.isFinite(seconds) || seconds < 0) return '0:00'
+  const total = Math.floor(seconds)
+  const hours = Math.floor(total / 3600)
+  const minutes = Math.floor((total % 3600) / 60)
+  const rest = total % 60
+  const pad = (value: number) => String(value).padStart(2, '0')
+  return hours > 0 ? `${hours}:${pad(minutes)}:${pad(rest)}` : `${minutes}:${pad(rest)}`
+}
+
 /** Подпись дня для разделителя в переписке: «Сегодня», «Вчера», «12 мая» (с годом, если он не текущий). */
 export const formatDay = (timestamp: number) => {
   if (!timestamp) return ''
