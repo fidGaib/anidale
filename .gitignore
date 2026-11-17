@@ -5,4 +5,7 @@ server/src/schema/resolvers-types.ts
 server/storage
 server/dist
 server/backups
+client/playwright-report
+client/test-results
+client/blob-report
 target

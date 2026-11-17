@@ -7,6 +7,8 @@
     "dev": "vite",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "codegen": "graphql-codegen --watch",
@@ -36,6 +38,7 @@
   "devDependencies": {
     "@graphql-codegen/cli": "^3.2.2",
     "@graphql-codegen/client-preset": "^2.1.1",
+    "@playwright/test": "^1.65.1",
     "@trivago/prettier-plugin-sort-imports": "^4.1.1",
     "@types/apollo-upload-client": "^17.0.2",
     "@types/compose-function": "^0.0.30",

@@ -41,6 +41,8 @@ jobs:
     env:
       DB_LINK: postgresql://postgres:postgres@127.0.0.1:5432/anidale
       TEST_REDIS_URL: redis://127.0.0.1:6379
+      # Origin preview-сборки, с которой браузер ходит в API в E2E
+      CLIENT_URL: http://127.0.0.1:4173
       # Значения только для CI: продакшен-секреты сюда не попадают
       JWT_ACCESS_SECRET: ci-access-secret-0123456789abcdef0123456789abcdef0123456789abcdef
       JWT_REFRESH_SECRET: ci-refresh-secret-0123456789abcdef0123456789abcdef0123456789abcdef
@@ -108,10 +110,38 @@ jobs:
 
       - name: Typecheck, test and build client
         working-directory: client
+        env:
+          VITE_API_URL: http://127.0.0.1:5000
+          VITE_STATIC_URL: ''
         run: |
           npx tsc --noEmit
           npm test
           npm run build
+
+      - name: Install Playwright browser
+        working-directory: client
+        run: npx playwright install --with-deps chromium
+
+      - name: Start client preview for E2E
+        working-directory: client
+        run: |
+          npm run preview -- --port 4173 --strictPort > "$RUNNER_TEMP/client.log" 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4173/ > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/client.log"
+          exit 1
+
+      - name: E2E smoke
+        working-directory: client
+        env:
+          E2E_BASE_URL: http://127.0.0.1:4173
+        run: npm run test:e2e
+
+      - name: Stop client preview
+        if: always()
+        run: pkill -f "vite preview" || true
 
       - name: Stop server
         if: always()
