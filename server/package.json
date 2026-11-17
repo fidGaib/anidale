@@ -12,6 +12,7 @@
     "start:prod": "node scripts/start.mjs --prod dist/index.js",
     "build": "vite build && node scripts/copy-native.mjs",
     "backup": "node scripts/backup.mjs",
+    "storage:report": "node scripts/storage-report.mjs",
     "db:migrate": "prisma migrate deploy",
     "preview": "vite-node preview",
     "codegen": "graphql-codegen -w",

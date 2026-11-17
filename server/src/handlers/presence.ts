@@ -1,4 +1,5 @@
 import { getRedis } from '@/redis'
+import { logger } from '@/utils/logger'
 
 /**
  * Присутствие: у каждого открытого сокета есть запись в Redis, поэтому статус
@@ -53,7 +54,7 @@ export const markConnected = async (userId: number, socketId = DEFAULT_SOCKET) =
     const count = Number(result?.[2]?.[1] ?? 0)
     return count === 1
   } catch (error) {
-    console.error('Redis: не удалось отметить подключение', error)
+    logger.error('Redis: не удалось отметить подключение', error)
     return memoryConnect(userId, socketId)
   }
 }
@@ -70,7 +71,7 @@ export const markDisconnected = async (userId: number, socketId = DEFAULT_SOCKET
     await client.del(key)
     return true
   } catch (error) {
-    console.error('Redis: не удалось отметить отключение', error)
+    logger.error('Redis: не удалось отметить отключение', error)
     return memoryDisconnect(userId, socketId)
   }
 }
@@ -83,7 +84,7 @@ export const touchPresence = async (userId: number, socketId = DEFAULT_SOCKET) =
     const key = redisKey(userId)
     await client.multi().zadd(key, 'XX', Date.now() + TTL_MS, socketId).pexpire(key, TTL_MS).exec()
   } catch (error) {
-    console.error('Redis: не удалось продлить присутствие', error)
+    logger.error('Redis: не удалось продлить присутствие', error)
   }
 }
 
@@ -101,7 +102,7 @@ export const isOnline = async (userId: number) => {
     }
     return true
   } catch (error) {
-    console.error('Redis: не удалось проверить присутствие', error)
+    logger.error('Redis: не удалось проверить присутствие', error)
     return connections.has(userId)
   }
 }
@@ -128,7 +129,7 @@ export const onlineUsers = async (userIds: number[]) => {
     })
     return online
   } catch (error) {
-    console.error('Redis: не удалось проверить присутствие', error)
+    logger.error('Redis: не удалось проверить присутствие', error)
     return new Set(userIds.filter((id) => connections.has(id)))
   }
 }

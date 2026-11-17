@@ -2,6 +2,7 @@ import { createGraphQLError } from 'graphql-yoga'
 
 import prisma from '@/db/db'
 import { getRedis } from '@/redis'
+import { logger } from '@/utils/logger'
 
 const SECOND = 1000
 const MINUTE = 60 * SECOND
@@ -63,7 +64,7 @@ const redisHit = async (key: string, max: number, windowMs: number): Promise<Lim
       retryAfter: Math.max(Math.ceil(ttl / SECOND), 1),
     }
   } catch (error) {
-    console.error('Redis: не удалось проверить лимит, считаем в базе', key, error)
+    logger.error('Redis: не удалось проверить лимит, считаем в базе', key, error)
     return null
   }
 }
@@ -127,7 +128,7 @@ export const throttle = async (policy: Policy, subject: string | number) => {
   try {
     result = await hit(`${policy}:${subject}`, max, windowMs)
   } catch (error) {
-    console.error('Не удалось проверить лимит', policy, error)
+    logger.error('Не удалось проверить лимит', policy, error)
     return
   }
   if (!result.allowed) {

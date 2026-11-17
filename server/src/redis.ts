@@ -1,5 +1,7 @@
 import Redis from 'ioredis'
 
+import { logger } from '@/utils/logger'
+
 /**
  * Общий Redis: кэш, счётчики ограничителей и присутствие пользователей.
  * Данные должны быть одинаковыми у нескольких процессов сервера.
@@ -28,8 +30,8 @@ export const redis = url
   : null
 
 if (redis) {
-  redis.on('ready', () => console.log('Redis подключён'))
-  redis.on('error', (error) => console.error('Redis:', error.message))
+  redis.on('ready', () => logger.info('Redis подключён'))
+  redis.on('error', (error) => logger.error('Redis:', error.message))
 }
 
 let connecting: Promise<void> | null = null
@@ -50,7 +52,7 @@ export const createRedisConnection = () => {
     maxRetriesPerRequest: null,
     connectTimeout: 5000,
   })
-  client.on('error', (error) => console.error('Redis (сокеты):', error.message))
+  client.on('error', (error) => logger.error('Redis (сокеты):', error.message))
   extraConnections.push(client)
   return client
 }
@@ -125,7 +127,7 @@ export const cacheGet = async <T>(key: string): Promise<T | null> => {
     const raw = await client.get(key)
     return raw === null ? null : (JSON.parse(raw, reviveDates) as T)
   } catch (error) {
-    console.error('Redis: не удалось прочитать кэш', key, error)
+    logger.error('Redis: не удалось прочитать кэш', key, error)
     return null
   }
 }
@@ -137,7 +139,7 @@ export const cacheSet = async (key: string, value: unknown, ttlSeconds: number) 
   try {
     await client.set(key, JSON.stringify(markDates(value)), 'EX', Math.max(1, Math.round(ttlSeconds)))
   } catch (error) {
-    console.error('Redis: не удалось записать кэш', key, error)
+    logger.error('Redis: не удалось записать кэш', key, error)
   }
 }
 
@@ -149,7 +151,7 @@ export const cacheDel = async (...keys: string[]) => {
   try {
     await client.del(...keys)
   } catch (error) {
-    console.error('Redis: не удалось удалить кэш', keys, error)
+    logger.error('Redis: не удалось удалить кэш', keys, error)
   }
 }
 
@@ -185,7 +187,7 @@ export const createVersionedCache = (prefix: string, ttlSeconds: number): Versio
     try {
       return (await client.get(versionKey)) ?? '0'
     } catch (error) {
-      console.error('Redis: не удалось прочитать версию кэша', prefix, error)
+      logger.error('Redis: не удалось прочитать версию кэша', prefix, error)
       return null
     }
   }
@@ -203,7 +205,7 @@ export const createVersionedCache = (prefix: string, ttlSeconds: number): Versio
       try {
         await client.incr(versionKey)
       } catch (error) {
-        console.error('Redis: не удалось сбросить кэш', prefix, error)
+        logger.error('Redis: не удалось сбросить кэш', prefix, error)
       }
     },
   }

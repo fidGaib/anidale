@@ -1,0 +1,12 @@
+# Ротация файловых логов AniDale (нужна, только если пишете лог в файл, например под pm2/nohup).
+# Под systemd логи идут в journald — там ротацией занимается journald.
+# Установка: sudo cp deploy/anidale.logrotate /etc/logrotate.d/anidale
+/var/log/anidale/*.log {
+    daily
+    rotate 14
+    compress
+    delaycompress
+    missingok
+    notifempty
+    copytruncate
+}

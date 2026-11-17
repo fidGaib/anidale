@@ -1,33 +1,27 @@
 @echo off
-
-title AniDale start developer mode
-
-
-
+title AniDale: server setup
 setlocal
-set /p vs=Launching the editor? y/n:
-if %vs% == y (
-	echo Launching the editor... &echo.
-	cmd.exe /c start /D "C:\Users\h\AppData\Local\Programs\Microsoft VS Code\" Code.exe
-) 
 
-echo Log in to the server folder... &echo.
-cd C:\Users\h\Desktop\anidale\anidale\server\
+rem Папка скрипта -> корень проекта (рядом лежат server и client)
+cd /d "%~dp0..\server" || exit /b 1
 
 set /p dep=Install dependencies? y/n:
-if %dep% == y (
-	echo Installing dependencies... &echo.
-	CMD /C "C:\Program Files\nodejs\npm" i --loglevel error
-) 
-set /p env=Create .env file? y/n:
-if %env% == y (
-	echo Create .env file... &echo.
-	CMD /C "C:\Program Files\nodejs\npx" vite-node generate-env.ts --loglevel error
-) 
-set /p mig=Migration DataBase? y/n:
-if %mig% == y (
-	echo Migration DataBase... &echo.
-	CMD /C "C:\Program Files\nodejs\npx" prisma migrate dev error
+if /i "%dep%"=="y" (
+    echo Installing dependencies...
+    call npm i --loglevel error
 )
-echo Generation types for GraphQL... &echo.
-npm run codegen
+
+set /p env=Create .env file? y/n:
+if /i "%env%"=="y" (
+    echo Creating .env...
+    call npx vite-node generate-env.ts
+)
+
+set /p mig=Apply database migrations? y/n:
+if /i "%mig%"=="y" (
+    echo Applying migrations...
+    call npm run db:migrate
+)
+
+echo Generating GraphQL types (watch mode, Ctrl+C to stop)...
+call npm run codegen

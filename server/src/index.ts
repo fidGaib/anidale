@@ -13,6 +13,7 @@ import { markConnected, markDisconnected, presenceRoom, touchPresence } from './
 import { storageAuth } from './handlers/storage-auth'
 import { closeRedis, createRedisConnection, pingRedis, redis, redisEnabled } from './redis'
 import { yoga } from './schema'
+import { logger } from './utils/logger'
 
 const server = http.createServer()
 const io = new IoServer(server, {
@@ -70,13 +71,13 @@ server.on('request', async (req, res) => {
       res.end('Not Found')
     }
   } catch (error) {
-    console.log(error)
+    logger.error('Ошибка обработки запроса', error)
   }
 })
 
 // Обработчик Socket.IO
 io.on('connection', async (socket) => {
-  console.log('Клиент подключился: ', socket.id)
+  logger.debug('Клиент подключился:', socket.id)
   // Вошедший пользователь получает личные события (сообщения) через свою комнату.
   // Куки читаем из рукопожатия, поэтому после входа клиент переподключает сокет.
   const userId = await getOptionalUserId({ cookies: parseCookies(socket.request) })
@@ -103,14 +104,14 @@ io.on('connection', async (socket) => {
     io.to(`user:${to}`).emit('typing', { from: userId })
   })
   socket.on('disconnect', async () => {
-    console.log('Клиент отключился: ', socket.id)
+    logger.debug('Клиент отключился:', socket.id)
     if (userId && (await markDisconnected(userId, socket.id))) {
       const lastSeenAt = new Date()
       io.to(presenceRoom(userId)).emit('presence', { userId, online: false, lastSeenAt })
       try {
         await prisma.user.update({ where: { id: userId }, data: { lastSeenAt } })
       } catch (error) {
-        console.error('Не удалось записать время последнего визита', error)
+        logger.error('Не удалось записать время последнего визита', error)
       }
     }
   })
@@ -129,7 +130,7 @@ const onHotReload = async (server: http.Server) => {
   if (hotContext) {
     await hotContext.data.stopping
     hotContext.on('vite:beforeFullReload', async () => {
-      console.log('\nPerforming an HMR reload...')
+      logger.debug('Performing an HMR reload...')
       hotContext.data.stopping = stopApplication(server)
     })
   }
@@ -146,7 +147,7 @@ const setupRedisAdapter = async () => {
   try {
     await Promise.all([pubClient.connect(), subClient.connect()])
     io.adapter(createAdapter(pubClient, subClient))
-    console.log('Socket.IO: Redis-адаптер включён')
+    logger.info('Socket.IO: Redis-адаптер включён')
   } catch (error) {
     pubClient.disconnect()
     subClient.disconnect()
@@ -162,7 +163,7 @@ const enableRedisAdapter = () => {
       adapterEnabled = true
     })
     .catch((error) => {
-      console.error('Socket.IO: не удалось включить Redis-адаптер, работаем без него', error)
+      logger.error('Socket.IO: не удалось включить Redis-адаптер, работаем без него', error)
       adapterSetup = null
     })
   return adapterSetup
@@ -175,7 +176,7 @@ const start = async () => {
       // Если Redis поднимется позже, адаптер включится при первом успешном подключении
       redis?.on('ready', () => void enableRedisAdapter())
       const redisReady = await pingRedis()
-      console.log(
+      logger.info(
         redisReady
           ? 'Redis готов — кэш, онлайн-статусы и лимиты общие'
           : 'Redis недоступен — без кэша: лимиты в PostgreSQL, статусы в памяти процесса',
@@ -184,10 +185,10 @@ const start = async () => {
       // (сообщения, «печатает…», статусы онлайна) через общий Redis.
       if (redisReady) await enableRedisAdapter()
     }
-    server.listen(process.env.PORT, () => console.log(`Server started on port ${process.env.PORT}`))
+    server.listen(process.env.PORT, () => logger.info(`Server started on port ${process.env.PORT}`))
     onHotReload(server)
   } catch (e) {
-    console.error(e)
+    logger.error('Не удалось запустить сервер', e)
   }
 }
 
