@@ -9,6 +9,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
+    "perf:feed": "node scripts/perf-feed.mjs http://localhost fast4g",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "codegen": "graphql-codegen --watch",

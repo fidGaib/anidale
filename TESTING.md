@@ -36,6 +36,20 @@ npm run test:e2e                  # нужны запущенные server (:500
 Против собранного клиента: `E2E_BASE_URL=http://localhost npm run test:e2e`.
 В CI эти тесты идут после сборки против `vite preview` на :4173.
 
+## Скорость загрузки
+
+Замер в браузере с отключённым кэшем и ограничением сети (как в DevTools). Сравнивайте только собранный клиент:
+dev-сервер отдаёт сотни несжатых модулей, и его цифры ничего не говорят о продакшене.
+
+```bash
+cd client
+npm run perf:feed                                  # http://localhost, fast4g, /feed
+node scripts/perf-feed.mjs http://localhost slow4g
+node scripts/perf-feed.mjs http://localhost fast4g /anime
+```
+
+Профили: `fast4g` (9 Мбит/с, 170 мс), `slow4g` (1.6 Мбит/с, 150 мс), `none`.
+
 ## Как писать новые тесты
 
 - Нашли баг: сначала тест, который его воспроизводит, потом исправление.
