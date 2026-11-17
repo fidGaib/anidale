@@ -237,6 +237,22 @@
   color: rgba(255, 255, 255, 0.72);
 }
 
+.episodeProgress {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 3;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.episodeProgress > span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+
 /* Промо-баннер */
 .promo {
   position: relative;

@@ -66,6 +66,13 @@ export interface AnimeScheduleInput {
   airAt: Date
 }
 
+export interface AnimeWatchProgressInput {
+  releaseId: number
+  episodeId: number
+  position: number
+  duration: number
+}
+
 /** Поля релиза, которые нужны карточкам каталога. */
 const releaseInclude = {
   genres: { orderBy: { name: 'asc' } },
@@ -107,6 +114,16 @@ const viewSchedule = <T extends { release: object }>(entry: T) => ({
   ...entry,
   release: viewRelease(entry.release),
 })
+
+/** Прогресс просмотра: к нему всегда прикладываем релиз и серию, чтобы клиент не делал второй запрос. */
+const viewProgress = <T extends { release: object; episode: object }>(progress: T) => {
+  const release = viewRelease(progress.release)
+  return {
+    ...progress,
+    release,
+    episode: viewEpisode({ ...progress.episode, release }),
+  }
+}
 
 class AnimeService {
   private storage = new AnimeStorageService(storagePath)
@@ -238,6 +255,57 @@ class AnimeService {
     })
     if (!release) return null
     return viewRelease(release)
+  }
+
+  /** «Продолжить просмотр»: по одной записи на релиз, сначала самые свежие. */
+  async continueWatching(userId: number, limit?: number | null) {
+    const rows = await prisma.animeWatchProgress.findMany({
+      where: { userId, release: { isPublished: true } },
+      orderBy: { updatedAt: 'desc' },
+      take: clampLimit(limit ?? 20),
+      include: { release: { include: { genres: true } }, episode: true },
+    })
+    return rows.map(viewProgress)
+  }
+
+  /** Сохранённая позиция просмотра релиза; null — пользователь ещё не смотрел. */
+  async watchProgress(userId: number, releaseId: number) {
+    const row = await prisma.animeWatchProgress.findUnique({
+      where: { userId_releaseId: { userId, releaseId } },
+      include: { release: { include: { genres: true } }, episode: true },
+    })
+    return row ? viewProgress(row) : null
+  }
+
+  /** Запоминает, где пользователь остановился. Одна запись на релиз обновляется при смене серии. */
+  async saveWatchProgress(userId: number, input: AnimeWatchProgressInput) {
+    const position = Number(input.position)
+    const duration = Number(input.duration)
+    if (!Number.isFinite(position) || position < 0) throw createGraphQLError('Некорректная позиция просмотра')
+    if (!Number.isFinite(duration) || duration < 0) throw createGraphQLError('Некорректная длительность серии')
+
+    // Серия должна принадлежать релизу: иначе в «Продолжить просмотр» попадёт чужая серия
+    const episode = await prisma.animeEpisode.findFirst({
+      where: { id: input.episodeId, releaseId: input.releaseId },
+      select: { id: true },
+    })
+    if (!episode) throw createGraphQLError('Серия не найдена')
+
+    const completed = duration > 0 && position >= duration - 5
+    const row = await prisma.animeWatchProgress.upsert({
+      where: { userId_releaseId: { userId, releaseId: input.releaseId } },
+      create: {
+        userId,
+        releaseId: input.releaseId,
+        episodeId: input.episodeId,
+        position,
+        duration,
+        completed,
+      },
+      update: { episodeId: input.episodeId, position, duration, completed },
+      include: { release: { include: { genres: true } }, episode: true },
+    })
+    return viewProgress(row)
   }
 
   // | ----------------> АДМИНКА <---------------- |

@@ -1,11 +1,14 @@
 import { requireAdmin } from '@/api/anime/access'
 import { animeCached, invalidateAnimeCache } from '@/api/anime/cache'
 import AnimeController from '@/api/anime/controller'
+import { getOptionalUserId } from '@/api/user/optional-user'
+import UserController from '@/api/user/controller'
 import {
   AnimeEpisode,
   AnimeHome,
   AnimeRelease,
   AnimeScheduleEntry,
+  AnimeWatchProgress,
   Resolvers,
 } from '@/schema/resolvers-types'
 
@@ -21,6 +24,8 @@ const asSchedule = (value: unknown) => value as AnimeScheduleEntry[]
 const asScheduleEntry = (value: unknown) => value as AnimeScheduleEntry
 const asEpisodes = (value: unknown) => value as AnimeEpisode[]
 const asEpisode = (value: unknown) => value as AnimeEpisode
+const asProgress = (value: unknown) => value as AnimeWatchProgress
+const asProgressList = (value: unknown) => value as AnimeWatchProgress[]
 
 const AnimeResolvers: Resolvers = {
   Query: {
@@ -34,6 +39,17 @@ const AnimeResolvers: Resolvers = {
     },
     async animeRelease(_, { id }) {
       return asRelease(await animeCached(`release:${id}`, () => AnimeController.release(id)))
+    },
+    // Гостю прогресс недоступен: страница просто начнёт серию с начала
+    async animeContinueWatching(_, { limit }, { req }) {
+      const userId = await getOptionalUserId(req)
+      if (!userId) return []
+      return asProgressList(await AnimeController.continueWatching(userId, limit))
+    },
+    async animeWatchProgress(_, { releaseId }, { req }) {
+      const userId = await getOptionalUserId(req)
+      if (!userId) return null
+      return asProgress(await AnimeController.watchProgress(userId, releaseId))
     },
     async adminAnimeReleases(_, { search, limit, offset }, { req, res }) {
       await requireAdmin(req, res)
@@ -88,6 +104,10 @@ const AnimeResolvers: Resolvers = {
       const deleted = await AnimeController.deleteSchedule(id)
       await invalidateAnimeCache()
       return deleted
+    },
+    async saveAnimeWatchProgress(_, { input }, { req, res }) {
+      const user = await UserController.refresh(res, req.cookies.refreshToken)
+      return asProgress(await AnimeController.saveWatchProgress(user.id, input))
     },
     async deleteAnimeGenre(_, { id }, { req, res }) {
       await requireAdmin(req, res)

@@ -58,6 +58,7 @@ model User {
   discussionTopics      DiscussionTopic[]
   discussionMessages    DiscussionMessage[]
   communityContacts     CommunityContact[]
+  animeProgress         AnimeWatchProgress[]
   notifications         Notification[]      @relation("NotificationOwner")
   notificationsMade     Notification[]      @relation("NotificationActor")
   // Подписки: кого подписан я и кто подписан на меня
@@ -632,6 +633,7 @@ model AnimeRelease {
   genres        AnimeGenre[]  @relation("AnimeReleaseGenres")
   episodes      AnimeEpisode[]
   schedule      AnimeScheduleEntry[]
+  progress      AnimeWatchProgress[]
 
   @@index([isPublished, year])
 }
@@ -656,6 +658,7 @@ model AnimeEpisode {
   duration    String       @default("")
   publishedAt DateTime     @default(now())
   createdAt   DateTime     @default(now())
+  progress    AnimeWatchProgress[]
 
   @@unique([releaseId, number])
   @@index([publishedAt])
@@ -672,4 +675,26 @@ model AnimeScheduleEntry {
 
   @@unique([releaseId, episodeNumber])
   @@index([airAt])
+}
+
+// Где пользователь остановился в сериале. Одна запись на релиз: при переходе к следующей
+// серии она обновляется, поэтому «Продолжить просмотр» показывает последнюю серию.
+model AnimeWatchProgress {
+  id        Int          @id @default(autoincrement())
+  userId    Int
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  releaseId Int
+  release   AnimeRelease @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+  episodeId Int
+  episode   AnimeEpisode @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  // Позиция в серии и её длительность в секундах
+  position  Float        @default(0)
+  duration  Float        @default(0)
+  // Серия досмотрена до конца
+  completed Boolean      @default(false)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@unique([userId, releaseId])
+  @@index([userId, updatedAt])
 }

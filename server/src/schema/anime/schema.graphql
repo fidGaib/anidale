@@ -85,6 +85,21 @@ type AnimeHome {
   franchises: [AnimeFranchise!]!
 }
 
+"Где вошедший пользователь остановился в сериале"
+type AnimeWatchProgress {
+  "Релиз, к которому относится прогресс"
+  release: AnimeRelease!
+  "Серия, на которой остановились"
+  episode: AnimeEpisode!
+  "Позиция в серии в секундах"
+  position: Float!
+  "Длительность серии в секундах; 0 — неизвестна"
+  duration: Float!
+  "Серия досмотрена до конца"
+  completed: Boolean!
+  updatedAt: Date!
+}
+
 extend type Query {
   "Главная каталога: новые серии, расписание за промежуток, жанры и франшизы"
   animeHome(from: Date!, to: Date!): AnimeHome!
@@ -92,6 +107,10 @@ extend type Query {
   animeSchedule(from: Date!, to: Date!): [AnimeScheduleEntry!]!
   "Опубликованный релиз со всеми сериями"
   animeRelease(id: Int!): AnimeRelease
+  "Последние просмотры вошедшего пользователя: по одной записи на релиз"
+  animeContinueWatching(limit: Int): [AnimeWatchProgress!]!
+  "Сохранённая позиция просмотра релиза; null — ещё не смотрел или не вошёл"
+  animeWatchProgress(releaseId: Int!): AnimeWatchProgress
   "Все релизы для админки, включая черновики"
   adminAnimeReleases(search: String, limit: Int, offset: Int): [AnimeRelease!]!
   "Всё расписание для админки, включая прошедшие серии"
@@ -136,6 +155,15 @@ input AnimeScheduleInput {
   airAt: Date!
 }
 
+input AnimeWatchProgressInput {
+  releaseId: Int!
+  episodeId: Int!
+  "Позиция в серии в секундах"
+  position: Float!
+  "Длительность серии в секундах"
+  duration: Float!
+}
+
 extend type Mutation {
   "Создать или изменить релиз (нужна роль администратора)"
   saveAnimeRelease(input: AnimeReleaseInput!): AnimeRelease!
@@ -147,6 +175,8 @@ extend type Mutation {
   "Запланировать выход серии; повтор заменяет дату"
   saveAnimeSchedule(input: AnimeScheduleInput!): AnimeScheduleEntry!
   deleteAnimeSchedule(id: Int!): Boolean!
+  "Сохранить, где пользователь остановился в сериале"
+  saveAnimeWatchProgress(input: AnimeWatchProgressInput!): AnimeWatchProgress!
   "Удалить жанр, который не используется релизами"
   deleteAnimeGenre(id: Int!): Boolean!
 }

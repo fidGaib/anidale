@@ -25,11 +25,18 @@ interface Props {
   description?: string
   /** Серия закончилась: обычно открываем следующую. */
   onEnded?: () => void
+  /** Место, с которого продолжить серию (секунды). */
+  startAt?: number
+  /** Плеер продвинулся: страница сохраняет прогресс. */
+  onProgressSave?: (playedSeconds: number, duration: number) => void
 }
 
-export const ViedeoWrapper = ({ title, src, description, onEnded }: Props) => {
+export const ViedeoWrapper = ({ title, src, description, onEnded, startAt = 0, onProgressSave }: Props) => {
   const ref__player = useRef<ReactPlayerType>(null)
   const refScreenfull = useRef<HTMLDivElement>(null)
+  // Стартовая позиция может прийти позже монтирования (запрос прогресса), поэтому храним её в ref
+  const startAtRef = useRef(Math.max(startAt, 0))
+  startAtRef.current = Math.max(startAt, 0)
   // store player
   const playing = usePayerStore((store) => store.playing)
   const volume = usePayerStore((store) => store.volume)
@@ -48,6 +55,37 @@ export const ViedeoWrapper = ({ title, src, description, onEnded }: Props) => {
   useEffect(() => {
     resetProgress()
   }, [src, resetProgress])
+
+  // Продолжение просмотра: ставим сохранённую позицию, когда известна длительность.
+  // onReady срабатывает до метаданных, и seekTo на этом этапе теряется.
+  const resumed = useRef(false)
+  const tryResume = useCallback((knownDuration: number) => {
+    const target = startAtRef.current
+    if (resumed.current || target <= 1 || knownDuration <= 0) return
+    resumed.current = true
+    ref__player.current?.seekTo(Math.min(target, knownDuration))
+  }, [])
+
+  const handleDuration = useCallback(
+    (value: number) => {
+      handle__duration(value)
+      tryResume(value)
+    },
+    [handle__duration, tryResume],
+  )
+
+  // Прогресс мог загрузиться после метаданных — тогда досылаем перемотку отдельно
+  useEffect(() => {
+    tryResume(usePayerStore.getState().duration)
+  }, [startAt, tryResume])
+
+  const handleProgress = useCallback(
+    (state: { playedSeconds: number; loadedSeconds: number }) => {
+      handle__progress(state)
+      onProgressSave?.(state.playedSeconds, duration)
+    },
+    [duration, handle__progress, onProgressSave],
+  )
 
   // Клавиши как в привычных плеерах; поля ввода не перехватываем
   useEffect(() => {
@@ -92,8 +130,8 @@ export const ViedeoWrapper = ({ title, src, description, onEnded }: Props) => {
               volume={volume}
               playsinline
               progressInterval={500}
-              onProgress={handle__progress}
-              onDuration={handle__duration}
+              onProgress={handleProgress}
+              onDuration={handleDuration}
               onEnded={onEnded}
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore

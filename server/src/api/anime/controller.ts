@@ -1,4 +1,9 @@
-import AnimeService, { AnimeEpisodeInput, AnimeReleaseInput, AnimeScheduleInput } from './service'
+import AnimeService, {
+  AnimeEpisodeInput,
+  AnimeReleaseInput,
+  AnimeScheduleInput,
+  AnimeWatchProgressInput,
+} from './service'
 
 class AnimeController {
   async home(from: Date, to: Date) {
@@ -11,6 +16,18 @@ class AnimeController {
 
   async release(id: number) {
     return await AnimeService.release(id)
+  }
+
+  async continueWatching(userId: number, limit?: number | null) {
+    return await AnimeService.continueWatching(userId, limit)
+  }
+
+  async watchProgress(userId: number, releaseId: number) {
+    return await AnimeService.watchProgress(userId, releaseId)
+  }
+
+  async saveWatchProgress(userId: number, input: AnimeWatchProgressInput) {
+    return await AnimeService.saveWatchProgress(userId, input)
   }
 
   async adminReleases(search?: string | null, limit?: number | null, offset?: number | null) {

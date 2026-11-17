@@ -6,8 +6,9 @@ import { useDarkModeStore } from '@/app/module'
 import { useRefreshStore } from '@/app/providers/routes/model'
 import Content from '@/shared/content'
 import { storageUrl } from '@/shared/config'
-import { ANIME_HOME } from '@/shared/graphql/schema'
+import { ANIME_CONTINUE_WATCHING, ANIME_HOME } from '@/shared/graphql/schema'
 import { AnimeEpisodeFieldsFragment, AnimeReleaseCardFragment, AnimeScheduleFieldsFragment } from '@/shared/graphql/gql/graphql'
+import { formatMediaTime } from '@/shared/lib/time'
 import { Empty, FormError } from '@/shared/ui/notice'
 
 import cl from './ui.module.css'
@@ -62,11 +63,19 @@ const emptyDay = () => ({ yesterday: [], today: [], tomorrow: [] }) as Record<Sc
 export const Anime = () => {
   const theme = useDarkModeStore((store) => store.theme)
   const isAdmin = useRefreshStore((store) => store.refreshData.isAdmin)
+  const userId = useRefreshStore((store) => store.refreshData.id)
   const [day, setDay] = useState<ScheduleDay>('today')
   const [range] = useState(scheduleRange)
   const { data, loading, error } = useQuery(ANIME_HOME, {
     variables: { from: range.from, to: range.to },
   })
+  // «Продолжить просмотр» есть только у вошедших: гостю запрос не нужен
+  const { data: progressData } = useQuery(ANIME_CONTINUE_WATCHING, {
+    variables: { limit: 8 },
+    skip: !userId,
+    fetchPolicy: 'cache-and-network',
+  })
+  const continueWatching = progressData?.animeContinueWatching ?? []
 
   const home = data?.animeHome
   const schedule = useMemo(() => {
@@ -102,6 +111,51 @@ export const Anime = () => {
 
         {home && (
           <>
+            {continueWatching.length > 0 && (
+              <Section
+                id='continue'
+                title='Продолжить просмотр'
+                subtitle='Серии, на которых вы остановились'
+              >
+                <div className={cl.episodes}>
+                  {continueWatching.map((item) => {
+                    const percent =
+                      item.duration > 0
+                        ? Math.min(100, Math.round((item.position / item.duration) * 100))
+                        : 0
+                    return (
+                      <Link
+                        to={`/watch/${item.release.id}?episode=${item.episode.id}`}
+                        className={cl.episodeCard}
+                        key={item.release.id}
+                      >
+                        <img
+                          src={imageUrl(item.episode.preview || item.release.preview || item.release.poster)}
+                          alt={item.release.title}
+                          loading='lazy'
+                        />
+                        <span className={cl.episodeBadge}>Эпизод {item.episode.number}</span>
+                        <span className={cl.episodePlay} aria-hidden>
+                          <span className={cl.playIcon} />
+                        </span>
+                        <span className={cl.episodeBody}>
+                          <span className={cl.episodeTitle}>{item.release.title}</span>
+                          <span className={cl.episodeMeta}>
+                            {item.completed
+                              ? 'Просмотрено'
+                              : `${formatMediaTime(item.position)} из ${formatMediaTime(item.duration)}`}
+                          </span>
+                        </span>
+                        <span className={cl.episodeProgress} aria-hidden>
+                          <span style={{ width: `${item.completed ? 100 : percent}%` }} />
+                        </span>
+                      </Link>
+                    )
+                  })}
+                </div>
+              </Section>
+            )}
+
             <Section
               id='new-episodes'
               title='Новые эпизоды'
