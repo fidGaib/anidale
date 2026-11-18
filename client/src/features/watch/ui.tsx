@@ -10,19 +10,25 @@ import cl from './ui.module.css'
 interface ControlsProps {
   ref__player: RefObject<Seekable>
   handle_screenfull: () => void
+  handle_pip: () => void
 }
 
 const SKIP_SECONDS = 10
+const RATES = [0.5, 0.75, 1, 1.25, 1.5, 2]
 
-export const ControlsVideo = ({ ref__player, handle_screenfull }: ControlsProps) => {
+export const ControlsVideo = ({ ref__player, handle_screenfull, handle_pip }: ControlsProps) => {
   const handle__volume = usePayerStore((store) => store.handle__volume)
   const handle__play = usePayerStore((store) => store.handle__play)
   const handle_prodress_track = usePayerStore((store) => store.handle_prodress_track)
+  const toggleMute = usePayerStore((store) => store.toggleMute)
+  const handle__rate = usePayerStore((store) => store.handle__rate)
   const loadedSeconds = usePayerStore((store) => store.loadedSeconds)
   const playedSeconds = usePayerStore((store) => store.playedSeconds)
   const duration = usePayerStore((store) => store.duration)
   const playing = usePayerStore((store) => store.playing)
   const volume = usePayerStore((store) => store.volume)
+  const muted = usePayerStore((store) => store.muted)
+  const playbackRate = usePayerStore((store) => store.playbackRate)
 
   // Длительность приходит от плеера; до неё перемотка ограничена загруженным фрагментом
   const total = duration || loadedSeconds
@@ -56,16 +62,46 @@ export const ControlsVideo = ({ ref__player, handle_screenfull }: ControlsProps)
         <button type='button' className={cl.video__controls_skip} onClick={() => skip(SKIP_SECONDS)}>
           +{SKIP_SECONDS} с
         </button>
+        <button
+          type='button'
+          className={cl.video__controls_icon}
+          onClick={toggleMute}
+          aria-label={muted ? 'Включить звук' : 'Выключить звук'}
+          title={muted ? 'Включить звук (M)' : 'Выключить звук (M)'}
+        >
+          <img className={muted ? cl.video__controls_muted : ''} src='/icons/mute.svg' alt='' />
+        </button>
         <input
           type='range'
           onChange={handle__volume}
           min={0}
           max={1}
-          value={volume}
+          value={muted ? 0 : volume}
           step={0.1}
           aria-label='Громкость'
           className={cl.video__controls_volume}
         />
+        <select
+          className={cl.video__controls_rate}
+          aria-label='Скорость воспроизведения'
+          value={playbackRate}
+          onChange={(e) => handle__rate(Number(e.target.value))}
+        >
+          {RATES.map((rate) => (
+            <option value={rate} key={rate}>
+              {rate}×
+            </option>
+          ))}
+        </select>
+        <button
+          type='button'
+          className={cl.video__controls_icon}
+          onClick={handle_pip}
+          aria-label='Картинка в картинке'
+          title='Картинка в картинке'
+        >
+          <span className={cl.video__controls_pip}>PiP</span>
+        </button>
         <img
           width={'30px'}
           style={{ marginLeft: '10px', cursor: 'pointer' }}

@@ -40,15 +40,33 @@ export const ViedeoWrapper = ({ title, src, description, onEnded, startAt = 0, o
   // store player
   const playing = usePayerStore((store) => store.playing)
   const volume = usePayerStore((store) => store.volume)
+  const muted = usePayerStore((store) => store.muted)
+  const playbackRate = usePayerStore((store) => store.playbackRate)
+  const buffering = usePayerStore((store) => store.buffering)
   const playedSeconds = usePayerStore((store) => store.playedSeconds)
   const loadedSeconds = usePayerStore((store) => store.loadedSeconds)
   const duration = usePayerStore((store) => store.duration)
   const handle__play = usePayerStore((store) => store.handle__play)
   const handle__progress = usePayerStore((store) => store.handle__progress)
   const handle__duration = usePayerStore((store) => store.handle__duration)
+  const toggleMute = usePayerStore((store) => store.toggleMute)
+  const changeVolume = usePayerStore((store) => store.changeVolume)
+  const setBuffering = usePayerStore((store) => store.setBuffering)
   const resetProgress = usePayerStore((store) => store.resetProgress)
   const handle_screenfull = useCallback(() => {
     if (refScreenfull.current) screenfull.toggle(refScreenfull.current)
+  }, [])
+  // Картинка в картинке: HTML5-видео умеет это само, остальные источники просто игнорируем
+  const handle_pip = useCallback(async () => {
+    const player = ref__player.current as unknown as { getInternalPlayer?: () => HTMLVideoElement | null }
+    const video = player?.getInternalPlayer?.()
+    if (!video) return
+    try {
+      if (document.pictureInPictureElement) await document.exitPictureInPicture()
+      else await video.requestPictureInPicture()
+    } catch {
+      // Браузер не поддерживает PiP или запрос отменён — ничего не ломаем
+    }
   }, [])
 
   // Новая серия начинается с нуля, а не с позиции предыдущей
@@ -105,11 +123,19 @@ export const ViedeoWrapper = ({ title, src, description, onEnded, startAt = 0, o
         seek(playedSeconds + SKIP_SECONDS)
       } else if (event.key.toLowerCase() === 'f') {
         handle_screenfull()
+      } else if (event.key.toLowerCase() === 'm') {
+        toggleMute()
+      } else if (event.code === 'ArrowUp') {
+        event.preventDefault()
+        changeVolume(0.1)
+      } else if (event.code === 'ArrowDown') {
+        event.preventDefault()
+        changeVolume(-0.1)
       }
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [duration, handle__play, handle_screenfull, loadedSeconds, playedSeconds])
+  }, [changeVolume, duration, handle__play, handle_screenfull, loadedSeconds, playedSeconds, toggleMute])
 
   const theme = useDarkModeStore((store) => store.theme)
 
@@ -128,17 +154,27 @@ export const ViedeoWrapper = ({ title, src, description, onEnded, startAt = 0, o
               width={'100%'}
               height={'100%'}
               volume={volume}
+              muted={muted}
+              playbackRate={playbackRate}
               playsinline
               progressInterval={500}
               onProgress={handleProgress}
               onDuration={handleDuration}
               onEnded={onEnded}
+              onBuffer={() => setBuffering(true)}
+              onBufferEnd={() => setBuffering(false)}
+              onPlay={() => setBuffering(false)}
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
               ref={ref__player}
               className={cl.video}
             />
-            <ControlsVideo ref__player={ref__player} handle_screenfull={handle_screenfull} />
+            {buffering && (
+              <div className={cl.buffering} role='status' aria-label='Загрузка видео'>
+                <span className={cl.spinner} />
+              </div>
+            )}
+            <ControlsVideo ref__player={ref__player} handle_screenfull={handle_screenfull} handle_pip={handle_pip} />
           </>
         ) : (
           <div className={cl.empty}>

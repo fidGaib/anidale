@@ -69,13 +69,60 @@
   justify-content: center;
   cursor: pointer;
 }
-.video__controls_volume {
+input[type='range'].video__controls_volume {
   flex: none;
   width: 90px;
+  min-width: 90px;
 }
-.video__controls_track {
-  flex: 1;
+
+.video__controls_icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.video__controls_icon img {
+  width: 22px;
+  height: 22px;
+  transition: opacity 0.2s ease;
+}
+
+.video__controls_icon:hover img {
+  opacity: 0.7;
+}
+
+.video__controls_muted {
+  opacity: 0.45;
+}
+
+.video__controls_pip {
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.video__controls_rate {
+  flex: none;
+  padding: 3px 4px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 6px;
+  background: rgba(20, 20, 22, 0.72);
+  color: #fff;
+  font-size: 12px;
+  cursor: pointer;
+}
+input[type='range'].video__controls_track {
+  flex: 1 1 auto;
   width: auto;
+  min-width: 0;
   margin-left: 0;
 }
 .video__controls_time {
@@ -108,8 +155,17 @@
     font-size: 11px;
   }
 
-  .video__controls_volume {
+  input[type='range'].video__controls_volume {
     width: 60px;
+    min-width: 60px;
+  }
+
+  .video__controls_rate {
+    display: none;
+  }
+
+  .video__controls_pip {
+    display: none;
   }
 }
 /*********** Baseline, reset styles ***********/
