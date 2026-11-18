@@ -22,7 +22,8 @@ const STATUSES = [
 interface Props {
   release?: AnimeReleaseCardFragment | null
   onClose: () => void
-  onSaved: () => void
+  /** Сохранённый релиз: новый можно сразу открыть на загрузку серий. */
+  onSaved: (release: AnimeReleaseCardFragment) => void
 }
 
 /** Создание и редактирование релиза: карточка каталога, постер, жанры и публикация. */
@@ -42,8 +43,8 @@ export const ReleaseForm = ({ release, onClose, onSaved }: Props) => {
   const [preview, setPreview] = useState<File | null>(null)
 
   const [save, { loading, error }] = useMutation(SAVE_ANIME_RELEASE, {
-    onCompleted: () => {
-      onSaved()
+    onCompleted: (data) => {
+      if (data?.saveAnimeRelease) onSaved(data.saveAnimeRelease)
       onClose()
     },
   })
@@ -181,7 +182,9 @@ export const ReleaseForm = ({ release, onClose, onSaved }: Props) => {
             <small>Черновик виден только в админке</small>
           </span>
         </label>
-        <Hint>Постер и кадр сжимаются в webp на сервере. Видео серий загружается отдельно.</Hint>
+        <Hint>
+          Постер и кадр сжимаются в webp на сервере. {release ? 'Видео серий — в кнопке «Серии и видео» у релиза.' : 'После сохранения сразу откроется загрузка серий: можно выбрать несколько видеофайлов.'}
+        </Hint>
       </form>
     </Dialog>
   )

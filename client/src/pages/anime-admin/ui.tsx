@@ -44,7 +44,7 @@ export const AnimeAdmin = () => {
   const [tab, setTab] = useState<Tab>('releases')
   const [search, setSearch] = useState('')
   const [releaseForm, setReleaseForm] = useState<AnimeReleaseCardFragment | 'new' | null>(null)
-  const [episodesOf, setEpisodesOf] = useState<AnimeReleaseCardFragment | null>(null)
+  const [episodesOf, setEpisodesOf] = useState<{ release: AnimeReleaseCardFragment; upload: boolean } | null>(null)
   const [scheduleForm, setScheduleForm] = useState<{ entry?: AnimeScheduleFieldsFragment; releaseId?: number } | null>(
     null,
   )
@@ -105,6 +105,12 @@ export const AnimeAdmin = () => {
     await genres.refetch()
   }
 
+  /** После создания релиза сразу предлагаем загрузить серии: это самый частый следующий шаг. */
+  const handleReleaseSaved = (saved: AnimeReleaseCardFragment) => {
+    void refreshAll()
+    if (releaseForm === 'new') setEpisodesOf({ release: saved, upload: true })
+  }
+
   return (
     <Content id={cl.content}>
       <div className={`${cl.page} ${theme === 'dark' ? cl.dark : cl.light}`}>
@@ -144,6 +150,13 @@ export const AnimeAdmin = () => {
 
         {tab === 'releases' && (
           <section className={cl.panel}>
+            <div className={cl.banner}>
+              <b>Видео серий загружается в «Серии и видео».</b>
+              <span>
+                Нажмите эту кнопку у релиза (или «Загрузить видео», если релиза ещё нет), выберите сразу несколько
+                файлов — серии создадутся с номерами по порядку.
+              </span>
+            </div>
             <input
               className={cl.search}
               placeholder='Поиск по названию'
@@ -176,7 +189,10 @@ export const AnimeAdmin = () => {
                       <p className={cl.releaseGenres}>{release.genres.map((genre) => genre.name).join(' • ')}</p>
                     )}
                     <div className={cl.releaseActions}>
-                      <Btn onClick={() => setEpisodesOf(release)}>Серии</Btn>
+                      <Btn variant='primary' onClick={() => setEpisodesOf({ release, upload: true })}>
+                        Загрузить видео
+                      </Btn>
+                      <Btn onClick={() => setEpisodesOf({ release, upload: false })}>Серии и видео</Btn>
                       <Btn onClick={() => setScheduleForm({ releaseId: release.id })}>В расписание</Btn>
                       <Btn onClick={() => setReleaseForm(release)}>Изменить</Btn>
                       <Btn variant='danger' onClick={() => removeRelease(release)}>
@@ -248,13 +264,14 @@ export const AnimeAdmin = () => {
         <ReleaseForm
           release={releaseForm === 'new' ? null : releaseForm}
           onClose={() => setReleaseForm(null)}
-          onSaved={refreshAll}
+          onSaved={handleReleaseSaved}
         />
       )}
       {episodesOf && (
         <EpisodesDialog
-          releaseId={episodesOf.id}
-          releaseTitle={episodesOf.title}
+          releaseId={episodesOf.release.id}
+          releaseTitle={episodesOf.release.title}
+          startWithUpload={episodesOf.upload}
           onClose={() => setEpisodesOf(null)}
           onChanged={refreshAll}
         />
