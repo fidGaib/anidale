@@ -224,7 +224,7 @@ export const Anime = () => {
               <div className={cl.schedule}>
                 {schedule[day].length === 0 && <Empty>На этот день ничего не запланировано</Empty>}
                 {schedule[day].map((entry) => (
-                  <Link to={`/watch/${entry.releaseId}`} className={cl.scheduleCard} key={entry.id}>
+                  <Link to={`/anime/${entry.releaseId}`} className={cl.scheduleCard} key={entry.id}>
                     <img
                       className={cl.schedulePoster}
                       src={imageUrl(entry.release.poster)}

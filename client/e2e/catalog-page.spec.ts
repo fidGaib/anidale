@@ -80,14 +80,14 @@ test('каталог показывает релизы и ищет по назв
 
   await expect(page.getByRole('heading', { name: 'Все аниме' })).toBeVisible()
   await expect(page.getByText('Найдено: 2 релиза')).toBeVisible()
-  await expect(page.locator('a[href="/watch/1"]')).toContainText('Киберпанк: Бегущие по краю 2')
-  await expect(page.locator('a[href="/watch/2"]')).toContainText('Герб демонов')
+  await expect(page.locator('a[href="/anime/1"]')).toContainText('Киберпанк: Бегущие по краю 2')
+  await expect(page.locator('a[href="/anime/2"]')).toContainText('Герб демонов')
 
   // Поиск с паузой: после ввода остаётся только подходящий релиз
   await page.getByLabel('Поиск по названию').fill('кибер')
   await expect(page.getByText('Найдено: 1 релиз')).toBeVisible()
-  await expect(page.locator('a[href="/watch/1"]')).toBeVisible()
-  await expect(page.locator('a[href="/watch/2"]')).toHaveCount(0)
+  await expect(page.locator('a[href="/anime/1"]')).toBeVisible()
+  await expect(page.locator('a[href="/anime/2"]')).toHaveCount(0)
 
   // Фильтры заполняются с сервера
   await expect(page.getByLabel('Жанр').locator('option', { hasText: 'Киберпанк' })).toHaveCount(1)

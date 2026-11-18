@@ -1,0 +1,438 @@
+#content {
+  width: min(1240px, 94vw);
+}
+
+.page {
+  --accent: #8b5cf6;
+  --text: #18181b;
+  --muted: #6b7280;
+  --card: #ffffff;
+  --card-hover: #f6f6f8;
+  --line: rgba(0, 0, 0, 0.08);
+  --chip: rgba(0, 0, 0, 0.05);
+  --shadow: 0 14px 30px rgba(30, 30, 40, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+  padding: 18px 0 56px;
+  color: var(--text);
+}
+
+.dark {
+  --text: #f4f4f5;
+  --muted: #a1a1aa;
+  --card: #17171d;
+  --card-hover: #1e1e27;
+  --line: rgba(255, 255, 255, 0.08);
+  --chip: rgba(255, 255, 255, 0.06);
+  --shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
+  color-scheme: dark;
+}
+
+.back {
+  width: fit-content;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.back:hover {
+  color: var(--text);
+}
+
+/* Карточка релиза */
+.hero {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 34px;
+  align-items: start;
+}
+
+.posterBox {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 2 / 3;
+  border-radius: 18px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.posterBox img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.noPoster {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.5), rgba(30, 30, 40, 0.9));
+  color: #fff;
+  font-size: 56px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.status {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: rgba(10, 10, 14, 0.76);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(26px, 3.4vw, 40px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.original {
+  margin: -6px 0 0;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.meta > span {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--chip);
+}
+
+.meta .age {
+  background: rgba(139, 92, 246, 0.18);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.genre {
+  padding: 5px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-top: 4px;
+}
+
+.watch,
+.watchDisabled {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 26px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 10px 24px rgba(139, 92, 246, 0.3);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.watch:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(139, 92, 246, 0.42);
+}
+
+.watchDisabled {
+  background: var(--chip);
+  color: var(--muted);
+  box-shadow: none;
+  cursor: default;
+}
+
+.playIcon {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 6px 0 6px 10px;
+  border-color: transparent transparent transparent #fff;
+}
+
+.progress {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 190px;
+}
+
+.progressText {
+  color: var(--muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.progressTrack {
+  display: block;
+  overflow: hidden;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--chip);
+}
+
+.progressTrack span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+}
+
+.description {
+  margin: 0;
+  max-width: 76ch;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.next {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  border-radius: 12px;
+  background: rgba(139, 92, 246, 0.08);
+  font-size: 14px;
+}
+
+.nextLabel {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* Серии */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sectionHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.sectionHint {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.episodes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 10px;
+}
+
+.episode {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.episode:hover {
+  border-color: rgba(139, 92, 246, 0.5);
+  background: var(--card-hover);
+}
+
+.episodeActive,
+.episodeActive:hover {
+  border-color: var(--accent);
+  background: rgba(139, 92, 246, 0.12);
+}
+
+.episodeNumber {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--chip);
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.episodeBody {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+}
+
+.episodeTitle {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.episodeMeta {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.episodePlay {
+  flex: none;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.episodeNoVideo {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* Другие релизы франшизы */
+.related {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 18px 14px;
+}
+
+.relatedCard {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.relatedPoster {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 2 / 3;
+  margin-bottom: 6px;
+  border-radius: 14px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.relatedPoster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.relatedCard:hover .relatedPoster img {
+  transform: scale(1.05);
+}
+
+.relatedTitle {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  transition: color 0.2s ease;
+}
+
+.relatedCard:hover .relatedTitle {
+  color: var(--accent);
+}
+
+.relatedMeta {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+@media (max-width: 1040px) {
+  .related {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .posterBox {
+    max-width: 220px;
+  }
+
+  .episodes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .related {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .related {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

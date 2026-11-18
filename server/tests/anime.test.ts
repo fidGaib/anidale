@@ -265,6 +265,17 @@ describe('публичный каталог', () => {
     expect(await AnimeService.release(draft.id)).toBeNull()
   })
 
+  it('фильтрует каталог по франшизе', async () => {
+    await createRelease({ title: 'Первая часть', franchise: 'Франшиза' })
+    await createRelease({ title: 'Вторая часть', franchise: 'Франшиза' })
+    await createRelease({ title: 'Другой релиз', franchise: 'Другое' })
+
+    const page = await AnimeService.catalog({ franchise: 'Франшиза' })
+
+    expect(page.total).toBe(2)
+    expect(page.items.map((item) => item.title).sort()).toEqual(['Вторая часть', 'Первая часть'])
+  })
+
   it('файлы каталога аниме открыты без входа', async () => {
     expect(await canAccessFile('anime/posters/cyberpunk.webp')).toBe(true)
     expect(await canAccessFile('anime/videos/demo.mp4')).toBe(true)

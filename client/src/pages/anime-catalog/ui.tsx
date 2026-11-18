@@ -155,7 +155,7 @@ export const AnimeCatalog = () => {
 
         <div className={cl.grid}>
           {items.map((release) => (
-            <Link to={`/watch/${release.id}`} className={cl.card} key={release.id}>
+            <Link to={`/anime/${release.id}`} className={cl.card} key={release.id}>
               <span className={cl.poster}>
                 {release.poster ? (
                   <img src={imageUrl(release.poster)} alt={release.title} loading='lazy' />

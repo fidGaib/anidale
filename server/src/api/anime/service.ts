@@ -79,6 +79,7 @@ export interface AnimeCatalogFilter {
   year?: number | null
   type?: string | null
   status?: string | null
+  franchise?: string | null
 }
 
 export const CATALOG_SORTS = ['new', 'title'] as const
@@ -270,10 +271,12 @@ class AnimeService {
   /** Каталог: опубликованные релизы с поиском, фильтрами и сортировкой. */
   async catalog(filter: AnimeCatalogFilter = {}, sort?: string | null, limit?: number | null, offset?: number | null) {
     const search = text(filter.search, 100)
+    const franchise = text(filter.franchise, 120)
     const type = filter.type ? oneOf(filter.type, RELEASE_TYPES, 'type') : undefined
     const status = filter.status ? oneOf(filter.status, RELEASE_STATUSES, 'status') : undefined
     const where: Prisma.AnimeReleaseWhereInput = {
       isPublished: true,
+      ...(franchise ? { franchise } : {}),
       ...(search
         ? {
             OR: [

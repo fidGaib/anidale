@@ -142,8 +142,8 @@ export const Watch = () => {
   return (
     <Content id={cl.content}>
       <div className={`${cl.page} ${theme === 'dark' ? cl.dark : cl.light}`}>
-        <Link className={cl.back} to='/anime'>
-          ← Каталог аниме
+        <Link className={cl.back} to={`/anime/${releaseId}`}>
+          ← Страница релиза
         </Link>
 
         {episode ? (
