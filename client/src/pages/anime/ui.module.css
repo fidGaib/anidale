@@ -3,8 +3,8 @@
 }
 
 .page {
-  --accent: #8b5cf6;
-  --accent-soft: rgba(139, 92, 246, 0.16);
+  --accent: #a52a2a;
+  --accent-soft: rgba(165, 42, 42, 0.16);
   --radius: 16px;
   display: flex;
   flex-direction: column;
@@ -72,7 +72,7 @@
 /* Ссылка администратора: справа от разделов */
 .navAdmin {
   margin-left: auto;
-  border: 1px solid rgba(139, 92, 246, 0.55);
+  border: 1px solid rgba(165, 42, 42, 0.55);
   background: transparent;
   color: var(--accent);
 }
@@ -115,7 +115,7 @@
   bottom: 0.12em;
   width: 4px;
   border-radius: 4px;
-  background: linear-gradient(180deg, #a78bfa, #6d28d9);
+  background: linear-gradient(180deg, #c85a4a, #7a1c1c);
 }
 
 .sectionSubtitle {
@@ -194,8 +194,8 @@
   width: 54px;
   height: 54px;
   border-radius: 50%;
-  background: rgba(139, 92, 246, 0.92);
-  box-shadow: 0 8px 24px rgba(109, 40, 217, 0.5);
+  background: rgba(165, 42, 42, 0.92);
+  box-shadow: 0 8px 24px rgba(122, 28, 28, 0.5);
   position: relative;
 }
 
@@ -263,8 +263,8 @@
   overflow: hidden;
   padding: 30px 36px;
   border-radius: var(--radius);
-  background: linear-gradient(115deg, #5b21b6 0%, #7c3aed 45%, #a78bfa 100%);
-  box-shadow: 0 18px 40px rgba(76, 29, 149, 0.35);
+  background: linear-gradient(115deg, #5c1414 0%, #8f2323 45%, #c85a4a 100%);
+  box-shadow: 0 18px 40px rgba(92, 20, 20, 0.35);
   color: #fff;
 }
 
@@ -318,7 +318,7 @@
   padding: 12px 22px;
   border-radius: 12px;
   background: #fff;
-  color: #5b21b6;
+  color: #5c1414;
   font-size: 14px;
   font-weight: 700;
   text-decoration: none;
@@ -365,7 +365,7 @@
 .tabActive:hover {
   color: #fff;
   background: var(--accent);
-  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
+  box-shadow: 0 6px 16px rgba(165, 42, 42, 0.4);
 }
 
 .schedule {
@@ -391,7 +391,7 @@
 
 .scheduleCard:hover {
   transform: translateY(-2px);
-  border-color: rgba(139, 92, 246, 0.55);
+  border-color: rgba(165, 42, 42, 0.55);
   background: var(--card-hover);
 }
 
@@ -604,7 +604,7 @@
 }
 
 .genre:hover {
-  border-color: rgba(139, 92, 246, 0.45);
+  border-color: rgba(165, 42, 42, 0.45);
   background: var(--card-hover);
 }
 

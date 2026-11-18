@@ -3,7 +3,7 @@
 }
 
 .page {
-  --accent: #8b5cf6;
+  --accent: #a52a2a;
   --text: #18181b;
   --muted: #6b7280;
   --card: #ffffff;
@@ -71,7 +71,7 @@
   justify-content: center;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.5), rgba(30, 30, 40, 0.9));
+  background: linear-gradient(135deg, rgba(165, 42, 42, 0.5), rgba(30, 30, 40, 0.9));
   color: #fff;
   font-size: 56px;
   font-weight: 800;
@@ -126,7 +126,7 @@
 }
 
 .meta .age {
-  background: rgba(139, 92, 246, 0.18);
+  background: rgba(165, 42, 42, 0.18);
   color: var(--accent);
   font-weight: 700;
 }
@@ -166,7 +166,7 @@
   font-size: 15px;
   font-weight: 700;
   text-decoration: none;
-  box-shadow: 0 10px 24px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 10px 24px rgba(165, 42, 42, 0.3);
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
@@ -174,7 +174,7 @@
 
 .watch:hover {
   transform: translateY(-1px);
-  box-shadow: 0 14px 30px rgba(139, 92, 246, 0.42);
+  box-shadow: 0 14px 30px rgba(165, 42, 42, 0.42);
 }
 
 .watchDisabled {
@@ -233,9 +233,9 @@
   align-items: center;
   gap: 12px;
   padding: 14px 18px;
-  border: 1px solid rgba(139, 92, 246, 0.4);
+  border: 1px solid rgba(165, 42, 42, 0.4);
   border-radius: 12px;
-  background: rgba(139, 92, 246, 0.08);
+  background: rgba(165, 42, 42, 0.08);
   font-size: 14px;
 }
 
@@ -292,14 +292,14 @@
 }
 
 .episode:hover {
-  border-color: rgba(139, 92, 246, 0.5);
+  border-color: rgba(165, 42, 42, 0.5);
   background: var(--card-hover);
 }
 
 .episodeActive,
 .episodeActive:hover {
   border-color: var(--accent);
-  background: rgba(139, 92, 246, 0.12);
+  background: rgba(165, 42, 42, 0.12);
 }
 
 .episodeNumber {

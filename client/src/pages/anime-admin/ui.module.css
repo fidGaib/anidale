@@ -9,7 +9,7 @@
   --card-hover: #f6f6f8;
   --line: rgba(0, 0, 0, 0.08);
   --chip: rgba(0, 0, 0, 0.05);
-  --accent: #8b5cf6;
+  --accent: #a52a2a;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -249,9 +249,9 @@
   flex-direction: column;
   gap: 4px;
   padding: 14px 16px;
-  border: 1px solid rgba(139, 92, 246, 0.4);
+  border: 1px solid rgba(165, 42, 42, 0.4);
   border-radius: 12px;
-  background: rgba(139, 92, 246, 0.08);
+  background: rgba(165, 42, 42, 0.08);
   font-size: 13px;
   line-height: 1.5;
 }
