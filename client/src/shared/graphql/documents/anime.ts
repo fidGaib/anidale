@@ -173,6 +173,32 @@ export const SAVE_ANIME_WATCH_PROGRESS = graphql(`
   }
 `)
 
+/** Каталог: поиск, фильтры и сортировка опубликованных релизов. */
+export const ANIME_CATALOG = graphql(`
+  query ANIME_CATALOG($filter: AnimeReleaseFilter, $sort: String, $limit: Int, $offset: Int) {
+    animeCatalog(filter: $filter, sort: $sort, limit: $limit, offset: $offset) {
+      total
+      items {
+        ...AnimeReleaseCard
+      }
+    }
+  }
+`)
+
+export const ANIME_FILTERS = graphql(`
+  query ANIME_FILTERS {
+    animeFilters {
+      years
+      types
+      genres {
+        id
+        name
+        releasesCount
+      }
+    }
+  }
+`)
+
 export const ADMIN_ANIME_RELEASES = graphql(`
   query ADMIN_ANIME_RELEASES($search: String, $limit: Int, $offset: Int) {
     adminAnimeReleases(search: $search, limit: $limit, offset: $offset) {

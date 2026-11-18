@@ -13,6 +13,7 @@ const Settings = lazy(() => import('@/pages/settings'))
 const Music = lazy(() => import('@/pages/music'))
 const Messages = lazy(() => import('@/pages/messages'))
 const Anime = lazy(() => import('@/pages/anime'))
+const AnimeCatalog = lazy(() => import('@/pages/anime-catalog'))
 const Watch = lazy(() => import('@/pages/watch'))
 const AnimeAdmin = lazy(() => import('@/pages/anime-admin'))
 const Bookmarks = lazy(() => import('@/pages/bookmarks'))
@@ -32,6 +33,7 @@ export const privateRoutes = [
   { path: '/messages', element: Messages },
   { path: '/messages/:userId', element: Messages },
   { path: '/anime', element: Anime },
+  { path: '/anime/catalog', element: AnimeCatalog },
   { path: '/watch/:id', element: Watch },
   { path: '/bookmarks', element: Bookmarks },
   { path: '/communities', element: Communities },
@@ -48,6 +50,7 @@ export const privateRoutes = [
 export const publicRoutes = [
   { path: '/feed', element: Feed },
   { path: '/anime', element: Anime },
+  { path: '/anime/catalog', element: AnimeCatalog },
   { path: '/watch/:id', element: Watch },
   { path: '/signin', element: Signin },
   { path: '/signup', element: Registration },

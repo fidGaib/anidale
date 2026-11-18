@@ -94,6 +94,9 @@ export const Anime = () => {
     <Content id={cl.content}>
       <div className={`${cl.page} ${theme === 'dark' ? cl.dark : cl.light}`}>
         <nav className={cl.nav} aria-label='Разделы каталога'>
+          <Link to='/anime/catalog' className={cl.navLink}>
+            Все аниме
+          </Link>
           {PAGE_NAV.map((item, index) => (
             <a key={item.href} href={item.href} className={`${cl.navLink} ${index === 0 ? cl.navLinkActive : ''}`}>
               {item.label}

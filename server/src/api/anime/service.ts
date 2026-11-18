@@ -73,6 +73,16 @@ export interface AnimeWatchProgressInput {
   duration: number
 }
 
+export interface AnimeCatalogFilter {
+  search?: string | null
+  genreId?: number | null
+  year?: number | null
+  type?: string | null
+  status?: string | null
+}
+
+export const CATALOG_SORTS = ['new', 'title'] as const
+
 /** Поля релиза, которые нужны карточкам каталога. */
 const releaseInclude = {
   genres: { orderBy: { name: 'asc' } },
@@ -255,6 +265,67 @@ class AnimeService {
     })
     if (!release) return null
     return viewRelease(release)
+  }
+
+  /** Каталог: опубликованные релизы с поиском, фильтрами и сортировкой. */
+  async catalog(filter: AnimeCatalogFilter = {}, sort?: string | null, limit?: number | null, offset?: number | null) {
+    const search = text(filter.search, 100)
+    const type = filter.type ? oneOf(filter.type, RELEASE_TYPES, 'type') : undefined
+    const status = filter.status ? oneOf(filter.status, RELEASE_STATUSES, 'status') : undefined
+    const where: Prisma.AnimeReleaseWhereInput = {
+      isPublished: true,
+      ...(search
+        ? {
+            OR: [
+              { title: { contains: search, mode: 'insensitive' as const } },
+              { originalTitle: { contains: search, mode: 'insensitive' as const } },
+            ],
+          }
+        : {}),
+      ...(filter.genreId ? { genres: { some: { id: filter.genreId } } } : {}),
+      ...(filter.year ? { year: filter.year } : {}),
+      ...(type ? { type } : {}),
+      ...(status ? { status } : {}),
+    }
+    const orderBy: Prisma.AnimeReleaseOrderByWithRelationInput[] =
+      sort === 'title' ? [{ title: 'asc' }, { id: 'asc' }] : [{ year: 'desc' }, { id: 'desc' }]
+    const [items, total] = await Promise.all([
+      prisma.animeRelease.findMany({
+        where,
+        orderBy,
+        take: clampLimit(limit ?? 24),
+        skip: clampOffset(offset),
+        include: releaseInclude,
+      }),
+      prisma.animeRelease.count({ where }),
+    ])
+    return { items: items.map(viewRelease), total }
+  }
+
+  /** Значения фильтров каталога: годы, типы и жанры, которые реально есть у опубликованных релизов. */
+  async catalogFilters() {
+    const [years, genres] = await Promise.all([
+      prisma.animeRelease.findMany({
+        where: { isPublished: true },
+        select: { year: true },
+        distinct: ['year'],
+        orderBy: { year: 'desc' },
+      }),
+      prisma.animeGenre.findMany({
+        where: { releases: { some: { isPublished: true } } },
+        orderBy: { name: 'asc' },
+        include: { _count: { select: { releases: true } } },
+      }),
+    ])
+    return {
+      years: years.map((row) => row.year),
+      types: [...RELEASE_TYPES],
+      genres: genres.map((genre) => ({
+        id: genre.id,
+        name: genre.name,
+        releasesCount: genre._count.releases,
+      })),
+    }
   }
 
   /** «Продолжить просмотр»: по одной записи на релиз, сначала самые свежие. */

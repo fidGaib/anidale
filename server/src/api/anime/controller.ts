@@ -1,4 +1,5 @@
 import AnimeService, {
+  AnimeCatalogFilter,
   AnimeEpisodeInput,
   AnimeReleaseInput,
   AnimeScheduleInput,
@@ -16,6 +17,14 @@ class AnimeController {
 
   async release(id: number) {
     return await AnimeService.release(id)
+  }
+
+  async catalog(filter?: AnimeCatalogFilter, sort?: string | null, limit?: number | null, offset?: number | null) {
+    return await AnimeService.catalog(filter, sort, limit, offset)
+  }
+
+  async catalogFilters() {
+    return await AnimeService.catalogFilters()
   }
 
   async continueWatching(userId: number, limit?: number | null) {

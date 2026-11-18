@@ -100,9 +100,28 @@ type AnimeWatchProgress {
   updatedAt: Date!
 }
 
+"Страница каталога: релизы под фильтром и их общее количество"
+type AnimeReleasePage {
+  items: [AnimeRelease!]!
+  total: Int!
+}
+
+"Значения фильтров, доступные в каталоге"
+type AnimeFilters {
+  "Годы выпуска опубликованных релизов, новые сверху"
+  years: [Int!]!
+  "ТВ, ONA, OVA или Фильм"
+  types: [String!]!
+  genres: [AnimeGenre!]!
+}
+
 extend type Query {
   "Главная каталога: новые серии, расписание за промежуток, жанры и франшизы"
   animeHome(from: Date!, to: Date!): AnimeHome!
+  "Каталог: опубликованные релизы с поиском, фильтрами и сортировкой (new или title)"
+  animeCatalog(filter: AnimeReleaseFilter, sort: String, limit: Int, offset: Int): AnimeReleasePage!
+  "Значения фильтров, которые реально есть в каталоге"
+  animeFilters: AnimeFilters!
   "Расписание выхода серий за промежуток"
   animeSchedule(from: Date!, to: Date!): [AnimeScheduleEntry!]!
   "Опубликованный релиз со всеми сериями"
@@ -135,6 +154,18 @@ input AnimeReleaseInput {
   poster: FILE
   preview: FILE
   genres: [String!]
+}
+
+"Фильтры каталога: все поля необязательны"
+input AnimeReleaseFilter {
+  "Поиск по названию и оригинальному названию"
+  search: String
+  genreId: Int
+  year: Int
+  "ТВ, ONA, OVA или Фильм"
+  type: String
+  "ongoing, completed или announced"
+  status: String
 }
 
 input AnimeEpisodeInput {

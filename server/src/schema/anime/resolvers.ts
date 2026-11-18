@@ -5,8 +5,10 @@ import { getOptionalUserId } from '@/api/user/optional-user'
 import UserController from '@/api/user/controller'
 import {
   AnimeEpisode,
+  AnimeFilters,
   AnimeHome,
   AnimeRelease,
+  AnimeReleasePage,
   AnimeScheduleEntry,
   AnimeWatchProgress,
   Resolvers,
@@ -26,12 +28,21 @@ const asEpisodes = (value: unknown) => value as AnimeEpisode[]
 const asEpisode = (value: unknown) => value as AnimeEpisode
 const asProgress = (value: unknown) => value as AnimeWatchProgress
 const asProgressList = (value: unknown) => value as AnimeWatchProgress[]
+const asPage = (value: unknown) => value as AnimeReleasePage
+const asFilters = (value: unknown) => value as AnimeFilters
 
 const AnimeResolvers: Resolvers = {
   Query: {
     async animeHome(_, { from, to }) {
       const key = `home:${from.getTime()}:${to.getTime()}`
       return asHome(await animeCached(key, () => AnimeController.home(from, to)))
+    },
+    async animeCatalog(_, { filter, sort, limit, offset }) {
+      const key = `catalog:${JSON.stringify(filter ?? {})}:${sort ?? 'new'}:${limit ?? 24}:${offset ?? 0}`
+      return asPage(await animeCached(key, () => AnimeController.catalog(filter ?? undefined, sort, limit, offset)))
+    },
+    async animeFilters() {
+      return asFilters(await animeCached('filters', () => AnimeController.catalogFilters()))
     },
     async animeSchedule(_, { from, to }) {
       const key = `schedule:${from.getTime()}:${to.getTime()}`
